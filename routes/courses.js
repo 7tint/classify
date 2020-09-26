@@ -15,4 +15,4 @@ Course.create({
     }
 })
 
-module.exports = router
+module.exports = router;
