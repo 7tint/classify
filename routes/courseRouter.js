@@ -1,6 +1,6 @@
-const express = require('express')
-const Course = require('./../models/course')
-const router = express.Router()
+const express = require('express');
+const Course = require('./../models/courseModel');
+const router = express.Router();
 
 Course.create({
     name: "Course 5",

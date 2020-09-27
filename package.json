@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/Lambo-Liu/course-catalogue#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "mongoose": "^5.10.5"
   }
