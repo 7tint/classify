@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 
 const app = express();
 mongoose.connect("mongodb://localhost/course_catalogue", {useNewUrlParser: true, useUnifiedTopology: true});
@@ -10,7 +9,7 @@ const http = require("http");
 const hostname = "127.0.0.1";
 const port = 3000;
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 // Routes
