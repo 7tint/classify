@@ -2,7 +2,8 @@ const express = require('express');
 const Course = require('./../models/courseModel');
 const router = express.Router();
 
-Course.create({
+router.get('/create-new-course', (req, res) => {
+  Course.create({
     name: "Course 5",
     code: "mpm5u",
     description: "Hello",
@@ -14,5 +15,8 @@ Course.create({
       console.log(course);
     }
 })
+  res.render("admin-dashboard")
+})
+
 
 module.exports = router;

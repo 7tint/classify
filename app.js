@@ -16,7 +16,7 @@ app.set("view engine", "ejs");
 const courseRouter = require("./routes/courseRouter.js");
 const preferencesRouter = require("./routes/preferencesRouter.js");
 
-//app.use("/create-new-course", courseRouter);
+app.use("/courses", courseRouter);
 
 app.post("/update-course-preferences", function(req, res) {
   var coursePreferences = {
