@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const preferencesSchema = new mongoose.Schema({
+  hasTeachers: {
+    type: Boolean,
+    required: true
+  },
+  hasDepartments: {
+    type: Boolean,
+    required: true
+  },
   isPublic: {
     type: Boolean,
     required: true
