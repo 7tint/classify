@@ -13,7 +13,7 @@
           <p>Grade: <%= course.grade %></p>
           <p>Pace: <%= course.pace %></p>
           <p>Prerequisites: <%= course.prereq %></p>
-          <a href="/courses/code">View Course</a>
+          <a href="/courses/<%= course.code %>">View Course</a>
         </div>
       <% }); %>
     </div>

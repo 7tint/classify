@@ -37,23 +37,14 @@ function checkPrereq(prerequisites, code, callback) {
   }
 }
 
-router.get("/code", function(req, res) {
-  Course.find({}, function(err) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.render("course-info");
-    }
-  });
-});
-  // var course = await Course.findOne({ code: req.params.code })
+router.get("/:code", async (req, res) => {
+  const course = await Course.findOne({ code: req.params.code })
   // if (err) {
   //   console.log(err);
   // } else {
-  //   res.render("course-info");
+  res.render("course-info", { course: course });
   // }
-// });
+});
 
 router.get("/", function(req, res) {
   Course.find({}, function(err, allCourses) {

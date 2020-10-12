@@ -78,7 +78,7 @@ router.post("/", function(req, res) {
 // ******* //
 // COURSES //
 // ******* //
-router.get("/add-courses", function(req, res) {
+router.get("/course/new", function(req, res) {
   Course.find({}, function(err, allCourses) {
     if (err) {
       console.log(err);
