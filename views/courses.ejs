@@ -1,0 +1,20 @@
+<%- include('partials/header'); -%>
+  <div class="m-5">
+    Courses Page <br/>
+    <a href="/">Home</a> <br/>
+    <a href="/admin">Admin</a>
+
+    <div class="d-flex flex-row mt-5">
+      <% courses.forEach(function(course){ %>
+        <div class="p-2 m-1 bg-light">
+          <p>Name: <%= course.name %></p>
+          <p>Code: <%= course.code %></p>
+          <p>Description: <%= course.description %></p>
+          <p>Grade: <%= course.grade %></p>
+          <p>Pace: <%= course.pace %></p>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+<%- include('partials/footer'); -%>

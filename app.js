@@ -14,14 +14,14 @@ app.set("view engine", "ejs");
 
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");
-const preferencesRouter = require("./routes/preferencesRouter.js");
+const adminRouter = require("./routes/adminRouter.js");
 
 // Routes
 app.use("/courses", courseRouter);
-app.use("/admin", preferencesRouter);
+app.use("/admin", adminRouter);
 
 app.get("/", function(req, res) {
-  res.send("Welcome to the home page");
+  res.render("home");
 });
 
 app.listen(port, hostname, function() {
