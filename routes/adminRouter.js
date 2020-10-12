@@ -75,11 +75,10 @@ router.post("/", function(req, res) {
 });
 
 
-
 // ******* //
 // COURSES //
 // ******* //
-router.get("/courses", function(req, res) {
+router.get("/add-courses", function(req, res) {
   Course.find({}, function(err, allCourses) {
     if (err) {
       console.log(err);
@@ -89,5 +88,6 @@ router.get("/courses", function(req, res) {
     }
   });
 });
+
 
 module.exports = router;

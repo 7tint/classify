@@ -37,6 +37,24 @@ function checkPrereq(prerequisites, code, callback) {
   }
 }
 
+router.get("/code", function(req, res) {
+  Course.find({}, function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("course-info");
+    }
+  });
+});
+  // var course = await Course.findOne({ code: req.params.code })
+  // if (err) {
+  //   console.log(err);
+  // } else {
+  //   res.render("course-info");
+  // }
+// });
+
 router.get("/", function(req, res) {
   Course.find({}, function(err, allCourses) {
     if (err) {
@@ -57,6 +75,7 @@ router.post("/", function(req, res) {
     pace: req.body.coursePace,
     prereq: req.body.coursePrerequisites
   };
+
 
   // Search for existing courses with the course code to check for duplicates
   Course.find({code: course.code}, function(err, searchResults) {
