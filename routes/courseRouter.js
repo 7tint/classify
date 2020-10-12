@@ -2,6 +2,41 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
 
+function checkPrereq(prerequisites, code, callback) {
+  console.log("Code: " + code);
+  console.log("Prerequisites: " + prerequisites);
+  if (prerequisites == code) {
+    callback(false);
+  }
+
+  if (prerequisites == null) {
+    console.log("returning true");
+    callback(true);
+  }
+
+  else {
+    // Check each prerequisite
+    for (var i = 0; i < prerequisites.length; i++) {
+      var prereq = prerequisites[i];
+
+      if (prereq != code) {
+        Course.find({code: prereq}, function(err, searchResults) {
+          if (!searchResults.length || searchResults.prereq == null) {
+            console.log("returning true");
+            callback(true);
+          }
+          else {
+            console.log(searchResults);
+            checkPrereq(searchResults[0].prereq, code, function(isValid) {
+              callback(isValid);
+            });
+          }
+        });
+      }
+    }
+  }
+}
+
 router.get("/", function(req, res) {
   Course.find({}, function(err, allCourses) {
     if (err) {
@@ -19,22 +54,33 @@ router.post("/", function(req, res) {
     code: req.body.courseCode,
     description: req.body.courseDescription,
     grade: req.body.courseGrade,
-    pace: req.body.coursePace
+    pace: req.body.coursePace,
+    prereq: req.body.coursePrerequisites
   };
 
   // Search for existing courses with the course code to check for duplicates
   Course.find({code: course.code}, function(err, searchResults) {
-    // If no results are found, create the course
+    // If no results are found, proceed
     if (!searchResults.length) {
-      Course.create(course, function(err, updatedCourse) {
-        if (err) {
-          console.log("ERROR while creating course object!");
-          console.log(err);
-          // Redirect to admin courses with an error message
+      // Check that the course prerequisites is valid
+      checkPrereq(course.prereq, course.code, function(isValid) {
+        if (isValid) {
+          Course.create(course, function(err, updatedCourse) {
+            if (err) {
+              console.log("ERROR while creating course object!");
+              console.log(err);
+              // Redirect to admin courses with an error message
+            }
+            else {
+              console.log("Course created!");
+              res.redirect("/admin/courses");
+            }
+          });
         }
         else {
-          console.log("Course created!");
+          console.log("Course prerequisites makes an infinite loop");
           res.redirect("/admin/courses");
+          // Redirect to admin courses with an error message
         }
       });
     }
