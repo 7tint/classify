@@ -74,20 +74,4 @@ router.post("/", function(req, res) {
   });
 });
 
-
-// ******* //
-// COURSES //
-// ******* //
-router.get("/courses/new", function(req, res) {
-  Course.find({}, function(err, allCourses) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.render("admin-courses", {courses: allCourses});
-    }
-  });
-});
-
-
 module.exports = router;

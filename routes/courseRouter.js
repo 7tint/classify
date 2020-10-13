@@ -50,15 +50,6 @@ function checkPrereq(prerequisites, code, callback) {
   }
 }
 
-router.get("/:code", async (req, res) => {
-  const course = await Course.findOne({ code: req.params.code })
-  // if (err) {
-  //   console.log(err);
-  // } else {
-  res.render("course-info", { course: course });
-  // }
-});
-
 router.get("/", function(req, res) {
   Course.find({}, function(err, allCourses) {
     if (err) {
@@ -66,6 +57,28 @@ router.get("/", function(req, res) {
     }
     else {
       res.render("courses", {courses: allCourses});
+    }
+  });
+});
+
+router.get("/new", function(req, res) {
+  Course.find({}, function(err, allCourses) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("admin-courses", {courses: allCourses});
+    }
+  });
+});
+
+router.get("/:code", async (req, res) => {
+  Course.findOne({code: req.params.code}, function(err, course) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("course-info", { course: course });
     }
   });
 });
@@ -79,7 +92,6 @@ router.post("/", function(req, res) {
     pace: req.body.coursePace,
     prereq: req.body.coursePrerequisites
   };
-
 
   // Search for existing courses with the course code to check for duplicates
   Course.find({code: course.code}, function(err, searchResults) {
@@ -115,22 +127,5 @@ router.post("/", function(req, res) {
     }
   });
 });
-
-// router.get('/create-new-course', (req, res) => {
-//   Course.create({
-//     name: "Course 5",
-//     code: "mpm5u",
-//     description: "Hello",
-//     grade: 9,
-//   }, function(err, course) {
-//       if (err) {
-//         console.log(err);
-//       } else {
-//         console.log(course);
-//       }
-//   });
-//   res.redicrect("/admin");
-// })
-
 
 module.exports = router;
