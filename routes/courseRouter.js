@@ -21,14 +21,14 @@ async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
       }
     });
   }
+
+  else {
+    callback(false);
+  }
 }
 
 function checkPrereq(prerequisites, code, callback) {
-  if (prerequisites == code) {
-    callback(false);
-  }
-
-  if (prerequisites == null) {
+  if (prerequisites == [] || prerequisites == null) {
     callback(true);
   }
 
@@ -36,7 +36,6 @@ function checkPrereq(prerequisites, code, callback) {
     var isValid = true;
 
     // Check each prerequisite
-
     var i = 0;
     prerequisites.forEach(function(prereq, index, prerequisites) {
         asyncCheckPrereqHelper(prereq, code, isValid, function(data) {
@@ -108,13 +107,13 @@ router.post("/", function(req, res) {
             }
             else {
               console.log("Course created!");
-              res.redirect("/admin/courses");
+              res.redirect("/courses/new");
             }
           });
         }
         else {
           console.log("Course prerequisites is not valid.");
-          res.redirect("/admin/courses");
+          res.redirect("/courses/new");
           // Redirect to admin courses with an error message
         }
       });

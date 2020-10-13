@@ -14,15 +14,32 @@ router.get("/", function(req, res) {
     }
     else {
       if (retrievedPreferences === null) {
-        res.render("admin-dashboard", {
-          isPublicVar: true,
-          courseMetricsVar: true,
-          courseCommentsVar: true,
-          teacherMetricsVar: true,
-          teacherCommentsVar: true,
-          isAnonymousVar: true
+        var defaultPreferences = {
+          isPublic: true,
+        	course: {
+            hasMetrics: true,
+            hasComments: true
+          },
+          teacher: {
+            hasMetrics: true,
+            hasComments: true
+          },
+          isAnonymous: true
+        };
+
+        Preferences.create(defaultPreferences, function(err, createdPreferences) {
+          if (err) {
+            console.log("ERROR while creating preferences object!");
+            console.log(err);
+            // Redirect to preferences page with an error message
+          }
+          else {
+            console.log("Preferences created!");
+            res.redirect("/admin");
+          }
         });
       }
+
       else {
         res.render("admin-dashboard", {
           isPublicVar: retrievedPreferences.isPublic,
@@ -61,7 +78,7 @@ router.post("/", function(req, res) {
     preferences.isAnonymous = req.body.isAnonymous;
   }
 
-  // Delete all existing preference objects
+  // Replace one existing preference object
   Preferences.replaceOne({}, preferences, null, function(err, docs) {
     if (err) {
       console.log("ERROR while deleting preference objects!");

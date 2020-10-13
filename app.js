@@ -26,12 +26,12 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Require routes
-const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
+const courseRouter = require("./routes/courseRouter.js");
 
 // Routes
-app.use("/courses", courseRouter);
 app.use("/admin", adminRouter);
+app.use("/courses", courseRouter);
 
 app.get("/", function(req, res) {
   res.render("home");
