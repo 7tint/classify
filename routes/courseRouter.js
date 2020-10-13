@@ -2,38 +2,51 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
 
+async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
+  if (prereq != code) {
+    Course.find({code: prereq}, function(err, searchResults) {
+      console.log(searchResults);
+      console.log(searchResults[0].prereq);
+      if (!searchResults.length) {
+        callback(false);
+      }
+      else if (searchResults[0].prereq.length === 0) {
+        callback(true);
+      }
+      else {
+        checkPrereq(searchResults[0].prereq, code, function(isValidi) {
+          isValid = isValid && isValidi;
+          callback(isValid);
+        });
+      }
+    });
+  }
+}
+
 function checkPrereq(prerequisites, code, callback) {
-  console.log("Code: " + code);
-  console.log("Prerequisites: " + prerequisites);
   if (prerequisites == code) {
     callback(false);
   }
 
   if (prerequisites == null) {
-    console.log("returning true");
     callback(true);
   }
 
   else {
-    // Check each prerequisite
-    for (var i = 0; i < prerequisites.length; i++) {
-      var prereq = prerequisites[i];
+    var isValid = true;
 
-      if (prereq != code) {
-        Course.find({code: prereq}, function(err, searchResults) {
-          if (!searchResults.length || searchResults.prereq == null) {
-            console.log("returning true");
-            callback(true);
-          }
-          else {
-            console.log(searchResults);
-            checkPrereq(searchResults[0].prereq, code, function(isValid) {
-              callback(isValid);
-            });
-          }
+    // Check each prerequisite
+
+    var i = 0;
+    prerequisites.forEach(function(prereq, index, prerequisites) {
+        asyncCheckPrereqHelper(prereq, code, isValid, function(data) {
+             i++;
+             isValid = isValid && data;
+             if (i === prerequisites.length) {
+               callback(isValid);
+             }
         });
-      }
-    }
+    });
   }
 }
 
@@ -88,7 +101,7 @@ router.post("/", function(req, res) {
           });
         }
         else {
-          console.log("Course prerequisites makes an infinite loop");
+          console.log("Course prerequisites is not valid.");
           res.redirect("/admin/courses");
           // Redirect to admin courses with an error message
         }
