@@ -122,7 +122,7 @@ router.post("/", function(req, res) {
     // If course code already exists, display error message
     else {
       console.log("Course code already exists!");
-      res.redirect("/admin/courses");
+      res.redirect("/courses/new");
       // Redirect to admin courses with an error message
     }
   });
