@@ -2,6 +2,32 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const Teacher = require('./../models/teacherModel');
 
+function convertNametoObj(name) {
+  var firstName = "";
+  var lastName = "";
+  var isFirstName = true;
+
+  for (let i = 0; i < name.length; i++) {
+    if (name[i] === "_") {
+      isFirstName = false;
+      i++;
+    }
+    if (isFirstName) {
+      firstName += name[i];
+    }
+    else {
+      lastName += name[i];
+    }
+  }
+
+  var name = {
+    firstName: firstName,
+    lastName: lastName
+  }
+
+  return name
+}
+
 router.get("/", function(req, res) {
   Teacher.find({}, function(err, allTeachers) {
     if (err) {
@@ -45,7 +71,10 @@ router.post("/", function(req, res) {
   });
 });
 
-router.get("/:name.firstName_:name.lastName", function(req, res) {
+router.get("/:name", function(req, res) {
+  var nameObject = convertNametoObj(req.params.name);
+  console.log(nameObject);
+
   Teacher.findOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, teacher) {
     if (err) {
       console.log(err);
@@ -56,7 +85,7 @@ router.get("/:name.firstName_:name.lastName", function(req, res) {
   });
 });
 
-router.get("/:name.firstName_:name.lastName/edit", function(req, res) {
+router.get("/:name/edit", function(req, res) {
   Course.findOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, teacher) {
     if (err) {
       console.log(err);
@@ -67,11 +96,11 @@ router.get("/:name.firstName_:name.lastName/edit", function(req, res) {
   });
 });
 
-router.put("/:name.firstName_:name.lastName/edit", function(req, res) {
+router.put("/:name", function(req, res) {
   console.log("Put");
 });
 
-router.delete("/:name.firstName_:name.lastName/", function(req, res) {
+router.delete("/:name", function(req, res) {
   Course.deleteOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, deletedTeacher) {
     if (err) {
       console.log(err);
