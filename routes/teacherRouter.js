@@ -8,7 +8,7 @@ router.get("/", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("teachers", {teachers: allTeachers});
+      res.render("teachers/index", {teachers: allTeachers});
     }
   });
 });
@@ -19,7 +19,7 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin/teacher-new", {teachers: allTeachers});
+      res.render("teachers/new", {teachers: allTeachers});
     }
   });
 });
@@ -40,7 +40,7 @@ router.post("/", function(req, res) {
     // If no results are found, proceed
     if (searchResults.length) {
         console.log("Teacher already exists!");
-        res.redirect("/teacher/new");
+        res.redirect("/teachers/new");
     }
   });
 });
@@ -51,7 +51,7 @@ router.get("/:name.firstName_:name.lastName", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("teacher", { teacher: teacher });
+      res.render("teachers/show", { teacher: teacher });
     }
   });
 });
@@ -62,12 +62,12 @@ router.get("/:name.firstName_:name.lastName/edit", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin/teacher-edit", { teacher: teacher });
+      res.render("teachers/edit", { teacher: teacher });
     }
   });
 });
 
-router.put("/:code", function(req, res) {
+router.put("/:name.firstName_:name.lastName/edit", function(req, res) {
   console.log("Put");
 });
 
@@ -78,7 +78,7 @@ router.delete("/:name.firstName_:name.lastName/", function(req, res) {
     }
     else {
       console.log("Deleted: " + req.params.name.firstName + req.params.name.lastName);
-      res.redirect("/courses");
+      res.redirect("/teachers/index");
     }
   });
 });

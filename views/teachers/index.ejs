@@ -1,0 +1,22 @@
+<%- include('../partials/header'); -%>
+  <div class="m-5">
+    Teachers Page <br/>
+    <a href="/">Home</a> <br/>
+    <a href="/admin">Admin</a>
+
+    <div class="d-flex flex-row mt-5">
+      <% teachers.forEach(function(teacher){ %>
+        <div class="p-2 m-1 bg-light">
+          <p>Name: <%= teacher.name.firstName %></p>
+          <p>Courses: <%= teacher.courses %></p>
+          <a href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>">View Teacher</a>
+          <br/>
+          <form action="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+<%- include('../partials/footer'); -%>
