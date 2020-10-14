@@ -40,7 +40,7 @@ router.get("/", function(req, res) {
 });
 
 router.get("/new", function(req, res) {
-  Course.find({}, function(err, allTeachers) {
+  Teacher.find({}, function(err, allTeachers) {
     if (err) {
       console.log(err);
     }
@@ -52,30 +52,31 @@ router.get("/new", function(req, res) {
 
 router.post("/", function(req, res) {
   var teacher = {
-    // change to teacher fields from new ejs file
-    name: req.body.courseName,
-    code: req.body.courseCode,
-    description: req.body.courseDescription,
-    grade: req.body.courseGrade,
-    pace: req.body.coursePace,
-    prereq: req.body.coursePrerequisites
+    name: {
+        firstName: req.body.teacherFirstName,
+        lastName: req.body.teacherLastName,
+    },
+    prefferedTitle: req.body.prefferedTitle,
+    profilePicture: req.body.profilePicture,
+    courses: req.body.courses,
   };
-
-  // Search for existing teachers with the name to check for duplicates
-  Teacher.find({name: teacher.name}, function(err, searchResults) {
-    // If no results are found, proceed
-    if (searchResults.length) {
-        console.log("Teacher already exists!");
-        res.redirect("/teachers/new");
-    }
-  });
+    Teacher.create(teacher, function(err, newTeacher) {
+        if (err) {
+        console.log("ERROR while creating teacher object!");
+        console.log(err);
+        }
+        else {
+        console.log("Teacher created!");
+        res.redirect("/teachers");
+        }
+    });
 });
 
 router.get("/:name", function(req, res) {
   var nameObject = convertNametoObj(req.params.name);
   console.log(nameObject);
 
-  Teacher.findOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, teacher) {
+  Teacher.findOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, teacher) {
     if (err) {
       console.log(err);
     }
@@ -86,7 +87,8 @@ router.get("/:name", function(req, res) {
 });
 
 router.get("/:name/edit", function(req, res) {
-  Course.findOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, teacher) {
+    var nameObject = convertNametoObj(req.params.name);
+  Teacher.findOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, teacher) {
     if (err) {
       console.log(err);
     }
@@ -101,12 +103,13 @@ router.put("/:name", function(req, res) {
 });
 
 router.delete("/:name", function(req, res) {
-  Course.deleteOne({lastName: req.params.name.lastName, firstName: req.params.firstName}, function(err, deletedTeacher) {
+    var nameObject = convertNametoObj(req.params.name);
+  Teacher.deleteOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, deletedTeacher) {
     if (err) {
       console.log(err);
     }
     else {
-      console.log("Deleted: " + req.params.name.firstName + req.params.name.lastName);
+      console.log("Deleted: " + nameObject.firstName + nameObject.lastName);
       res.redirect("/teachers/index");
     }
   });
