@@ -66,18 +66,7 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin/new-course", {courses: allCourses});
-    }
-  });
-});
-
-router.get("/:code", async (req, res) => {
-  Course.findOne({code: req.params.code}, function(err, course) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.render("course", { course: course });
+      res.render("admin/course-new", {courses: allCourses});
     }
   });
 });
@@ -123,6 +112,44 @@ router.post("/", function(req, res) {
       console.log("Course code already exists!");
       res.redirect("/courses/new");
       // Redirect to admin courses with an error message
+    }
+  });
+});
+
+router.get("/:code", function(req, res) {
+  Course.findOne({code: req.params.code}, function(err, course) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("course", { course: course });
+    }
+  });
+});
+
+router.get("/:code/edit", function(req, res) {
+  Course.findOne({code: req.params.code}, function(err, course) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("admin/course-edit", { course: course });
+    }
+  });
+});
+
+router.put("/:code", function(req, res) {
+  console.log("Put");
+});
+
+router.delete("/:code", function(req, res) {
+  Course.deleteOne({code: req.params.code}, function(err, deletedCourse) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      console.log("Deleted: " + req.params.code);
+      res.redirect("/courses");
     }
   });
 });

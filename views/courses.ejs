@@ -14,6 +14,10 @@
           <p>Pace: <%= course.pace %></p>
           <p>Prerequisites: <%= course.prereq %></p>
           <a href="/courses/<%= course.code %>">View Course</a>
+          <br/>
+          <form action="/courses/<%= course.code %>?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
         </div>
       <% }); %>
     </div>

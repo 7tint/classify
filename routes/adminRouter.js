@@ -88,7 +88,7 @@ router.get("/edit", function(req, res) {
       }
 
       else {
-        res.render("admin/edit-preferences", {
+        res.render("admin/preferences-edit", {
           isPublicVar: retrievedPreferences.isPublic,
           courseMetricsVar: retrievedPreferences.course.hasMetrics,
           courseCommentsVar: retrievedPreferences.course.hasComments,
