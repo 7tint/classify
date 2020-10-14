@@ -55,7 +55,7 @@ router.get("/", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("courses", {courses: allCourses});
+      res.render("courses/index", {courses: allCourses});
     }
   });
 });
@@ -66,7 +66,7 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin/course-new", {courses: allCourses});
+      res.render("courses/new", {courses: allCourses});
     }
   });
 });
@@ -122,7 +122,7 @@ router.get("/:code", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("course", { course: course });
+      res.render("courses/show", { course: course });
     }
   });
 });
@@ -133,7 +133,14 @@ router.get("/:code/edit", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin/course-edit", { course: course });
+      Course.find({}, function(err, courses) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          res.render("courses/edit", { course: course, courses: courses });
+        }
+      });
     }
   });
 });

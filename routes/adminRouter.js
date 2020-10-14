@@ -39,7 +39,7 @@ router.get("/", function(req, res) {
       }
 
       else {
-        res.render("admin/preferences", {
+        res.render("preferences/index", {
           isPublicVar: retrievedPreferences.isPublic,
           courseMetricsVar: retrievedPreferences.course.hasMetrics,
           courseCommentsVar: retrievedPreferences.course.hasComments,
@@ -88,7 +88,7 @@ router.get("/edit", function(req, res) {
       }
 
       else {
-        res.render("admin/preferences-edit", {
+        res.render("preferences/edit", {
           isPublicVar: retrievedPreferences.isPublic,
           courseMetricsVar: retrievedPreferences.course.hasMetrics,
           courseCommentsVar: retrievedPreferences.course.hasComments,
