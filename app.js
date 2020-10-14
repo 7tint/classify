@@ -31,10 +31,12 @@ app.set("views", path.join(__dirname, "views"));
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
+const teacherRouter = require("./routes/teacherRouter.js");
 
 // Routes
 app.use("/courses", courseRouter);
 app.use("/admin", adminRouter);
+app.use("/teachers", teacherRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");

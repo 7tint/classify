@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const teacherSchema = new mongoose.Schema({
     name: {
-        type: String,
+        firstName: {
+            type: String,
         required: true
+        },
+        lastName: {
+            type: String,
+        required: true
+        },
     },
     prefferedTitle: {
         type: String,
