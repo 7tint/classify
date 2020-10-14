@@ -88,7 +88,7 @@ router.post("/", function(req, res) {
       // Check that the course prerequisites is valid
       checkPrereq(course.prereq, course.code, function(isValid) {
         if (isValid) {
-          Course.create(course, function(err, updatedCourse) {
+          Course.create(course, function(err, newCourse) {
             if (err) {
               console.log("ERROR while creating course object!");
               console.log(err);
@@ -96,7 +96,7 @@ router.post("/", function(req, res) {
             }
             else {
               console.log("Course created!");
-              res.redirect("/courses/new");
+              res.redirect("/courses");
             }
           });
         }
@@ -146,7 +146,50 @@ router.get("/:code/edit", function(req, res) {
 });
 
 router.put("/:code", function(req, res) {
-  console.log("Put");
+  var course = {
+    name: req.body.courseName,
+    code: req.body.courseCode,
+    description: req.body.courseDescription,
+    grade: req.body.courseGrade,
+    pace: req.body.coursePace,
+    prereq: req.body.coursePrerequisites
+  };
+
+  // Search for existing courses with the course code to check for duplicates
+  Course.find({code: course.code}, function(err, searchResults) {
+    // If no OTHER COURSE results are found, proceed
+    if (!searchResults.length || searchResults[0].code === req.params.code) {
+      // Check that the course prerequisites is valid
+      checkPrereq(course.prereq, course.code, function(isValid) {
+        if (isValid) {
+          Course.findOneAndUpdate({code: req.params.code}, course, function(err, updatedCourse) {
+            if (err) {
+              console.log("ERROR while creating course object!");
+              console.log(err);
+              // Redirect to admin courses with an error message
+            }
+            else {
+              console.log("Course updated!");
+              res.redirect("/courses");
+            }
+          });
+        }
+        else {
+          console.log("Course prerequisites is not valid.");
+          let url = "/courses/" + course.code + "/edit";
+          res.redirect(url);
+          // Redirect to admin courses with an error message
+        }
+      });
+    }
+    // If course code already exists, display error message
+    else {
+      console.log("Course code already exists!");
+      let url = "/courses/" + course.code + "/edit";
+      res.redirect(url);
+      // Redirect to admin courses with an error message
+    }
+  });
 });
 
 router.delete("/:code", function(req, res) {
