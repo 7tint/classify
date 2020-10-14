@@ -1,12 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const methodOverride = require("method-override");
 
 const app = express();
 mongoose.connect("mongodb://localhost/course_catalogue", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -22,6 +24,7 @@ const port = 3000;
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));
+app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 

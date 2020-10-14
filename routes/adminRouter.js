@@ -1,11 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router({mergeParams: true});
 const Preferences = require("./../models/preferencesModel.js");
 const Course = require("./../models/courseModel.js");
 
-// *********** //
-// PREFERENCES //
-// *********** //
 router.get("/", function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
     if (err) {
@@ -14,6 +11,7 @@ router.get("/", function(req, res) {
     }
     else {
       if (retrievedPreferences === null) {
+        // Create default preferences object.
         var defaultPreferences = {
           isPublic: true,
         	course: {
@@ -41,7 +39,7 @@ router.get("/", function(req, res) {
       }
 
       else {
-        res.render("admin-dashboard", {
+        res.render("admin/preferences", {
           isPublicVar: retrievedPreferences.isPublic,
           courseMetricsVar: retrievedPreferences.course.hasMetrics,
           courseCommentsVar: retrievedPreferences.course.hasComments,
@@ -54,7 +52,56 @@ router.get("/", function(req, res) {
   });
 });
 
-router.post("/", function(req, res) {
+router.get("/edit", function(req, res) {
+  Preferences.findOne({}, function(err, retrievedPreferences) {
+    if (err) {
+      console.log("ERROR while retrieving preferences!");
+      console.log(err);
+    }
+    else {
+      if (retrievedPreferences === null) {
+        // Create default preferences object.
+        var defaultPreferences = {
+          isPublic: true,
+        	course: {
+            hasMetrics: true,
+            hasComments: true
+          },
+          teacher: {
+            hasMetrics: true,
+            hasComments: true
+          },
+          isAnonymous: true
+        };
+
+        Preferences.create(defaultPreferences, function(err, createdPreferences) {
+          if (err) {
+            console.log("ERROR while creating preferences object!");
+            console.log(err);
+            // Redirect to preferences page with an error message
+          }
+          else {
+            console.log("Preferences created!");
+            res.redirect("/admin/edit");
+          }
+        });
+      }
+
+      else {
+        res.render("admin/edit-preferences", {
+          isPublicVar: retrievedPreferences.isPublic,
+          courseMetricsVar: retrievedPreferences.course.hasMetrics,
+          courseCommentsVar: retrievedPreferences.course.hasComments,
+          teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
+          teacherCommentsVar: retrievedPreferences.teacher.hasComments,
+          isAnonymousVar: retrievedPreferences.isAnonymous
+        });
+      }
+    }
+  });
+});
+
+router.put("/", function(req, res) {
   var preferences = {
     isPublic: req.body.isPublic,
   	course: {
@@ -79,14 +126,14 @@ router.post("/", function(req, res) {
   }
 
   // Replace one existing preference object
-  Preferences.replaceOne({}, preferences, null, function(err, docs) {
+  Preferences.findOneAndUpdate({}, preferences, {upsert: true}, function(err, docs) {
     if (err) {
       console.log("ERROR while deleting preference objects!");
       console.log(err);
     }
     else {
       console.log("Replaced old preferences: ", docs);
-      res.redirect("/admin");
+      res.redirect("/admin/edit");
     }
   });
 });

@@ -66,7 +66,7 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("admin-courses", {courses: allCourses});
+      res.render("admin/new-course", {courses: allCourses});
     }
   });
 });
@@ -77,7 +77,7 @@ router.get("/:code", async (req, res) => {
       console.log(err);
     }
     else {
-      res.render("course-info", { course: course });
+      res.render("course", { course: course });
     }
   });
 });
