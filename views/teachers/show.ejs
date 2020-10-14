@@ -3,7 +3,8 @@
   <div class="container">
       <a href='/teachers' class="btn btn-secondary">All Teachers</a>
       <br/>
-      <button type="button" class="btn btn-primary"><a class="text-white" href="/teachers/<%= teacher.name.firstName %><%= teacher.name.lastName %>/edit">Edit Teacher</a></button>
+      <p><%= teacher.name %></p>
+      <button type="button" class="btn btn-primary"><a class="text-white" href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/edit">Edit Teacher</a></button>
   </div>
 
 <%- include('../partials/footer'); -%>

@@ -81,13 +81,22 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="col">
-          <div class="form-group">
-            <label for="grade">Courses</label>
-            <input type="text" class="form-control" name="courses" id="courses" placeholder="Courses" required>
-          </div>
-        </div>
+      <script type="text/javascript">
+        $(document).ready(function() {
+            $('#teachercourses').multiselect({
+                enableFiltering: true,
+                filterBehavior: 'value',
+                enableCaseInsensitiveFiltering: true
+            });
+        });
+      </script>
+      <div class="mt-2 mb-4">
+        <label for="courses">Courses</label> <br/>
+        <select class="mb-3" id="teachercourses" multiple="multiple" name="courses[]">
+          <% courses.forEach(function(course){ %>
+            <option><%= course.code %></option>
+          <% }); %>
+        </select>
       </div>
 
       <button type="submit" class="btn btn-primary">Add Teacher</button>

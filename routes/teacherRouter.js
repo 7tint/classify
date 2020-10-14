@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const Teacher = require('./../models/teacherModel');
+const Course = require('./../models/courseModel');
 
 function convertNametoObj(name) {
   var firstName = "";
@@ -45,7 +46,9 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("teachers/new", {teachers: allTeachers});
+        Course.find({}, function(err, courses) {
+            res.render("teachers/new", { teachers: allTeachers, courses: courses });
+        });
     }
   });
 });
@@ -74,9 +77,8 @@ router.post("/", function(req, res) {
 
 router.get("/:name", function(req, res) {
   var nameObject = convertNametoObj(req.params.name);
-  console.log(nameObject);
 
-  Teacher.findOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, teacher) {
+  Teacher.findOne({ name: {firstName: nameObject.firstName, lastName: nameObject.lastName}}, function(err, teacher) {
     if (err) {
       console.log(err);
     }
@@ -88,12 +90,14 @@ router.get("/:name", function(req, res) {
 
 router.get("/:name/edit", function(req, res) {
     var nameObject = convertNametoObj(req.params.name);
-  Teacher.findOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, teacher) {
+  Teacher.findOne({ name: {firstName: nameObject.firstName, lastName: nameObject.lastName}}, function(err, teacher) {
     if (err) {
       console.log(err);
     }
     else {
-      res.render("teachers/edit", { teacher: teacher });
+        Course.find({}, function(err, courses) {
+            res.render("teachers/edit", { teacher: teacher, courses: courses });
+        });
     }
   });
 });
@@ -104,13 +108,13 @@ router.put("/:name", function(req, res) {
 
 router.delete("/:name", function(req, res) {
     var nameObject = convertNametoObj(req.params.name);
-  Teacher.deleteOne({firstName: nameObject.firstName, lastName: nameObject.lastName}, function(err, deletedTeacher) {
+  Teacher.deleteOne({name: nameObject}, function(err, deletedTeacher) {
     if (err) {
       console.log(err);
     }
     else {
-      console.log("Deleted: " + nameObject.firstName + nameObject.lastName);
-      res.redirect("/teachers/index");
+      console.log("Deleted: " + nameObject.firstName + "" + nameObject.lastName);
+      res.redirect("/teachers");
     }
   });
 });
