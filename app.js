@@ -14,7 +14,7 @@ mongoose.connect("mongodb://localhost/course_catalogue", {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
-    console.log("Database connected");
+	console.log("Database connected");
 });
 
 // Host and port
@@ -29,17 +29,17 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Require routes
-const adminRouter = require("./routes/adminRouter.js");
 const courseRouter = require("./routes/courseRouter.js");
+const adminRouter = require("./routes/adminRouter.js");
 
 // Routes
-app.use("/admin", adminRouter);
 app.use("/courses", courseRouter);
+app.use("/admin", adminRouter);
 
 app.get("/", function(req, res) {
-  res.render("home");
+	res.render("home");
 });
 
 app.listen(port, hostname, function() {
-  console.log(`Server running at http://${hostname}:${port}/`);
+	console.log(`Server running at http://${hostname}:${port}/`);
 });
