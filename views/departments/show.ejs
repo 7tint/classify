@@ -3,9 +3,21 @@
   <div class="container">
     <h1 class="mb-1"><%= department.name %></h1>
     <p><%= department.description %></p>
+    <h2>Courses</h2>
+    <ul>
+      <% for (let name of department.courses) { %>
+      <li><%= name %> </li>
+      <% } %>
+    </ul>
+    <h2>Teachers</h2>
+    <ul>
+      <% for (let teacher of department.teachers) { %>
+      <li><%= teacher %> </li>
+      <% } %>
+    </ul>
     <a href='/departments' class="btn btn-secondary">All Departments</a>
     <br/>
-    <button type="button" class="btn btn-primary"><a class="text-white" href="/departments/<%= department.name %>/edit">Edit course</a></button>
+    <button type="button" class="btn btn-primary"><a class="text-white" href="/departments/<%= department.name %>/edit">Edit Department</a></button>
   </div>
 
 <%- include('../partials/footer'); -%>

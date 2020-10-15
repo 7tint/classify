@@ -7,7 +7,7 @@
     <div class="d-flex flex-row mt-5">
       <% teachers.forEach(function(teacher){ %>
         <div class="p-2 m-1 bg-light">
-          <p>Name: <%= teacher.name.firstName %></p>
+          <p>Name: <%= teacher.name.firstName %> <%= teacher.name.lastName %></p>
           <p>Courses: <%= teacher.courses %></p>
           <a href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>">View Teacher</a>
           <br/>

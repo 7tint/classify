@@ -66,19 +66,35 @@
         <label for="description">Department Description</label>
         <textarea class="form-control" name="departmentDescription" id="description" rows="3"></textarea>
       </div>
-      <div class="form-row">
-        <div class="col">
-          <div class="form-group">
-            <label for="grade">Department Courses</label>
-            <input type="text" class="form-control" name="departmentCourses" id="grade" placeholder="Department Course" required>
-          </div>
-        </div>
-        <div class="col">
-          <div class="form-group">
-            <label for="pace">Department Teachers</label>
-            <input type="text" class="form-control" name="departmentTeachers" id="pace" placeholder="Department Teacher">
-          </div>
-        </div>
+      <script type="text/javascript">
+        $(document).ready(function() {
+            $('#courses').multiselect({
+                enableFiltering: true,
+                filterBehavior: 'value',
+                enableCaseInsensitiveFiltering: true
+            });
+            $('#teachers').multiselect({
+                enableFiltering: true,
+                filterBehavior: 'value',
+                enableCaseInsensitiveFiltering: true
+            });
+        });
+      </script>
+      <div class="mt-2 mb-4">
+        <label for="courses">Department Courses</label> <br/>
+        <select class="mb-3" id="courses" multiple="multiple" name="departmentCourses[]">
+          <% for (let course of courses) { %>
+            <option value=<%= course.code %>><%= course.code %></option>
+          <% } %>
+        </select>
+      </div>
+      <div class="mt-2 mb-4">
+        <label for="teachers">Department Teachers</label> <br/>
+        <select class="mb-3" id="teachers" multiple="multiple" name="departmentTeachers[]">
+          <% for (let teacher of teachers) { %>
+            <option value="<%= teacher.name.firstName %> <%= teacher.name.lastName %>"><%= teacher.name.firstName %> <%= teacher.name.lastName %></option>
+          <% } %>
+        </select>
       </div>
       <button type="submit" class="btn btn-primary">Add Department</button>
     </form>
