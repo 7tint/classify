@@ -1,0 +1,14 @@
+<%- include('../partials/header'); -%>
+<h1>Departments Page</h1>
+<a href="/">Home</a> <br/>
+<a href="/admin">Admin</a>
+
+<ul>
+  <% for (let department of departments) { %>
+  <li><a href="/departments/<%= department.name %>"><%= department.name %></a></li>
+  <form action="/departments/<%= department.name %>?_method=DELETE" method="POST">
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </form>
+  <% } %>
+</ul>
+<%- include('../partials/footer'); -%>

@@ -5,10 +5,10 @@ const methodOverride = require("method-override");
 
 const app = express();
 mongoose.connect("mongodb://localhost/course_catalogue", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false
 });
 
 const db = mongoose.connection;
@@ -22,8 +22,8 @@ const http = require("http");
 const hostname = "127.0.0.1";
 const port = 3000;
 
-app.use(express.urlencoded({extended: true}));
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -32,11 +32,13 @@ app.set("views", path.join(__dirname, "views"));
 const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const teacherRouter = require("./routes/teacherRouter.js");
+const departmentRouter = require("./routes/departmentRouter.js");
 
 // Routes
-app.use("/courses", courseRouter);
 app.use("/admin", adminRouter);
+app.use("/courses", courseRouter);
 app.use("/teachers", teacherRouter);
+app.use("/departments", departmentRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");

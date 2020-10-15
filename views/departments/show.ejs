@@ -1,0 +1,11 @@
+<%- include('../partials/header'); -%>
+
+  <div class="container">
+    <h1 class="mb-1"><%= department.name %></h1>
+    <p><%= department.description %></p>
+    <a href='/departments' class="btn btn-secondary">All Departments</a>
+    <br/>
+    <button type="button" class="btn btn-primary"><a class="text-white" href="/departments/<%= department.name %>/edit">Edit course</a></button>
+  </div>
+
+<%- include('../partials/footer'); -%>
