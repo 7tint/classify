@@ -93,11 +93,6 @@
                 filterBehavior: 'value',
                 enableCaseInsensitiveFiltering: true
             });
-            $('#teachers').multiselect({
-                enableFiltering: true,
-                filterBehavior: 'value',
-                enableCaseInsensitiveFiltering: true
-            });
         });
       </script>
       <div class="mt-2 mb-4">
@@ -105,14 +100,6 @@
         <select class="mb-3" id="prerequisites" multiple="multiple" name="coursePrerequisites[]">
           <% courses.forEach(function(course){ %>
             <option value=<%= course.code %>><%= course.code %></option>
-          <% }); %>
-        </select>
-      </div>
-      <div class="mt-2 mb-4">
-        <label for="teachers">Course Teachers</label> <br/>
-        <select class="mb-3" id="teachers" multiple="multiple" name="courseTeachers[]">
-          <% teachers.forEach(function(teacher){ %>
-            <option value=<%= teacher._id %>><%= teacher.name.firstName %> <%= teacher.name.lastName %></option>
           <% }); %>
         </select>
       </div>

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 const Teacher = require("./../models/teacherModel");
-const Course = require("./../models/courseModel");
 
 function convertNametoObj(name) {
 	var firstName = "";
@@ -41,14 +40,7 @@ router.get("/", function(req, res) {
 });
 
 router.get("/new", function(req, res) {
-  Course.find({}, function(err, courses) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      res.render("teachers/new", { courses });
-    }
-  });
+  res.render("teachers/new");
 });
 
 router.post("/", function(req, res) {
@@ -61,21 +53,32 @@ router.post("/", function(req, res) {
 		profilePicture: req.body.profilePicture
 	};
 
-	Teacher.create(teacher, function(err, newTeacher) {
-		if (err) {
-			console.log("ERROR while creating teacher object!");
-			console.log(err);
-		}
+  Teacher.find({name: teacher.name}, function(err, searchResults) {
+    if (err) {
+      console.log(err);
+    }
+    else if (!searchResults.length) {
+    	Teacher.create(teacher, function(err, newTeacher) {
+    		if (err) {
+    			console.log("ERROR while creating teacher object!");
+    			console.log(err);
+    		}
+        else {
+    			console.log("Teacher created!");
+    			res.redirect("/teachers");
+    		}
+    	});
+    }
     else {
-			console.log("Teacher created!");
-			res.redirect("/teachers");
-		}
-	});
+    	console.log("Teacher already exists!");
+    	res.redirect("/teachers/new");
+    }
+  });
 });
 
 router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject }, function(err, teacher) {
+	Teacher.findOne({name: nameObject}, function(err, teacher) {
 		if (err) {
 			console.log(err);
 		}
@@ -92,14 +95,7 @@ router.get("/:name/edit", function(req, res) {
 			console.log(err);
 		}
     else {
-			Course.find({}, function(err, courses) {
-        if (err) {
-    			console.log(err);
-        }
-        else {
-  				res.render("teachers/edit", { teacher, courses });
-        }
-			});
+			res.render("teachers/edit", {teacher});
 		}
 	});
 });
@@ -113,17 +109,27 @@ router.put("/:name", function(req, res) {
 		},
 		prefferedTitle: req.body.prefferedTitle,
 		profilePicture: req.body.profilePicture,
-		courses: req.body.courses
 	};
 
-	Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
-		if (err) {
-			console.log(err);
-		}
+  Teacher.find({name: teacher.name}, function(err, searchResults) {
+    if (err) {
+      console.log(err);
+    }
+    else if (!searchResults.length) {
+    	Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
+    		if (err) {
+    			console.log(err);
+    		}
+        else {
+    			res.redirect("/teachers");
+    		}
+    	});
+    }
     else {
-			res.redirect("/teachers");
-		}
-	});
+    	console.log("Teacher already exists!");
+    	res.redirect("/teachers/new");
+    }
+  });
 });
 
 router.delete("/:name", function(req, res) {

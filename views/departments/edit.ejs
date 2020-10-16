@@ -66,44 +66,6 @@
         <label for="description">Department Description</label>
         <textarea class="form-control" name="departmentDescription" id="description" rows="3"><%= department.description %> </textarea>
       </div>
-      <script type="text/javascript">
-        $(document).ready(function() {
-            $('#courses').multiselect({
-                enableFiltering: true,
-                filterBehavior: 'value',
-                enableCaseInsensitiveFiltering: true
-            });
-            $('#teachers').multiselect({
-                enableFiltering: true,
-                filterBehavior: 'value',
-                enableCaseInsensitiveFiltering: true
-            });
-        });
-      </script>
-      <div class="mt-2 mb-4">
-        <label for="courses">Department Courses</label> <br/>
-        <select class="mb-3" id="courses" multiple="multiple" name="departmentCourses[]">
-          <% for (let course of courses) { %>
-            <% if (department.courses.includes(course.code)) { %> 
-            <option value="<%= course.code %>" selected><%= course.code %></option>
-            <% } else { %> 
-            <option value="<%= course.code %>"><%= course.code %></option>
-            <% } %> 
-          <% } %>
-        </select>
-      </div>
-      <div class="mt-2 mb-4">
-        <label for="teachers">Department Teachers</label> <br/>
-        <select class="mb-3" id="teachers" multiple="multiple" name="departmentTeachers[]">
-          <% for (let teacher of teachers) { %>
-            <% if (department.teachers.includes(`${teacher.name.firstName} ${teacher.name.lastName}`)) { %> 
-            <option value="<%= teacher.name.firstName %> <%= teacher.name.lastName %>" selected><%= teacher.name.firstName %> <%= teacher.name.lastName %></option>
-            <% } else { %> 
-            <option value="<%= teacher.name.firstName %> <%= teacher.name.lastName %>"><%= teacher.name.firstName %> <%= teacher.name.lastName %></option>
-            <% } %> 
-          <% } %>
-        </select>
-      </div>
       <button type="submit" class="btn btn-primary">Edit Department</button>
     </form>
   </div>

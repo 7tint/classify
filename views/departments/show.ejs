@@ -9,12 +9,6 @@
       <li><%= name %> </li>
       <% } %>
     </ul>
-    <h2>Teachers</h2>
-    <ul>
-      <% for (let teacher of department.teachers) { %>
-      <li><%= teacher %> </li>
-      <% } %>
-    </ul>
     <a href='/departments' class="btn btn-secondary">All Departments</a>
     <br/>
     <button type="button" class="btn btn-primary"><a class="text-white" href="/departments/<%= department.name %>/edit">Edit Department</a></button>

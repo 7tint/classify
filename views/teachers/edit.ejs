@@ -80,28 +80,6 @@
           <input type="text" class="form-control" name="profilePicture" id="profilepicture" placeholder="Profile Picture" value="<%= teacher.profilePicture %>" required>
         </div>
       </div>
-      <script type="text/javascript">
-        $(document).ready(function() {
-            $('#teachercourses').multiselect({
-                enableFiltering: true,
-                filterBehavior: 'value',
-                enableCaseInsensitiveFiltering: true
-            });
-        });
-      </script>
-      <div class="mt-2 mb-4">
-        <label for="courses">Courses</label> <br/>
-        <select class="mb-3" id="teachercourses" multiple="multiple" name="courses[]">
-          <% for (let course of courses) { %>
-            <% if (teacher.courses.includes(course.code)) { %> 
-            <option value="<%= course.code %>" selected><%= course.code %></option>
-            <% } else { %> 
-            <option value="<%= course.code %>"><%= course.code %></option>
-            <% } %> 
-          <% } %>
-        </select>
-      </div>
-
       <button type="submit" class="btn btn-primary">Edit Teacher</button>
     </form>
   </div>

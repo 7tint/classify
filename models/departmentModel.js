@@ -11,9 +11,8 @@ const departmentSchema = new mongoose.Schema({
 	},
 	courses: [
 		{
-			type: String,
-			uppercase: true,
-			required: true
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Course"
 		}
 	]
 });

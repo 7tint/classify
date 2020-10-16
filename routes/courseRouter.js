@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
-const Teacher = require('./../models/teacherModel');
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
   if (prereq != code) {
@@ -39,51 +38,51 @@ function checkPrereq(prerequisites, code, callback) {
 
     var i = 0;
     prerequisites.forEach(function(prereq, index, prerequisites) {
-        asyncCheckPrereqHelper(prereq, code, isValid, function(data) {
-             i++;
-             isValid = isValid && data;
-             if (i === prerequisites.length) {
-               callback(isValid);
-             }
-        });
-    });
-  }
-}
-
-async function asyncCheckTeachersHelper(teacher, isValid, callback) {
-  Teacher.find({_id: teacher}, function(err, searchResults) {
-    if (err) {
-      callback(false);
-    }
-    else if (!searchResults.length) {
-      callback(false);
-    }
-    else {
-      callback(true);
-    }
-  });
-}
-
-function checkTeachers(teachers, callback) {
-  if (teachers == [] || teachers == null) {
-    callback(true);
-  }
-
-  else {
-    var isValid = true;
-
-    var i = 0;
-    teachers.forEach(function(teacher, index) {
-      asyncCheckTeachersHelper(teacher, isValid, function(data) {
-        i++;
-        isValid = isValid && data;
-        if (i === teachers.length) {
-          callback(isValid);
-        }
+      asyncCheckPrereqHelper(prereq, code, isValid, function(data) {
+         i++;
+         isValid = isValid && data;
+         if (i === prerequisites.length) {
+           callback(isValid);
+         }
       });
     });
   }
 }
+//
+// async function asyncCheckTeachersHelper(teacher, isValid, callback) {
+//   Teacher.find({_id: teacher}, function(err, searchResults) {
+//     if (err) {
+//       callback(false);
+//     }
+//     else if (!searchResults.length) {
+//       callback(false);
+//     }
+//     else {
+//       callback(true);
+//     }
+//   });
+// }
+//
+// function checkTeachers(teachers, callback) {
+//   if (teachers == [] || teachers == null) {
+//     callback(true);
+//   }
+//
+//   else {
+//     var isValid = true;
+//
+//     var i = 0;
+//     teachers.forEach(function(teacher, index) {
+//       asyncCheckTeachersHelper(teacher, isValid, function(data) {
+//         i++;
+//         isValid = isValid && data;
+//         if (i === teachers.length) {
+//           callback(isValid);
+//         }
+//       });
+//     });
+//   }
+// }
 
 
 
@@ -104,14 +103,7 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      Teacher.find({}, function(err, teachers) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          res.render("courses/new", {courses, teachers});
-        }
-      });
+      res.render("courses/new", {courses});
     }
   });
 });
@@ -124,7 +116,6 @@ router.post("/", function(req, res) {
     grade: req.body.courseGrade,
     pace: req.body.coursePace,
     prereq: req.body.coursePrerequisites,
-    teachers: req.body.courseTeachers
   };
 
   // Search for existing courses with the course code to check for duplicates
@@ -137,23 +128,15 @@ router.post("/", function(req, res) {
       // Check that the course prerequisites is valid
       checkPrereq(course.prereq, course.code, function(isValid) {
         if (isValid) {
-          checkTeachers(course.teachers, function(isValid) {
-            if (isValid) {
-              Course.create(course, function(err, newCourse) {
-                if (err) {
-                  console.log("ERROR while creating course object!");
-                  console.log(err);
-                  // Redirect to admin courses with an error message
-                }
-                else {
-                  console.log("Course created!");
-                  res.redirect("/courses");
-                }
-              });
+          Course.create(course, function(err, newCourse) {
+            if (err) {
+              console.log("ERROR while creating course object!");
+              console.log(err);
+              // Redirect to admin courses with an error message
             }
             else {
-              console.log("Teachers are not valid.");
-              res.redirect("/courses/new");
+              console.log("Course created!");
+              res.redirect("/courses");
             }
           });
         }
@@ -195,14 +178,7 @@ router.get("/:code/edit", function(req, res) {
           console.log(err);
         }
         else {
-          Teacher.find({}, function(err, teachers) {
-            if (err) {
-              console.log(err);
-            }
-            else {
-              res.render("courses/edit", { course, courses, teachers });
-            }
-          });
+          res.render("courses/edit", { course, courses });
         }
       });
     }
@@ -229,23 +205,15 @@ router.put("/:code", function(req, res) {
       // Check that the course prerequisites is valid
       checkPrereq(course.prereq, course.code, function(isValid) {
         if (isValid) {
-          checkTeachers(course.teachers, function(isValid) {
-            if (isValid) {
-              Course.findOneAndUpdate({code: req.params.code}, course, function(err, updatedCourse) {
-                if (err) {
-                  console.log("ERROR while creating course object!");
-                  console.log(err);
-                  // Redirect to admin courses with an error message
-                }
-                else {
-                  console.log("Course updated!");
-                  res.redirect("/courses");
-                }
-              });
+          Course.findOneAndUpdate({code: req.params.code}, course, function(err, updatedCourse) {
+            if (err) {
+              console.log("ERROR while creating course object!");
+              console.log(err);
+              // Redirect to admin courses with an error message
             }
             else {
-              console.log("Teachers are not valid.");
-              res.redirect("/courses/new");
+              console.log("Course updated!");
+              res.redirect("/courses");
             }
           });
         }
