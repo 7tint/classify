@@ -15,7 +15,7 @@ function convertNametoObj(name) {
 		if (isFirstName) {
 			firstName += name[i];
 		}
-    else {
+		else {
 			lastName += name[i];
 		}
 	}
@@ -33,14 +33,14 @@ router.get("/", function(req, res) {
 		if (err) {
 			console.log(err);
 		}
-    else {
+		else {
 			res.render("teachers/index", { teachers: allTeachers });
 		}
 	});
 });
 
 router.get("/new", function(req, res) {
-  res.render("teachers/new");
+	res.render("teachers/new");
 });
 
 router.post("/", function(req, res) {
@@ -53,36 +53,36 @@ router.post("/", function(req, res) {
 		profilePicture: req.body.profilePicture
 	};
 
-  Teacher.find({name: teacher.name}, function(err, searchResults) {
-    if (err) {
-      console.log(err);
-    }
-    else if (!searchResults.length) {
-    	Teacher.create(teacher, function(err, newTeacher) {
-    		if (err) {
-    			console.log("ERROR while creating teacher object!");
-    			console.log(err);
-    		}
-        else {
-    			console.log("Teacher created!");
-    			res.redirect("/teachers");
-    		}
-    	});
-    }
-    else {
-    	console.log("Teacher already exists!");
-    	res.redirect("/teachers/new");
-    }
-  });
+	Teacher.find({ name: teacher.name }, function(err, searchResults) {
+		if (err) {
+			console.log(err);
+		}
+		else if (!searchResults.length) {
+			Teacher.create(teacher, function(err, newTeacher) {
+				if (err) {
+					console.log("ERROR while creating teacher object!");
+					console.log(err);
+				}
+				else {
+					console.log("Teacher created!");
+					res.redirect("/teachers");
+				}
+			});
+		}
+		else {
+			console.log("Teacher already exists!");
+			res.redirect("/teachers/new");
+		}
+	});
 });
 
 router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
+	Teacher.findOne({ name: nameObject }, function(err, teacher) {
 		if (err) {
 			console.log(err);
 		}
-    else {
+		else {
 			res.render("teachers/show", { teacher });
 		}
 	});
@@ -90,12 +90,12 @@ router.get("/:name", function(req, res) {
 
 router.get("/:name/edit", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject }, function(err, teacher) {
+	Teacher.findOne({ name: nameObject }, function(err, teacher) {
 		if (err) {
 			console.log(err);
 		}
-    else {
-			res.render("teachers/edit", {teacher});
+		else {
+			res.render("teachers/edit", { teacher });
 		}
 	});
 });
@@ -108,37 +108,37 @@ router.put("/:name", function(req, res) {
 			lastName: req.body.teacherLastName
 		},
 		prefferedTitle: req.body.prefferedTitle,
-		profilePicture: req.body.profilePicture,
+		profilePicture: req.body.profilePicture
 	};
 
-  Teacher.find({name: teacher.name}, function(err, searchResults) {
-    if (err) {
-      console.log(err);
-    }
-    else if (!searchResults.length) {
-    	Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
-    		if (err) {
-    			console.log(err);
-    		}
-        else {
-    			res.redirect("/teachers");
-    		}
-    	});
-    }
-    else {
-    	console.log("Teacher already exists!");
-    	res.redirect("/teachers/new");
-    }
-  });
+	Teacher.find({ name: teacher.name }, function(err, searchResults) {
+		if (err) {
+			console.log(err);
+		}
+		else if (!searchResults.length) {
+			Teacher.findOneAndUpdate({ name: nameObject }, teacher, function(err) {
+				if (err) {
+					console.log(err);
+				}
+				else {
+					res.redirect("/teachers");
+				}
+			});
+		}
+		else {
+			console.log("Teacher already exists!");
+			res.redirect("/teachers/new");
+		}
+	});
 });
 
 router.delete("/:name", function(req, res) {
 	var nameObject = convertNametoObj(req.params.name);
-	Teacher.deleteOne({name: nameObject}, function(err, deletedTeacher) {
+	Teacher.deleteOne({ name: nameObject }, function(err, deletedTeacher) {
 		if (err) {
 			console.log(err);
 		}
-    else {
+		else {
 			console.log("Deleted: " + nameObject.firstName + "" + nameObject.lastName);
 			res.redirect("/teachers");
 		}
