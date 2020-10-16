@@ -58,8 +58,7 @@ router.post("/", function(req, res) {
 			lastName: req.body.teacherLastName
 		},
 		preferredTitle: req.body.preferredTitle,
-		profilePicture: req.body.profilePicture,
-		courses: req.body.courses
+		profilePicture: req.body.profilePicture
 	};
 
 	Teacher.create(teacher, function(err, newTeacher) {

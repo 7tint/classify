@@ -85,6 +85,8 @@ function checkTeachers(teachers, callback) {
   }
 }
 
+
+
 router.get("/", function(req, res) {
   Course.find({}, function(err, courses) {
     if (err) {

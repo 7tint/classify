@@ -28,7 +28,7 @@ router.get("/new", (req, res) => {
 			console.log(err);
 		}
 		else {
-			res.render("departments/new", { teachers });
+			res.render("departments/new", { courses });
 		}
 	});
 });
