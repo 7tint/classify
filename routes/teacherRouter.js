@@ -53,7 +53,7 @@ router.post("/", function(req, res) {
 		profilePicture: req.body.profilePicture
 	};
 
-	Teacher.find({ name: teacher.name }, function(err, searchResults) {
+	Teacher.find({ name: new RegExp(`^${teacher.name}$`, 'i') }, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}
@@ -111,7 +111,7 @@ router.put("/:name", function(req, res) {
 		profilePicture: req.body.profilePicture
 	};
 
-	Teacher.find({ name: teacher.name }, function(err, searchResults) {
+	Teacher.find({ name: new RegExp(`^${teacher.name}$`, 'i') }, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}

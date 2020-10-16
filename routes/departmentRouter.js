@@ -22,7 +22,7 @@ router.post("/", (req, res) => {
 		name: req.body.departmentName,
 		description: req.body.departmentDescription
 	};
-	Department.find({ name: department.name }, function(err, searchResults) {
+	Department.find({ name: new RegExp(`^${department.name}$`, 'i') }, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}
@@ -70,7 +70,7 @@ router.put("/:name", (req, res) => {
 		name: req.body.departmentName,
 		description: req.body.departmentDescription
 	};
-	Department.find({ name: department.name }, function(err, searchResults) {
+	Department.find({ name: new RegExp(`^${department.name}$`, 'i') }, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}

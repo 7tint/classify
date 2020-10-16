@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Lambo-Liu/course-catalogue#readme",
   "dependencies": {
+    "@shopify/draggable": "^1.0.0-beta.8",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "method-override": "^3.0.0",

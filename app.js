@@ -28,17 +28,22 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Static node module files
+app.use('/modules', express.static(path.join(__dirname, 'node_modules/')));
+
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const teacherRouter = require("./routes/teacherRouter.js");
 const departmentRouter = require("./routes/departmentRouter.js");
+const departmentCourseRouter = require("./routes/departmentCourseRouter.js");
 
 // Routes
 app.use("/admin", adminRouter);
 app.use("/courses", courseRouter);
 app.use("/teachers", teacherRouter);
 app.use("/departments", departmentRouter);
+app.use("/classify-courses", departmentCourseRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");
