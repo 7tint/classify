@@ -11,15 +11,12 @@ const teacherSchema = new mongoose.Schema({
 			required: true
 		}
 	},
-	prefferedTitle: {
+	preferredTitle: {
 		type: String,
 		required: true
 	},
 	profilePicture: {
 		type: String
-	},
-	courses: {
-		type: [String]
 	},
 	reviews: [
 		{

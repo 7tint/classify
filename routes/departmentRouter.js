@@ -8,7 +8,8 @@ router.get("/", (req, res) => {
 	Department.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+		else {
 			res.render("departments/index", { departments });
 		}
 	});
@@ -25,14 +26,9 @@ router.get("/new", (req, res) => {
 	Course.find({}, (err, courses) => {
 		if (err) {
 			console.log(err);
-		} else {
-			Teacher.find({}, (err, teachers) => {
-				if (err) {
-					console.log(err);
-				} else {
-					res.render("departments/new", { courses, teachers });
-				}
-			});
+		}
+		else {
+			res.render("departments/new", { teachers });
 		}
 	});
 });
@@ -47,7 +43,8 @@ router.post("/", (req, res) => {
 	Department.create(department, (err, newDepartment) => {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+		else {
 			res.redirect("/departments");
 		}
 	});
@@ -58,7 +55,8 @@ router.get("/:name", (req, res) => {
 	Department.findOne({ name }, function(err, department) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+		else {
 			res.render("departments/show", { department });
 			console.log(department);
 		}

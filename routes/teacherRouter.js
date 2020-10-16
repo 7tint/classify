@@ -15,7 +15,8 @@ function convertNametoObj(name) {
 		}
 		if (isFirstName) {
 			firstName += name[i];
-		} else {
+		}
+    else {
 			lastName += name[i];
 		}
 	}
@@ -32,22 +33,22 @@ router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+    else {
 			res.render("teachers/index", { teachers: allTeachers });
 		}
 	});
 });
 
 router.get("/new", function(req, res) {
-	Teacher.find({}, function(err, allTeachers) {
-		if (err) {
-			console.log(err);
-		} else {
-			Course.find({}, function(err, courses) {
-				res.render("teachers/new", { teachers: allTeachers, courses: courses });
-			});
-		}
-	});
+  Course.find({}, function(err, courses) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.render("teachers/new", { courses });
+    }
+  });
 });
 
 router.post("/", function(req, res) {
@@ -56,15 +57,17 @@ router.post("/", function(req, res) {
 			firstName: req.body.teacherFirstName,
 			lastName: req.body.teacherLastName
 		},
-		prefferedTitle: req.body.prefferedTitle,
+		preferredTitle: req.body.preferredTitle,
 		profilePicture: req.body.profilePicture,
 		courses: req.body.courses
 	};
+
 	Teacher.create(teacher, function(err, newTeacher) {
 		if (err) {
 			console.log("ERROR while creating teacher object!");
 			console.log(err);
-		} else {
+		}
+    else {
 			console.log("Teacher created!");
 			res.redirect("/teachers");
 		}
@@ -73,11 +76,11 @@ router.post("/", function(req, res) {
 
 router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	const name = { name: nameObject };
-	Teacher.findOne(name, function(err, teacher) {
+	Teacher.findOne({name: nameObject }, function(err, teacher) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+    else {
 			res.render("teachers/show", { teacher });
 		}
 	});
@@ -85,13 +88,18 @@ router.get("/:name", function(req, res) {
 
 router.get("/:name/edit", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	const name = { name: nameObject };
-	Teacher.findOne(name, function(err, teacher) {
+	Teacher.findOne({name: nameObject }, function(err, teacher) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+    else {
 			Course.find({}, function(err, courses) {
-				res.render("teachers/edit", { teacher, courses });
+        if (err) {
+    			console.log(err);
+        }
+        else {
+  				res.render("teachers/edit", { teacher, courses });
+        }
 			});
 		}
 	});
@@ -99,7 +107,6 @@ router.get("/:name/edit", function(req, res) {
 
 router.put("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	const name = { name: nameObject };
 	const teacher = {
 		name: {
 			firstName: req.body.teacherFirstName,
@@ -109,10 +116,12 @@ router.put("/:name", function(req, res) {
 		profilePicture: req.body.profilePicture,
 		courses: req.body.courses
 	};
-	Teacher.findOneAndUpdate(name, teacher, function(err) {
+
+	Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+    else {
 			res.redirect("/teachers");
 		}
 	});
@@ -120,10 +129,11 @@ router.put("/:name", function(req, res) {
 
 router.delete("/:name", function(req, res) {
 	var nameObject = convertNametoObj(req.params.name);
-	Teacher.deleteOne({ name: nameObject }, function(err, deletedTeacher) {
+	Teacher.deleteOne({name: nameObject}, function(err, deletedTeacher) {
 		if (err) {
 			console.log(err);
-		} else {
+		}
+    else {
 			console.log("Deleted: " + nameObject.firstName + "" + nameObject.lastName);
 			res.redirect("/teachers");
 		}

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const departmentSchema = new Schema({
+const departmentSchema = new mongoose.Schema({
 	name: {
 		type: String,
 		required: true
@@ -11,12 +10,6 @@ const departmentSchema = new Schema({
 		required: false
 	},
 	courses: [
-		{
-			type: String,
-			required: true
-		}
-	],
-	teachers: [
 		{
 			type: String,
 			required: true

@@ -13,6 +13,7 @@
           <p>Grade: <%= course.grade %></p>
           <p>Pace: <%= course.pace %></p>
           <p>Prerequisites: <%= course.prereq %></p>
+          <p>Teachers: <%= course.teachers %></p>
           <a href="/courses/<%= course.code %>">View Course</a>
           <br/>
           <form action="/courses/<%= course.code %>?_method=DELETE" method="POST">

@@ -17,8 +17,12 @@ const courseSchema = new mongoose.Schema({
   },
   pace: String,
   prereq: [String],
-  antireq: [String],
-  corereq: [String],
+  teachers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher"
+    }
+  ],
   reviews: [
     {
        type: mongoose.Schema.Types.ObjectId,

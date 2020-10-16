@@ -57,33 +57,33 @@
       <div class="form-row">
         <div class="col">
           <div class="form-group">
-            <label for="name">Teacher First Name</label>
-            <input type="text" class="form-control" name="teacherFirstName" id="firstname" placeholder="Teacher First Name" required>
+            <label for="first-name">Teacher First Name</label>
+            <input type="text" class="form-control" name="teacherFirstName" id="first-name" placeholder="Teacher First Name" required>
           </div>
         </div>
         <div class="col">
             <div class="form-group">
-              <label for="name">Teacher Last Name</label>
-              <input type="text" class="form-control" name="teacherLastName" id="lastname" placeholder="Teacher Last Name" required>
+              <label for="last-name">Teacher Last Name</label>
+              <input type="text" class="form-control" name="teacherLastName" id="last-name" placeholder="Teacher Last Name" required>
             </div>
           </div>
         <div class="col">
           <div class="form-group">
-            <label for="code">Preffered Title</label>
-            <input type="text" class="form-control" name="prefferedTitle" id="prefferedtitle" placeholder="Preffered Title" required>
+            <label for="preferred-title">Preffered Title</label>
+            <input type="text" class="form-control" name="preferredTitle" id="preferred-title" placeholder="Preffered Title" required>
           </div>
         </div>
       </div>
       <div class="col">
         <div class="form-group">
-          <label for="code">Profile Picture</label>
-          <input type="text" class="form-control" name="profilePicture" id="profilepicture" placeholder="Profile Picture" required>
+          <label for="profile-picture">Profile Picture</label>
+          <input type="text" class="form-control" name="profilePicture" id="profile-picture" placeholder="Profile Picture" required>
         </div>
       </div>
 
       <script type="text/javascript">
         $(document).ready(function() {
-            $('#teachercourses').multiselect({
+            $('#teacher-courses').multiselect({
                 enableFiltering: true,
                 filterBehavior: 'value',
                 enableCaseInsensitiveFiltering: true
@@ -92,7 +92,7 @@
       </script>
       <div class="mt-2 mb-4">
         <label for="courses">Courses</label> <br/>
-        <select class="mb-3" id="teachercourses" multiple="multiple" name="courses[]">
+        <select class="mb-3" id="teacher-courses" multiple="multiple" name="courses[]">
           <% courses.forEach(function(course){ %>
             <option><%= course.code %></option>
           <% }); %>
