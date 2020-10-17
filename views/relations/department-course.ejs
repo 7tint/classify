@@ -1,80 +1,77 @@
 <%- include('../partials/header'); -%>
+  <link rel="stylesheet" href="/css/department-course.css">
   <script src="/modules/@shopify/draggable/lib/draggable.bundle.js"></script>
+  <script src="/modules/vue/dist/vue.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.8/lib/draggable.bundle.js"></script>
+  <div id="app">
+  	<div class="grid flex-start-content department-courses">
+      <% departments.forEach(function(department){ %>
+        <div>
+          <p>Department: <%= department.name %> </p>
+      		<div
+      		name="sortableCards"
+      		class="
+      			grid
+      			flex-start-content
+      			disable-marker
+      			cards clickable
+      			sortable-animation
+      		"
+          style="min-height: 500px;"
+      		sortable>
+            <% department.courses.forEach(function(course){ %>
+        			<div sortItem>
+        				<p> <%= course %> </p>
+        			</div>
+            <% }); %>
+      		</div>
+        </div>
 
-  <style>
-    .grid {
-    	display: grid;
-    	grid-template: 150px 150px 150px / 150px 150px 150px 150px;
-    	grid-gap: 10px;
-    	background-color: #ffffff;
-    	padding: 10px;
-    }
-    .draggable {
-    	background-color: #ff3946;
-    	box-shadow: 10px 10px 10px #7777;
-    }
-
-    .draggable, .droppable.draggable-dropzone--occupied{
-    	width: 100px;
-    	height: 100px;
-    }
-    .droppable{
-    	width: 100px;
-    	height: 100px;
-    	border: solid;
-    	display: flex;
-    }
-  </style>
-
-  <div class="grid">
-  	<div class="block">
-  		<div class="droppable draggable-dropzone--occupied">
-  			<div class="draggable"></div>
-  		</div>
-  	</div>
-
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
-  	</div>
-  	<div class="block">
-  		<div class="droppable"></div>
+      <% }); %>
   	</div>
   </div>
 
   <script>
-    const containers = document.querySelectorAll('.block')
+    var departmentsObj = {
+      "all": []
+    };
 
-    const droppable = new Draggable.Droppable(containers, {
-      draggable: '.draggable',
-      droppable: '.droppable'
+    var data = {
+      departments: departmentsObj
+    };
+
+    courses = <%- JSON.stringify(courses) %>;
+    departments = <%- JSON.stringify(departments) %>;
+
+    courses.forEach(function(course, index) {
+      let courseInfo = {
+        course: course.code,
+        color: "#ef9a9a"
+      };
+      departmentsObj.all.push(courseInfo);
     });
 
+    departments.forEach(function(department, index) {
+      let departmentInfo = {
+        [department.name]: []
+      }
+
+      Object.assign(departmentsObj, departmentInfo);
+    });
+
+    const swappable = new Draggable.Swappable(
+    	document.querySelectorAll('[swappable]'), {
+    		draggable: '[swapItem]',
+    		delay: 0,
+    	}
+    );
+
+    const sortable = new Draggable.Sortable(
+    	document.querySelectorAll('[sortable]'), {
+    		draggable: '[sortItem]',
+    		delay: 0,
+    	}
+    );
   </script>
 
 <%- include('../partials/footer'); -%>
