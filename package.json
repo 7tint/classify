@@ -11,7 +11,21 @@
     "type": "git",
     "url": "git+https://github.com/Lambo-Liu/course-catalogue.git"
   },
-  "author": "",
+  "author": {
+    "name": "Lambert Liu",
+    "email": "lambert0928@outlook.com"
+  },
+  "contributors": [
+    {
+      "name": "Daniel Kaichis",
+      "email": "danielkaichis@gmail.com"
+    },
+    {
+      "name": "Brian Tu",
+      "email": "brianptu2@gmail.com",
+      "url": "https://briantu.tech/"
+    }
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Lambo-Liu/course-catalogue/issues"
