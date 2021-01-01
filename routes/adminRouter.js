@@ -82,7 +82,7 @@ router.get("/edit", function(req, res) {
           }
           else {
             console.log("Preferences created!");
-            res.redirect("/admin/edit");
+            res.redirect("/admin/");
           }
         });
       }
@@ -133,7 +133,7 @@ router.put("/", function(req, res) {
     }
     else {
       console.log("Replaced old preferences: ", docs);
-      res.redirect("/admin/edit");
+      res.redirect("/admin/");
     }
   });
 });

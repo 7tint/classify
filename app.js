@@ -4,7 +4,14 @@ const path = require("path");
 const methodOverride = require("method-override");
 
 const app = express();
-mongoose.connect("mongodb://localhost/course_catalogue", {
+
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
+const uri = process.env.URI;
+
+mongoose.connect(uri, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	useCreateIndex: true,
@@ -36,7 +43,7 @@ const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const teacherRouter = require("./routes/teacherRouter.js");
 const departmentRouter = require("./routes/departmentRouter.js");
-const departmentCourseRouter = require("./routes/departmentCourseRouter.js");
+const departmentCourseRouter = require("./routes/relationsRouter.js");
 
 // Routes
 app.use("/admin", adminRouter);

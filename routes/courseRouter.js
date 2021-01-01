@@ -48,7 +48,7 @@ function checkPrereq(prerequisites, code, callback) {
     });
   }
 }
-//
+
 // async function asyncCheckTeachersHelper(teacher, isValid, callback) {
 //   Teacher.find({_id: teacher}, function(err, searchResults) {
 //     if (err) {
