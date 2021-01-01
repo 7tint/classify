@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const courseReviewSchema = new mongoose.Schema({
+const reviewSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true
@@ -40,4 +40,4 @@ const courseReviewSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("CourseReview", courseReviewSchema);
+module.exports = mongoose.model("Review", reviewSchema);
