@@ -226,10 +226,11 @@ router.get("/:code/edit", function(req, res) {
           Department.find({}, function(err, departments) {
             if (err) {
               console.log(err);
-            } else {
+            }
+            else {
               res.render("courses/edit", {course, courses, departments});
             }
-          })
+          });
         }
       });
     }

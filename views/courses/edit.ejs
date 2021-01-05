@@ -113,9 +113,21 @@
         <div class="form-group">
           <label for="pace">Course Department</label>
           <select class="form-control mb-3" id="department" name="courseDepartment">
-            <option value="">None</option>
-            <% departments.forEach(function(department){ %>
-              <option value=<%= department._id %>><%= department.name %></option>
+            <% if (course.department === undefined) { %>
+              <option selected value="">None</option>
+            <% } else { %>
+              <option value="">None</option>
+            <% } %>
+
+            <% departments.forEach(function(department) { %>
+              <% if (course.department) { %>
+                <% if (course.department.toString() === department._id.toString()) { %>
+                  <option selected value=<%= department._id %>><%= department.name %></option>
+                <% } else { %>
+                  <option value=<%= department._id %>><%= department.name %></option>
+              <% }} else { %>
+                <option value=<%= department._id %>><%= department.name %></option>
+              <% } %>
             <% }); %>
           </select>
         </div>
