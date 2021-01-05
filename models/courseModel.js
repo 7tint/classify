@@ -17,6 +17,10 @@ const courseSchema = new mongoose.Schema({
   },
   pace: String,
   prereq: [String],
+  department: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Department"
+  },
   teachers: [
     {
       type: mongoose.Schema.Types.ObjectId,

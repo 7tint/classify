@@ -86,22 +86,40 @@
           </div>
         </div>
       </div>
-      <script type="text/javascript">
-        $(document).ready(function() {
-            $('#prerequisites').multiselect({
-                enableFiltering: true,
-                filterBehavior: 'value',
-                enableCaseInsensitiveFiltering: true
-            });
-        });
-      </script>
-      <div class="mt-2 mb-4">
-        <label for="prerequisites">Course Prerequisites</label> <br/>
-        <select class="mb-3" id="prerequisites" multiple="multiple" name="coursePrerequisites[]">
-          <% courses.forEach(function(course){ %>
-            <option value=<%= course.code %>><%= course.code %></option>
-          <% }); %>
-        </select>
+      <div class="form-row">
+        <div class="col">
+          <div class="form-group">
+            <script type="text/javascript">
+              $(document).ready(function() {
+                  $('#prerequisites').multiselect({
+                      enableFiltering: true,
+                      filterBehavior: 'value',
+                      enableCaseInsensitiveFiltering: true
+                  });
+              });
+            </script>
+            <div class="mt-2 mb-4">
+              <label for="prerequisites">Course Prerequisites</label> <br/>
+              <select class="mb-3" id="prerequisites" multiple="multiple" name="coursePrerequisites[]">
+                <% courses.forEach(function(course){ %>
+                  <option value=<%= course.code %>><%= course.code %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="form-group">
+            <label for="pace">Course Department</label>
+            <select class="form-control mb-3" id="department" name="courseDepartment">
+              <option value="">None</option>
+              <% departments.forEach(function(department){ %>
+                <option value=<%= department._id %>><%= department.name %></option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
       </div>
       <button type="submit" class="btn btn-primary">Add Course</button>
     </form>

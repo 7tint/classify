@@ -36,7 +36,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Static node module files
-app.use('/modules', express.static(path.join(__dirname, 'node_modules/')));
+// app.use('/modules', express.static(path.join(__dirname, 'node_modules/')));
 
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");

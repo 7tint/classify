@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
+const Department = require("./../models/departmentModel");
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
   if (prereq != code) {
@@ -103,7 +104,13 @@ router.get("/new", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("courses/new", {courses});
+      Department.find({}, function(err, departments) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.render("courses/new", {courses, departments});
+        }
+      })
     }
   });
 });
@@ -115,6 +122,7 @@ router.post("/", function(req, res) {
     description: req.body.courseDescription,
     grade: req.body.courseGrade,
     pace: req.body.coursePace,
+    department: req.body.courseDepartment,
     prereq: req.body.coursePrerequisites,
   };
 
@@ -128,16 +136,31 @@ router.post("/", function(req, res) {
       // Check that the course prerequisites is valid
       checkPrereq(course.prereq, course.code, function(isValid) {
         if (isValid) {
-          Course.create(course, function(err, newCourse) {
-            if (err) {
-              console.log("ERROR while creating course object!");
-              console.log(err);
-              // Redirect to admin courses with an error message
+          Department.countDocuments({_id: course.department}, function(err, count) {
+            if (count === 0 || count === undefined) {
+              delete course.department;
             }
-            else {
-              console.log("Course created!");
-              res.redirect("/courses");
-            }
+            Course.create(course, function(err, newCourse) {
+              if (err) {
+                console.log("ERROR while creating course object!");
+                console.log(err);
+                // Redirect to admin courses with an error message
+              }
+              else {
+                if (course.department) {
+                  Department.findOneAndUpdate({_id: course.department}, {$push: {courses: newCourse._id}}, function(err, updatedDepartment) {
+                    if (err) {
+                      console.log("ERROR while adding course to department!");
+                      console.log(err);
+                    } else {
+                      console.log("Department updated!");
+                    }
+                  });
+                }
+                console.log("Course created!");
+                res.redirect("/courses");
+              }
+            });
           });
         }
         else {
@@ -178,7 +201,13 @@ router.get("/:code/edit", function(req, res) {
           console.log(err);
         }
         else {
-          res.render("courses/edit", { course, courses });
+          Department.find({}, function(err, departments) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.render("courses/edit", {course, courses, departments});
+            }
+          })
         }
       });
     }
@@ -192,6 +221,7 @@ router.put("/:code", function(req, res) {
     description: req.body.courseDescription,
     grade: req.body.courseGrade,
     pace: req.body.coursePace,
+    department: req.body.courseDepartment,
     prereq: req.body.coursePrerequisites
   };
 
@@ -205,16 +235,47 @@ router.put("/:code", function(req, res) {
       // Check that the course prerequisites is valid
       checkPrereq(course.prereq, course.code, function(isValid) {
         if (isValid) {
-          Course.findOneAndUpdate({code: req.params.code}, course, function(err, updatedCourse) {
-            if (err) {
-              console.log("ERROR while creating course object!");
-              console.log(err);
-              // Redirect to admin courses with an error message
-            }
-            else {
-              console.log("Course updated!");
-              res.redirect("/courses");
-            }
+          Department.countDocuments({_id: course.department}, function(err, count) {
+            // Remove old course department
+            Course.findOneAndUpdate({code: req.params.code}, {$unset: {department: ""}}, function(err, updatedCourse) {
+              if (err) {
+                console.log("ERROR while updating course object!");
+                console.log(err);
+                // Redirect to admin courses with an error message
+              }
+              else {
+                if (count === 0 || count === undefined) {
+                  delete course.department;
+                }
+                Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse) {
+                  if (err) {
+                    console.log("ERROR while updating course object!");
+                    console.log(err);
+                    // Redirect to admin courses with an error message
+                  }
+                  else {
+                    if (!(searchResults[0].department === undefined)) {
+                      await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+                        if (err) {
+                          console.log("ERROR while adding course to department!");
+                          console.log(err);
+                        }
+                      });
+                    }
+                    if (!(course.department === undefined)) {
+                      await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+                        if (err) {
+                          console.log("ERROR while adding course to department!");
+                          console.log(err);
+                        }
+                      });
+                    }
+                    console.log("Course updated!");
+                    res.redirect("/courses");
+                  }
+                });
+              }
+            });
           });
         }
         else {
