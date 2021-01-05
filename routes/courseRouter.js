@@ -88,12 +88,27 @@ function checkPrereq(prerequisites, code, callback) {
 
 
 router.get("/", function(req, res) {
-  Course.find({}, function(err, courses) {
+  Course.find({}, async function(err, courses) {
     if (err) {
       console.log(err);
     }
     else {
-      res.render("courses/index", {courses});
+      let getCourses = new Promise(function(resolve, reject) {
+        courses.forEach(async function(course, i) {
+          if (!(course.department === undefined)) {
+            await Department.findOne({_id: course.department}, function(err, department) {
+              course.departmentName = department.name;
+            });
+          }
+          if (i + 1 === courses.length) {
+            resolve();
+          }
+        });
+      });
+
+      getCourses.then(function() {
+        res.render("courses/index", {courses});
+      });
     }
   });
 });
@@ -185,7 +200,14 @@ router.get("/:code", function(req, res) {
       console.log(err);
     }
     else {
-      res.render("courses/show", { course });
+      if (!(course.department === undefined)) {
+        Department.findOne({_id: course.department}, function(err, department) {
+          res.render("courses/show", {course, department});
+        });
+      }
+      else {
+        res.render("courses/show", {course, department: undefined});
+      }
     }
   });
 });
@@ -255,6 +277,7 @@ router.put("/:code", function(req, res) {
                   }
                   else {
                     if (!(searchResults[0].department === undefined)) {
+                      // Remove course from old department
                       await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                         if (err) {
                           console.log("ERROR while adding course to department!");
@@ -263,6 +286,7 @@ router.put("/:code", function(req, res) {
                       });
                     }
                     if (!(course.department === undefined)) {
+                      // Add course to new department
                       await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                         if (err) {
                           console.log("ERROR while adding course to department!");
