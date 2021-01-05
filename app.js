@@ -6,7 +6,7 @@ const methodOverride = require("method-override");
 const app = express();
 
 if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
+	require("dotenv").config();
 }
 
 const uri = process.env.URI;
@@ -43,14 +43,14 @@ const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const teacherRouter = require("./routes/teacherRouter.js");
 const departmentRouter = require("./routes/departmentRouter.js");
-const departmentCourseRouter = require("./routes/relationsRouter.js");
+const relationsRouter = require("./routes/relationsRouter.js");
 
 // Routes
 app.use("/admin", adminRouter);
 app.use("/courses", courseRouter);
 app.use("/teachers", teacherRouter);
 app.use("/departments", departmentRouter);
-app.use("/classify-courses", departmentCourseRouter);
+app.use("/classify-courses", relationsRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");
