@@ -6,7 +6,7 @@ const methodOverride = require("method-override");
 const app = express();
 
 if (process.env.NODE_ENV !== "production") {
-	require("dotenv").config();
+  require("dotenv").config();
 }
 
 const uri = process.env.URI;
