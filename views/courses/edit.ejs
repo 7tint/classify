@@ -102,9 +102,24 @@
           <div class="mt-2 mb-4">
             <label for="prerequisites">Course Prerequisites</label> <br/>
             <select class="mb-3" id="prerequisites" multiple="multiple" name="coursePrerequisites[]">
-              <% courses.forEach(function(course){ %>
-                <option value=<%= course.code %>><%= course.code %></option>
-              <% }); %>
+              <% let done = false; %>
+              <% courses.forEach(function(coursesCourse) { %>
+                <% done = false; %>
+                <% if (coursesCourse.code.toString() === course.code.toString()) { %>
+                <% } else { %>
+                  <% if (course.prereq) { %>
+                    <% course.prereq.forEach(function(prereq) { %>
+                      <% if (prereq.toString() === coursesCourse.code.toString()) { %>
+                        <% done = true; %>
+                        <option selected value=<%= coursesCourse.code %>><%= coursesCourse.code %></option>
+                      <% } %>
+                    <% }); %>
+                    <% if (done !== true) { %>
+                      <option value=<%= coursesCourse.code %>><%= coursesCourse.code %></option>
+                    <% } %>
+                  <% } else { %>
+                    <option value=<%= coursesCourse.code %>><%= coursesCourse.code %></option>
+              <% }}}); %>
             </select>
           </div>
         </div>
