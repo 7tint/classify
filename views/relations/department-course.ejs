@@ -2,7 +2,7 @@
   <link rel="stylesheet" href="/css/department-course.css">
   <script src="/modules/@shopify/draggable/lib/draggable.bundle.js"></script>
 
-  <div id="app">
+  <div class="d-flex flex-row flex-wrap justify-content-center w-100 h-100">
   	<div class="grid flex-start-content department-courses">
       <div>
         <p>Uncategorized:</p>
@@ -19,8 +19,8 @@
         sortable>
           <% courses.forEach(function(course) { %>
             <% if (course.department === undefined) { %>
-              <div sortItem>
-                <p> <%= course._id %> </p>
+              <div sortItem class="course" id=<%=course.code%>>
+                <p> <%= course.code %> </p>
               </div>
             <% } %>
           <% }); %>
@@ -29,7 +29,7 @@
       </div>
 
       <% departments.forEach(function(department) { %>
-        <div>
+        <div id=<%= department._id %>>
           <p>Department: <%= department.name %> </p>
       		<div
       		name="sortableCards"
@@ -42,10 +42,14 @@
       		"
           style="min-height: 500px;"
       		sortable>
-            <% department.courses.forEach(function(course){ %>
-        			<div sortItem>
-        				<p> <%= course %> </p>
-        			</div>
+            <% courses.forEach(function(course) { %>
+              <% if (course.department) { %>
+                <% if (course.department.toString() === department._id.toString()) { %>
+            			<div sortItem class="course" id=<%=course.code%>>
+            				<p> <%= course.code %> </p>
+            			</div>
+                <% } %>
+              <% } %>
             <% }); %>
       		</div>
         </div>
@@ -53,6 +57,8 @@
       <% }); %>
   	</div>
   </div>
+
+  <button class="m-3 btn btn-sm btn-success" type="button" onclick="submitChanges()" name="save">Save Changes</button> <br/>
 
   <script>
     var departmentsObj = {
@@ -82,19 +88,20 @@
       Object.assign(departmentsObj, departmentInfo);
     });
 
-    const swappable = new Draggable.Swappable(
-    	document.querySelectorAll('[swappable]'), {
-    		draggable: '[swapItem]',
-    		delay: 0,
-    	}
-    );
-
     const sortable = new Draggable.Sortable(
     	document.querySelectorAll('[sortable]'), {
     		draggable: '[sortItem]',
     		delay: 0,
     	}
     );
+
+    function submitChanges() {
+      var courses = document.querySelectorAll(".course");
+
+      courses.forEach(function(course) {
+        console.log(course);
+      });
+    }
   </script>
 
 <%- include('../partials/footer'); -%>

@@ -4,6 +4,44 @@ const Department = require("./../models/departmentModel");
 const Course = require("./../models/courseModel");
 const Teacher = require("./../models/teacherModel");
 
+// function getCourseNames(departments, callback) {
+// 	let getCourseNamesPromise = new Promise(function(resolve, reject) {
+// 		departments.forEach(function(department, i) {
+//
+// 			let getCourseNamesPromise2 = new Promise(function(resolve, reject) {
+// 				department.courses.forEach(async function(course, j) {
+// 					await Course.findOne({_id: course}, function(err, course) {
+// 						if (err) {
+// 							console.log(err);
+// 						}
+// 						else {
+// 							departments[i].courses[j] = {
+// 								_id: course._id,
+// 								code: course.code,
+// 								name: course.name
+// 							}
+// 						}
+// 					});
+// 					if (j + 1 === department.courses.length) {
+// 						resolve();
+// 					}
+// 				});
+// 			});
+//
+// 			getCourseNamesPromise2.then(function() {
+// 				if (i + 1 === departments.length) {
+// 					resolve();
+// 				}
+// 			});
+// 		});
+// 	});
+//
+// 	getCourseNamesPromise.then(function() {
+// 		console.log(departments);
+// 		callback(departments);
+// 	});
+// }
+
 // get add course to department
 router.get("/assign-courses", function(req, res) {
 	Department.find({}, (err, departments) => {
@@ -16,7 +54,11 @@ router.get("/assign-courses", function(req, res) {
 					console.log(err);
 				}
 				else {
-					res.render("relations/department-course", { departments, courses });
+					// getCourseNames(departments, function(returnedDepartments) {
+					// 	res.render("relations/department-course", {departments: returnedDepartments, courses});
+					// });
+
+					res.render("relations/department-course", {departments, courses});
 				}
 			});
 		}
