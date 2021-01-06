@@ -50,7 +50,7 @@ app.use("/admin", adminRouter);
 app.use("/courses", courseRouter);
 app.use("/teachers", teacherRouter);
 app.use("/departments", departmentRouter);
-app.use("/manage", relationsRouter);
+app.use("/", relationsRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");

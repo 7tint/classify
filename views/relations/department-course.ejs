@@ -29,7 +29,7 @@
       </div>
 
       <% departments.forEach(function(department) { %>
-        <div id=<%= department._id %>>
+        <div>
           <p>Department: <%= department.name %> </p>
       		<div
       		name="sortableCards"
@@ -41,7 +41,8 @@
       			sortable-animation
       		"
           style="min-height: 500px;"
-      		sortable>
+      		sortable
+          id=<%= department._id %>>
             <% courses.forEach(function(course) { %>
               <% if (course.department) { %>
                 <% if (course.department.toString() === department._id.toString()) { %>
@@ -57,6 +58,10 @@
       <% }); %>
   	</div>
   </div>
+
+  <form class="d-none hidden-form" action="/assign-courses?_method=PUT" method="POST">
+    <button class="hidden-submit-button" type="submit">SUBMIT</button>
+  </form>
 
   <button class="m-3 btn btn-sm btn-success" type="button" onclick="submitChanges()" name="save">Save Changes</button> <br/>
 
@@ -96,11 +101,19 @@
     );
 
     function submitChanges() {
-      var courses = document.querySelectorAll(".course");
+      const courses = document.querySelectorAll(".course");
+      const hiddenForm = document.querySelector(".hidden-form");
+
+      var returnCourses = new Array();
 
       courses.forEach(function(course) {
-        console.log(course);
+        hiddenForm.innerHTML += "<input type='text' name='courses[]' value='" + course.id + "'/>"
+        hiddenForm.innerHTML += "<input type='text' name='departments[]' value='" + course.parentElement.id + "'/>"
       });
+      const hiddenBtn = document.querySelector(".hidden-submit-button");
+      hiddenBtn.click();
+
+      // console.log(returnCourses);
     }
   </script>
 
