@@ -5,7 +5,7 @@ const Course = require("./../models/courseModel");
 const Teacher = require("./../models/teacherModel");
 
 // get add course to department
-router.get("/", function(req, res) {
+router.get("/assign-courses", function(req, res) {
 	Department.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
@@ -24,7 +24,7 @@ router.get("/", function(req, res) {
 });
 
 // get add teacher to course
-router.get("/teacher", function(req, res) {
+router.get("/assign-teachers", function(req, res) {
 	Course.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);

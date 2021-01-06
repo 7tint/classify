@@ -1,5 +1,6 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true });
+const router = express.Router({mergeParams: true});
+const Course = require('./../models/courseModel');
 const Department = require("./../models/departmentModel");
 
 router.get("/", (req, res) => {
@@ -8,7 +9,7 @@ router.get("/", (req, res) => {
 			console.log(err);
 		}
 		else {
-			res.render("departments/index", { departments });
+			res.render("departments/index", {departments});
 		}
 	});
 });
@@ -22,7 +23,7 @@ router.post("/", (req, res) => {
 		name: req.body.departmentName,
 		description: req.body.departmentDescription
 	};
-	Department.find({ name: new RegExp(`^${department.name}$`, 'i') }, function(err, searchResults) {
+	Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}
@@ -44,23 +45,23 @@ router.post("/", (req, res) => {
 });
 
 router.get("/:name", (req, res) => {
-	Department.findOne({ name: req.params.name }, function(err, department) {
+	Department.findOne({name: req.params.name}, function(err, department) {
 		if (err) {
 			console.log(err);
 		}
 		else {
-			res.render("departments/show", { department });
+			res.render("departments/show", {department});
 		}
 	});
 });
 
 router.get("/:name/edit", (req, res) => {
-	Department.findOne({ name: req.params.name }, function(err, department) {
+	Department.findOne({name: req.params.name}, function(err, department) {
 		if (err) {
 			console.log(err);
 		}
 		else {
-			res.render("departments/edit", { department });
+			res.render("departments/edit", {department});
 		}
 	});
 });
@@ -70,17 +71,17 @@ router.put("/:name", (req, res) => {
 		name: req.body.departmentName,
 		description: req.body.departmentDescription
 	};
-	Department.find({ name: new RegExp(`^${department.name}$`, 'i') }, function(err, searchResults) {
+	Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
 		if (err) {
 			console.log(err);
 		}
 		else if (!searchResults.length) {
-			Department.findOneAndUpdate({ name: req.params.name }, department, function(err, department) {
+			Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
 				if (err) {
 					console.log(err);
 				}
 				else {
-					console.log(department.name + " department updated");
+					console.log(updatedDepartment.name + " department updated");
 					res.redirect("/departments");
 				}
 			});
@@ -93,14 +94,41 @@ router.put("/:name", (req, res) => {
 });
 
 router.delete("/:name", (req, res) => {
-	const { name } = req.params;
-	Department.deleteOne({ name }, function(err) {
+	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
 		if (err) {
 			console.log(err);
 		}
 		else {
-			console.log("Deleted: " + name);
-			res.redirect("/departments");
+			Department.deleteOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err) {
+				if (err) {
+					console.log(err);
+				}
+				else {
+					if (department.courses.length === 0) {
+						console.log("Deleted: " + req.params.name);
+						res.redirect("/departments");
+		      }
+		      else {
+						let deleteCourses = new Promise(function(resolve, reject) {
+			        department.courses.forEach(async function(course, i) {
+								await Course.findOneAndUpdate({_id: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
+									if (err) {
+										console.log(err);
+									}
+								});
+			          if (i + 1 === department.courses.length) {
+			            resolve();
+			          }
+			        });
+			      });
+
+			      deleteCourses.then(function() {
+							console.log("Deleted: " + req.params.name);
+							res.redirect("/departments");
+			      });
+					}
+				}
+			});
 		}
 	});
 });

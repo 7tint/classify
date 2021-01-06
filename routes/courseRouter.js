@@ -93,22 +93,27 @@ router.get("/", function(req, res) {
       console.log(err);
     }
     else {
-      let getCourses = new Promise(function(resolve, reject) {
-        courses.forEach(async function(course, i) {
-          if (!(course.department === undefined)) {
-            await Department.findOne({_id: course.department}, function(err, department) {
-              course.departmentName = department.name;
-            });
-          }
-          if (i + 1 === courses.length) {
-            resolve();
-          }
-        });
-      });
-
-      getCourses.then(function() {
+      if (courses.length === 0) {
         res.render("courses/index", {courses});
-      });
+      }
+      else {
+        let getCourses = new Promise(function(resolve, reject) {
+          courses.forEach(async function(course, i) {
+            if (!(course.department === undefined)) {
+              await Department.findOne({_id: course.department}, function(err, department) {
+                course.departmentName = department.name;
+              });
+            }
+            if (i + 1 === courses.length) {
+              resolve();
+            }
+          });
+        });
+
+        getCourses.then(function() {
+          res.render("courses/index", {courses});
+        });
+      }
     }
   });
 });
@@ -322,7 +327,7 @@ router.put("/:code", function(req, res) {
 });
 
 router.delete("/:code", function(req, res) {
-  Course.deleteOne({code: req.params.code}, function(err, deletedCourse) {
+  Course.deleteOne({code: req.params.code}, function(err) {
     if (err) {
       console.log(err);
     }

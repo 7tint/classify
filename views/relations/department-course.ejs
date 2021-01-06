@@ -1,12 +1,33 @@
 <%- include('../partials/header'); -%>
   <link rel="stylesheet" href="/css/department-course.css">
   <script src="/modules/@shopify/draggable/lib/draggable.bundle.js"></script>
-  <script src="/modules/vue/dist/vue.min.js"></script>
 
-  <a href="/classify-courses/teacher">Add Teacher to Course</a>
-  
   <div id="app">
   	<div class="grid flex-start-content department-courses">
+      <div>
+        <p>Uncategorized:</p>
+        <div
+        name="sortableCards"
+        class="
+          grid
+          flex-start-content
+          disable-marker
+          cards clickable
+          sortable-animation
+        "
+        style="min-height: 500px;"
+        sortable>
+          <% courses.forEach(function(course) { %>
+            <% if (course.department === undefined) { %>
+              <div sortItem>
+                <p> <%= course._id %> </p>
+              </div>
+            <% } %>
+          <% }); %>
+        </div>
+
+      </div>
+
       <% departments.forEach(function(department) { %>
         <div>
           <p>Department: <%= department.name %> </p>
