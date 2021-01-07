@@ -76,7 +76,7 @@ router.put("/:name", (req, res) => {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
     if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
       console.log("Department not found!");
-      res.redirect("/courses");
+      res.redirect("/departments");
     }
 		else {
 			Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
@@ -96,7 +96,7 @@ router.put("/:name", (req, res) => {
 				}
 				else {
 					console.log("Department already exists!");
-					res.redirect("/departments/new");
+					res.redirect("/departments");
 				}
 			});
 		}
