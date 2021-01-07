@@ -105,15 +105,20 @@ function getOldDepartments(courses, oldDepartments, i, callback) {
 }
 
 function checkDepartmentsHelper(department, callback) {
-	Department.findOne({_id: department}, function(err, department) {
-		if (err || department === null || department === undefined || !department) {
-			console.log(err);
-			callback(false);
-		}
-		else {
-			callback(true);
-		}
-	})
+	if (department === "") {
+		callback(true);
+	}
+	else {
+		Department.findOne({_id: department}, function(err, department) {
+			if (err || department === null || department === undefined || !department) {
+				console.log(err);
+				callback(false);
+			}
+			else {
+				callback(true);
+			}
+		});
+	}
 }
 
 function checkDepartments(departments, i, callback) {
@@ -179,25 +184,29 @@ router.put("/assign-courses", function(req, res) {
 	checkDepartments(departments, 0, function(isValid) {
 		if (!isValid) {
 			console.log("ERROR in departments submitted!");
+			res.redirect("/assign-courses");
 		}
 		else {
 			getOldDepartments(courses, oldDepartments, 0, function(isValid, oldDepartments) {
 				if (!isValid) {
 					console.log("ERROR in course codes submitted!");
+					res.redirect("/assign-courses");
 				}
 
 				else if (courses.length === 0) {
 					console.log("ERROR please create courses before assigning them to departments!");
+					res.redirect("/assign-courses");
 				}
 
 				else if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
 					console.log("ERROR (array mismatch) while updating course departments!");
+					res.redirect("/assign-courses");
 				}
 
 				else {
 					updateCourseDepartmentsHelper(courses, departments, oldDepartments, 0, function() {
 						console.log("Successfully updated course departments!");
-						res.redirect("/admin");
+						res.redirect("/assign-courses");
 					});
 				}
 			});
