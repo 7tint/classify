@@ -105,9 +105,10 @@ router.put("/:name", (req, res) => {
 
 router.delete("/:name", (req, res) => {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
-		if (err) {
-			console.log(err);
-		}
+		if (err || department === null || department === undefined || !department) {
+      console.log("Department not found!");
+      res.redirect("/departments");
+    }
 		else {
 			Department.deleteOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err) {
 				if (err) {

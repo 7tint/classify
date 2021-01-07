@@ -346,9 +346,10 @@ router.put("/:code", function(req, res) {
 });
 
 router.delete("/:code", function(req, res) {
-  Course.deleteOne({code: req.params.code}, function(err) {
-    if (err) {
-      console.log(err);
+  Course.deleteOne({code: req.params.code}, function(err, course) {
+    if (err || course === null || course === undefined || !course) {
+      console.log("Course not found!");
+      res.redirect("/courses");
     }
     else {
       console.log("Deleted: " + req.params.code);
