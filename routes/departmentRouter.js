@@ -45,10 +45,11 @@ router.post("/", (req, res) => {
 });
 
 router.get("/:name", (req, res) => {
-	Department.findOne({name: req.params.name}, function(err, department) {
-		if (err) {
-			console.log(err);
-		}
+	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
+		if (err || department === null || department === undefined || !department) {
+      console.log("Department not found!");
+      res.redirect("/departments");
+    }
 		else {
 			res.render("departments/show", {department});
 		}
@@ -56,10 +57,11 @@ router.get("/:name", (req, res) => {
 });
 
 router.get("/:name/edit", (req, res) => {
-	Department.findOne({name: req.params.name}, function(err, department) {
-		if (err) {
-			console.log(err);
-		}
+	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
+		if (err || department === null || department === undefined || !department) {
+      console.log("Department not found!");
+      res.redirect("/departments");
+    }
 		else {
 			res.render("departments/edit", {department});
 		}
@@ -71,24 +73,32 @@ router.put("/:name", (req, res) => {
 		name: req.body.departmentName,
 		description: req.body.departmentDescription
 	};
-	Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
-		if (err) {
-			console.log(err);
-		}
-		else if (!searchResults.length) {
-			Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
+	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
+    if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
+      console.log("Department not found!");
+      res.redirect("/courses");
+    }
+		else {
+			Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
 				if (err) {
 					console.log(err);
 				}
+				else if (!searchResults.length) {
+					Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
+						if (err) {
+							console.log(err);
+						}
+						else {
+							console.log(updatedDepartment.name + " department updated");
+							res.redirect("/departments");
+						}
+					});
+				}
 				else {
-					console.log(updatedDepartment.name + " department updated");
-					res.redirect("/departments");
+					console.log("Department already exists!");
+					res.redirect("/departments/new");
 				}
 			});
-		}
-		else {
-			console.log("Department already exists!");
-			res.redirect("/departments/new");
 		}
 	});
 });

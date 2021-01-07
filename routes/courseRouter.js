@@ -184,7 +184,7 @@ router.post("/", function(req, res) {
           });
         }
         else {
-          console.log("Course prerequisites is not valid.");
+          console.log("Course prerequisites is not valid!");
           res.redirect("/courses/new");
           // Redirect to admin courses with an error message
         }
@@ -201,8 +201,9 @@ router.post("/", function(req, res) {
 
 router.get("/:code", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
-    if (err) {
-      console.log(err);
+    if (err || course === null || course === undefined || !course) {
+      console.log("Course not found!");
+      res.redirect("/courses");
     }
     else {
       if (!(course.department === undefined)) {
@@ -219,8 +220,9 @@ router.get("/:code", function(req, res) {
 
 router.get("/:code/edit", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
-    if (err) {
-      console.log(err);
+    if (err || course === null || course === undefined || !course) {
+      console.log("Course not found!");
+      res.redirect("/courses");
     }
     else {
       Course.find({}, function(err, courses) {
@@ -253,75 +255,92 @@ router.put("/:code", function(req, res) {
     prereq: req.body.coursePrerequisites
   };
 
-  // Search for existing courses with the course code to check for duplicates
-  Course.find({code: course.code}, function(err, searchResults) {
-    if (err) {
-      console.log(err);
+  Course.findOne({code: req.params.code}, function(err, foundCourse) {
+    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
+      console.log("Course not found!");
+      res.redirect("/courses");
     }
-    // If no OTHER COURSE results are found, proceed
-    else if (!searchResults.length || searchResults[0].code === req.params.code) {
-      // Check that the course prerequisites is valid
-      checkPrereq(course.prereq, course.code, function(isValid) {
-        if (isValid) {
-          Department.countDocuments({_id: course.department}, function(err, count) {
-            // Remove old course department
-            Course.findOneAndUpdate({code: req.params.code}, {$unset: {department: ""}}, function(err, updatedCourse) {
-              if (err) {
-                console.log("ERROR while updating course object!");
-                console.log(err);
-                // Redirect to admin courses with an error message
-              }
-              else {
-                if (count === 0 || count === undefined) {
-                  delete course.department;
+    else {
+      // Search for existing courses with the course code to check for duplicates
+      Course.find({code: course.code}, function(err, searchResults) {
+        console.log(searchResults);
+        if (err) {
+          console.log(err);
+        }
+        // If no OTHER COURSE results are found, proceed
+        else if (searchResults.length === 0 || searchResults[0].code === req.params.code) {
+          // Check that department exists
+          Department.findOne({_id: course.department}, function(err, department) {
+            if (err || department === null || department === undefined || !department) {
+              console.log("Department is not valid!");
+            }
+            else {
+              // Check that the course prerequisites is valid
+              checkPrereq(course.prereq, course.code, function(isValid) {
+                if (isValid) {
+                  Department.countDocuments({_id: course.department}, function(err, count) {
+                    // Remove old course department
+                    Course.findOneAndUpdate({code: req.params.code}, {$unset: {department: ""}}, function(err, updatedCourse) {
+                      if (err) {
+                        console.log("ERROR while updating course object!");
+                        console.log(err);
+                        // Redirect to admin courses with an error message
+                      }
+                      else {
+                        if (count === 0 || count === undefined) {
+                          delete course.department;
+                        }
+                        Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse) {
+                          if (err) {
+                            console.log("ERROR while updating course object!");
+                            console.log(err);
+                            // Redirect to admin courses with an error message
+                          }
+                          else {
+                            if (!(searchResults[0].department === undefined)) {
+                              // Remove course from old department
+                              await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+                                if (err) {
+                                  console.log("ERROR while adding course to department!");
+                                  console.log(err);
+                                }
+                              });
+                            }
+                            if (!(course.department === undefined)) {
+                              // Add course to new department
+                              await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+                                if (err) {
+                                  console.log("ERROR while adding course to department!");
+                                  console.log(err);
+                                }
+                              });
+                            }
+                            console.log("Course updated!");
+                            res.redirect("/courses");
+                          }
+                        });
+                      }
+                    });
+                  });
                 }
-                Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse) {
-                  if (err) {
-                    console.log("ERROR while updating course object!");
-                    console.log(err);
-                    // Redirect to admin courses with an error message
-                  }
-                  else {
-                    if (!(searchResults[0].department === undefined)) {
-                      // Remove course from old department
-                      await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
-                        if (err) {
-                          console.log("ERROR while adding course to department!");
-                          console.log(err);
-                        }
-                      });
-                    }
-                    if (!(course.department === undefined)) {
-                      // Add course to new department
-                      await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
-                        if (err) {
-                          console.log("ERROR while adding course to department!");
-                          console.log(err);
-                        }
-                      });
-                    }
-                    console.log("Course updated!");
-                    res.redirect("/courses");
-                  }
-                });
-              }
-            });
+                else {
+                  console.log("Course prerequisites is not valid!");
+                  let url = "/courses/" + req.params.code + "/edit";
+                  res.redirect(url);
+                  // Redirect to admin courses with an error message
+                }
+              });
+            }
           });
         }
+        // If course code already exists, display error message
         else {
-          console.log("Course prerequisites is not valid.");
-          let url = "/courses/" + course.code + "/edit";
+          console.log("Course code already exists!");
+          let url = "/courses/" + req.params.code + "/edit";
           res.redirect(url);
           // Redirect to admin courses with an error message
         }
       });
-    }
-    // If course code already exists, display error message
-    else {
-      console.log("Course code already exists!");
-      let url = "/courses/" + course.code + "/edit";
-      res.redirect(url);
-      // Redirect to admin courses with an error message
     }
   });
 });

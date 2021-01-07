@@ -5,7 +5,6 @@ const Course = require("./../models/courseModel");
 const Teacher = require("./../models/teacherModel");
 
 function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, callback) {
-
 	if (department !== "") {
 		Course.findOneAndUpdate({code: course}, {department}, function(err, updatedCourse) {
 			if (err) {
@@ -105,6 +104,33 @@ function getOldDepartments(courses, oldDepartments, i, callback) {
 	});
 }
 
+function checkDepartmentsHelper(department, callback) {
+	Department.findOne({_id: department}, function(err, department) {
+		if (err || department === null || department === undefined || !department) {
+			console.log(err);
+			callback(false);
+		}
+		else {
+			callback(true);
+		}
+	})
+}
+
+function checkDepartments(departments, i, callback) {
+	checkDepartmentsHelper(departments[i], function(isValid) {
+		if (!isValid) {
+			callback(false);
+		}
+		else if (i + 1 === departments.length) {
+			callback(true);
+		}
+		else {
+			i++;
+			checkDepartments(departments, i, callback);
+		}
+	});
+}
+
 
 // get add course to department
 router.get("/assign-courses", function(req, res) {
@@ -150,23 +176,30 @@ router.put("/assign-courses", function(req, res) {
 	const departments = req.body.departments;
 	var oldDepartments = new Array();
 
-	getOldDepartments(courses, oldDepartments, 0, function(isValid, oldDepartments) {
+	checkDepartments(departments, 0, function(isValid) {
 		if (!isValid) {
-			console.log("ERROR in course codes submitted!");
+			console.log("ERROR in departments submitted!");
 		}
-
-		else if (courses.length === 0) {
-			console.log("ERROR please create courses before assigning them to departments!");
-		}
-
-		else if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
-			console.log("ERROR (array mismatch) while updating course departments!");
-		}
-
 		else {
-			updateCourseDepartmentsHelper(courses, departments, oldDepartments, 0, function() {
-				console.log("Successfully updated course departments!");
-				res.redirect("/admin");
+			getOldDepartments(courses, oldDepartments, 0, function(isValid, oldDepartments) {
+				if (!isValid) {
+					console.log("ERROR in course codes submitted!");
+				}
+
+				else if (courses.length === 0) {
+					console.log("ERROR please create courses before assigning them to departments!");
+				}
+
+				else if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
+					console.log("ERROR (array mismatch) while updating course departments!");
+				}
+
+				else {
+					updateCourseDepartmentsHelper(courses, departments, oldDepartments, 0, function() {
+						console.log("Successfully updated course departments!");
+						res.redirect("/admin");
+					});
+				}
 			});
 		}
 	});
