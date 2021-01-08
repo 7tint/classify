@@ -263,7 +263,6 @@ router.put("/:code", function(req, res) {
     else {
       // Search for existing courses with the course code to check for duplicates
       Course.find({code: course.code}, function(err, searchResults) {
-        console.log(searchResults);
         if (err) {
           console.log(err);
         }
@@ -290,16 +289,17 @@ router.put("/:code", function(req, res) {
                         if (count === 0 || count === undefined) {
                           delete course.department;
                         }
-                        Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse) {
+                        Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse2) {
                           if (err) {
                             console.log("ERROR while updating course object!");
                             console.log(err);
                             // Redirect to admin courses with an error message
                           }
                           else {
-                            if (!(searchResults[0].department === undefined)) {
+                            console.log(updatedCourse);
+                            if (!(updatedCourse.department === undefined)) {
                               // Remove course from old department
-                              await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+                              await Department.findOneAndUpdate({_id: updatedCourse.department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                                 if (err) {
                                   console.log("ERROR while adding course to department!");
                                   console.log(err);
