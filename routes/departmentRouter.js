@@ -121,14 +121,14 @@ router.delete("/:name", (req, res) => {
 		      }
 		      else {
 						let promises = department.courses.map(async function(course) {
-	            let updateCourse = await Course.findOneAndUpdate({_id: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
+	            await Course.findOneAndUpdate({_id: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
 								if (err) {
 									console.log(err);
 								}
 							});
 		        });
 
-		        const deleteCourses = await Promise.all(promises);
+		        await Promise.all(promises);
 						console.log("Deleted: " + req.params.name);
 						res.redirect("/departments");
 					}

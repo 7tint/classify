@@ -99,13 +99,13 @@ router.get("/", function(req, res) {
       else {
         let promises = courses.map(async function(course) {
           if (!(course.department === undefined)) {
-            let courseDepartment = await Department.findOne({_id: course.department}, function(err, department) {
+            await Department.findOne({_id: course.department}, function(err, department) {
               course.departmentName = department.name;
             });
           }
         });
-        const getCourses = await Promise.all(promises);
-        
+
+        await Promise.all(promises);
         res.render("courses/index", {courses});
       }
     }
