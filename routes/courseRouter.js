@@ -97,22 +97,16 @@ router.get("/", function(req, res) {
         res.render("courses/index", {courses});
       }
       else {
-        let getCourses = new Promise(function(resolve, reject) {
-          courses.forEach(async function(course, i) {
-            if (!(course.department === undefined)) {
-              await Department.findOne({_id: course.department}, function(err, department) {
-                course.departmentName = department.name;
-              });
-            }
-            if (i + 1 === courses.length) {
-              resolve();
-            }
-          });
+        let promises = courses.map(async function(course) {
+          if (!(course.department === undefined)) {
+            let courseDepartment = await Department.findOne({_id: course.department}, function(err, department) {
+              course.departmentName = department.name;
+            });
+          }
         });
-
-        getCourses.then(function() {
-          res.render("courses/index", {courses});
-        });
+        const getCourses = await Promise.all(promises);
+        
+        res.render("courses/index", {courses});
       }
     }
   });

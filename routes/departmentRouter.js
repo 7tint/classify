@@ -110,7 +110,7 @@ router.delete("/:name", (req, res) => {
       res.redirect("/departments");
     }
 		else {
-			Department.deleteOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err) {
+			Department.deleteOne({name: new RegExp(`^${req.params.name}$`, 'i')}, async function(err) {
 				if (err) {
 					console.log(err);
 				}
@@ -120,23 +120,17 @@ router.delete("/:name", (req, res) => {
 						res.redirect("/departments");
 		      }
 		      else {
-						let deleteCourses = new Promise(function(resolve, reject) {
-			        department.courses.forEach(async function(course, i) {
-								await Course.findOneAndUpdate({_id: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
-									if (err) {
-										console.log(err);
-									}
-								});
-			          if (i + 1 === department.courses.length) {
-			            resolve();
-			          }
-			        });
-			      });
+						let promises = department.courses.map(async function(course) {
+	            let updateCourse = await Course.findOneAndUpdate({_id: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
+								if (err) {
+									console.log(err);
+								}
+							});
+		        });
 
-			      deleteCourses.then(function() {
-							console.log("Deleted: " + req.params.name);
-							res.redirect("/departments");
-			      });
+		        const deleteCourses = await Promise.all(promises);
+						console.log("Deleted: " + req.params.name);
+						res.redirect("/departments");
 					}
 				}
 			});
