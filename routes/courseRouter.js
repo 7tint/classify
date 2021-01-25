@@ -296,7 +296,6 @@ router.put("/:code", function(req, res) {
                             // Redirect to admin courses with an error message
                           }
                           else {
-                            console.log(updatedCourse);
                             if (!(updatedCourse.department === undefined)) {
                               // Remove course from old department
                               await Department.findOneAndUpdate({_id: updatedCourse.department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
@@ -346,15 +345,26 @@ router.put("/:code", function(req, res) {
 });
 
 router.delete("/:code", function(req, res) {
-  Course.deleteOne({code: req.params.code}, function(err, course) {
-    if (err || course === null || course === undefined || !course) {
+  Course.findOne({code: req.params.code}, function(err, foundCourse) {
+    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
       console.log("Course not found!");
       res.redirect("/courses");
     }
-    else {
-      console.log("Deleted: " + req.params.code);
-      res.redirect("/courses");
-    }
+    Course.deleteOne({code: req.params.code}, function(err, course) {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        Department.findOneAndUpdate({_id: foundCourse.department}, {$pull: {courses: foundCourse._id}}, function(err, updatedDepartment) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Deleted: " + req.params.code);
+            res.redirect("/courses");
+          }
+        });
+      }
+    });
   });
 });
 

@@ -6,6 +6,9 @@
 
     <div class="d-flex flex-row mt-5">
       <% courses.forEach(function(course){ %>
+        <script type="text/javascript">
+          console.log("<%= course.departmentName %>");
+        </script>
         <div class="p-2 m-1 bg-light">
           <p>Name: <%= course.name %></p>
           <p>Department: <%= course.departmentName %></p>
