@@ -3,13 +3,14 @@ const router = express.Router({ mergeParams: true });
 const Department = require("./../models/departmentModel");
 const Course = require("./../models/courseModel");
 const Teacher = require("./../models/teacherModel");
+const ObjectId = require('mongoose').Types.ObjectId;
 
-function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, callback) {
+function updateCourseDepartmentsHelper(course, department, oldDepartment, callback) {
 	if (department !== "") {
 		Course.findOneAndUpdate({code: course}, {department}, function(err, updatedCourse) {
 			if (err) {
 				console.log("ERROR while updating course object!");
-				console.log(err);
+				callback(err);
 				// Redirect to admin courses with an error message
 			}
 			else {
@@ -17,14 +18,14 @@ function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, ca
 					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
 						if (err) {
 							console.log("ERROR while adding course to department!");
-							console.log(err);
+							callback(err);
 						}
 					});
 				}
 				Department.findOneAndUpdate({_id: department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
 					if (err) {
 						console.log("ERROR while adding course to department!");
-						console.log(err);
+						callback(err);
 					}
 					else {
 						callback();
@@ -37,7 +38,7 @@ function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, ca
 		Course.findOneAndUpdate({code: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
 			if (err) {
 				console.log("ERROR while updating course object!");
-				console.log(err);
+				callback(err);
 				// Redirect to admin courses with an error message
 			}
 			else {
@@ -45,7 +46,7 @@ function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, ca
 					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
 						if (err) {
 							console.log("ERROR while adding course to department!");
-							console.log(err);
+							callback(err);
 						}
 						else {
 							callback();
@@ -59,83 +60,6 @@ function updateCourseDepartmentsHelper2(course, department, oldDepartment, i, ca
 		});
 	}
 }
-
-function updateCourseDepartmentsHelper(courses, departments, oldDepartments, i, callback) {
-	updateCourseDepartmentsHelper2(courses[i], departments[i], oldDepartments[i], i, function() {
-		if (i + 1 === courses.length) {
-			callback();
-		} else {
-			i++;
-			updateCourseDepartmentsHelper(courses, departments, oldDepartments, i, callback);
-		}
-	});
-}
-
-function getOldDepartmentsHelper(course, oldDepartments, callback) {
-	Course.findOne({code: course}, function(err, course) {
-		if (err || course === null || course === undefined || !course) {
-			console.log(err);
-			callback(false, undefined);
-		}
-		else {
-			if (course.department === undefined) {
-				oldDepartments.push("");
-				callback(true, oldDepartments);
-			} else {
-				oldDepartments.push(course.department);
-				callback(true, oldDepartments);
-			}
-		}
-	});
-}
-
-function getOldDepartments(courses, oldDepartments, i, callback) {
-	getOldDepartmentsHelper(courses[i], oldDepartments, function(isValid, oldDepartments) {
-		if (!isValid) {
-			callback(false, undefined);
-		}
-		else if (i + 1 === courses.length) {
-			callback(true, oldDepartments);
-		}
-		else {
-			i++;
-			getOldDepartments(courses, oldDepartments, i, callback);
-		}
-	});
-}
-
-function checkDepartmentsHelper(department, callback) {
-	if (department === "") {
-		callback(true);
-	}
-	else {
-		Department.findOne({_id: department}, function(err, department) {
-			if (err || department === null || department === undefined || !department) {
-				console.log(err);
-				callback(false);
-			}
-			else {
-				callback(true);
-			}
-		});
-	}
-}
-
-function checkDepartments(departments, i, callback) {
-	checkDepartmentsHelper(departments[i], function(isValid) {
-		if (!isValid) {
-			callback(false);
-		}
-		else if (i + 1 === departments.length) {
-			callback(true);
-		}
-		else {
-			i++;
-			checkDepartments(departments, i, callback);
-		}
-	});
-}
-
 
 // get add course to department
 router.get("/assign-courses", function(req, res) {
@@ -176,42 +100,82 @@ router.get("/assign-teachers", function(req, res) {
 });
 
 // put add course to department
-router.put("/assign-courses", function(req, res) {
+router.put("/assign-courses", async function(req, res) {
 	const courses = req.body.courses;
 	const departments = req.body.departments;
 	var oldDepartments = new Array();
+	var isValid = true;
 
-	checkDepartments(departments, 0, function(isValid) {
+	if (courses.length === 0) {
+		console.log("ERROR please create courses before attempting to assign them to departments!");
+		res.redirect("/assign-courses");
+	}
+
+	else {
+		let checkDepartments = departments.map(async function(department) {
+			if (department) {
+				if (ObjectId.isValid(department)) {
+					await Department.findOne({_id: department}, function(err, department) {
+						if (err || department === null || department === undefined || !department) {
+							console.log(err);
+							isValid = false;
+						}
+					});
+				} else {
+					isValid = false;
+				}
+			}
+		});
+		await Promise.all(checkDepartments);
+
 		if (!isValid) {
 			console.log("ERROR in departments submitted!");
 			res.redirect("/assign-courses");
 		}
+
 		else {
-			getOldDepartments(courses, oldDepartments, 0, function(isValid, oldDepartments) {
-				if (!isValid) {
-					console.log("ERROR in course codes submitted!");
-					res.redirect("/assign-courses");
-				}
+			let getOldDepartments = courses.map(async function(course) {
+				await Course.findOne({code: course}, function(err, course) {
+					if (err || course === null || course === undefined || !course) {
+						console.log(err);
+						isValid = false;
+					}
+					else {
+						if (course.department === undefined) {
+							oldDepartments.push("");
+						} else {
+							oldDepartments.push(course.department);
+						}
+					}
+				});
+			});
+			await Promise.all(getOldDepartments);
 
-				else if (courses.length === 0) {
-					console.log("ERROR please create courses before assigning them to departments!");
-					res.redirect("/assign-courses");
-				}
+			if (!isValid) {
+				console.log("ERROR in course codes submitted!");
+				res.redirect("/assign-courses");
+			}
 
-				else if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
+			else {
+				if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
 					console.log("ERROR (array mismatch) while updating course departments!");
 					res.redirect("/assign-courses");
 				}
 
 				else {
-					updateCourseDepartmentsHelper(courses, departments, oldDepartments, 0, function() {
-						console.log("Successfully updated course departments!");
-						res.redirect("/assign-courses");
+					let updateCourseDepartments = courses.map(async function(course, i) {
+						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
+							if (err) {
+								console.log(err);
+							}
+						});
 					});
+					await Promise.all(updateCourseDepartments);
+					res.redirect("/assign-courses");
 				}
-			});
+			}
 		}
-	});
+	}
 });
 
 // put add teacher to course //same copypasta as above get req
