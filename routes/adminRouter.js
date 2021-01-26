@@ -7,6 +7,7 @@ router.get("/", function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
     if (err) {
       console.log("ERROR while retrieving preferences!");
+      req.flash("error", "ERROR while retrieving preferences!");
       console.log(err);
     }
     else {
@@ -28,11 +29,13 @@ router.get("/", function(req, res) {
         Preferences.create(defaultPreferences, function(err, createdPreferences) {
           if (err) {
             console.log("ERROR while creating preferences object!");
+            req.flash("error", "ERROR while crearing preferences object!");
             console.log(err);
             // Redirect to preferences page with an error message
           }
           else {
             console.log("Preferences created!");
+            req.flash("success", "Preferences created!");
             res.redirect("/admin");
           }
         });
@@ -56,6 +59,7 @@ router.get("/edit", function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
     if (err) {
       console.log("ERROR while retrieving preferences!");
+      req.flash("error", "ERROR while retrieving preferences!");
       console.log(err);
     }
     else {
@@ -77,11 +81,13 @@ router.get("/edit", function(req, res) {
         Preferences.create(defaultPreferences, function(err, createdPreferences) {
           if (err) {
             console.log("ERROR while creating preferences object!");
+            req.flash("error", "ERROR while creating preferences object!");
             console.log(err);
             // Redirect to preferences page with an error message
           }
           else {
             console.log("Preferences created!");
+            req.flash("success", "Preferences created!");
             res.redirect("/admin/");
           }
         });
@@ -129,6 +135,7 @@ router.put("/", function(req, res) {
   Preferences.findOneAndUpdate({}, preferences, {upsert: true}, function(err, docs) {
     if (err) {
       console.log("ERROR while deleting preference objects!");
+      req.flash("error", "ERROR while deleting preference objects!");
       console.log(err);
     }
     else {

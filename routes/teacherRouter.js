@@ -33,6 +33,7 @@ router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
 		if (err) {
 			console.log(err);
+			req.flash("error", err);
 		}
 		else {
 			res.render("teachers/index", { teachers: allTeachers });
@@ -57,21 +58,25 @@ router.post("/", function(req, res) {
 	Teacher.find({ name: new RegExp(`^${teacher.name}$`, 'i') }, function(err, searchResults) {
 		if (err) {
 			console.log(err);
+			req.flash("error", err);
 		}
 		else if (!searchResults.length) {
 			Teacher.create(teacher, function(err, newTeacher) {
 				if (err) {
 					console.log("ERROR while creating teacher object!");
+					req.flash("error", "ERROR while creating teacher object!");
 					console.log(err);
 				}
 				else {
 					console.log("Teacher created!");
+					req.flash("success", "Teacher created!");
 					res.redirect("/teachers");
 				}
 			});
 		}
 		else {
 			console.log("Teacher already exists!");
+			req.flash("error", "Teacher already exists!");
 			res.redirect("/teachers/new");
 		}
 	});
@@ -81,7 +86,8 @@ router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
 	Teacher.findOne({name: nameObject}, function(err, teacher) {
 		if (err || teacher === null || teacher === undefined || !teacher) {
-      console.log("Teacher not found!");
+			console.log("Teacher not found!");
+			req.flash("error", "Teacher not found!");
       res.redirect("/teachers");
     }
 		else {
@@ -94,7 +100,8 @@ router.get("/:name/edit", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
 	Teacher.findOne({name: nameObject}, function(err, teacher) {
 		if (err || teacher === null || teacher === undefined || !teacher) {
-      console.log("Teacher not found!");
+			console.log("Teacher not found!");
+			req.flash("error", "Teacher not found!");
       res.redirect("/teachers");
     }
 		else {
@@ -116,18 +123,21 @@ router.put("/:name", function(req, res) {
 
 	Teacher.findOne({name: nameObject}, function(err, teacherFound) {
 		if (err || teacherFound === null || teacherFound === undefined || !teacherFound) {
-      console.log("Teacher not found!");
+			console.log("Teacher not found!");
+			req.flash("error", "Teacher not found!");
       res.redirect("/teachers");
     }
 		else {
 			Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, function(err, searchResults) {
 				if (err) {
 					console.log(err);
+					req.flash("error", err);
 				}
 				else if (!searchResults.length) {
 					Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
 						if (err) {
 							console.log(err);
+							req.flash("error", err);
 						}
 						else {
 							res.redirect("/teachers");
@@ -136,6 +146,7 @@ router.put("/:name", function(req, res) {
 				}
 				else {
 					console.log("Teacher already exists!");
+					req.flash("error", "Teacher already exists!");
 					res.redirect("/teachers/new");
 				}
 			});
@@ -147,16 +158,19 @@ router.delete("/:name", function(req, res) {
 	var nameObject = convertNametoObj(req.params.name);
 	Teacher.findOne({name: nameObject}, function(err, teacher) {
 		if (err || teacher === null || teacher === undefined || !teacher) {
-      console.log("Teacher not found!");
+			console.log("Teacher not found!");
+			req.flash("error", "Teacher not found!");
       res.redirect("/teachers");
     }
 		else {
 			Teacher.deleteOne({ name: nameObject }, function(err, deletedTeacher) {
 				if (err) {
 					console.log(err);
+					req.flash("error", err);
 				}
 				else {
 					console.log("Deleted: " + nameObject.firstName + "" + nameObject.lastName);
+					req.flash("success", "Deleted: " + nameObject.firstName + "" + nameObject.lastName);
 					res.redirect("/teachers");
 				}
 			});
@@ -169,7 +183,8 @@ router.delete("/:name", function(req, res) {
 router.get("/:name/reviews/new", function(req, res) {
   Teacher.findOne({name: req.params.name}, function(err, teacher) {
       if (err) {
-        console.log(err);
+				console.log(err);
+				req.flash("error", err);
       } else {
         res.render("reviews/new", {teacher});
       }
@@ -179,13 +194,15 @@ router.get("/:name/reviews/new", function(req, res) {
 router.get("/:name/:id/edit", function(req, res) {
 	Teacher.findOne({name: req.params.name}, function(err, teacher) {
         if (err || teacher === null || teacher === undefined || !teacher) {
-            console.log("Teacher Not Found!");
+						console.log("Teacher Not Found!");
+						req.flash("error", "Teacher Not Found!");
             res.redirect("/teachers/:name");
         }
         else {
             Review.findOne({_id: review.teacher}, function(err, review) {
             if (err) {
-                console.log(err);
+								console.log(err);
+								req.flash("error", err);
             }
                 else {
                 res.render("reviews/edit", {review, teacher});
@@ -215,11 +232,13 @@ router.post("/:name/review", function(req, res) {
   
 	Review.create(review, function(err) {
 	    if (err) {
-		    console.log("ERROR while creating review object!");
+				console.log("ERROR while creating review object!");
+				req.flash("error", "ERROR while creating review object!");
 		    console.log(err);
 	    }
 	    else {
-		    console.log("Review created!");
+				console.log("Review created!");
+				req.flash("success", "Review created!");
 		    res.redirect("/:name");
 	    }
 	});
@@ -247,15 +266,18 @@ router.put("/:name/:id", function(req, res) {
   
 	Teacher.findOne({name: req.params.name}, function(err, foundTeacher) {
         if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-            console.log("Teacher not found!");
+						console.log("Teacher not found!");
+						req.flash("error", "Teacher not found!");
             res.redirect("/teachers");
         }
         else { 
             Review.findOneAndUpdate({_id: review.course}, function(err, foundReview) {
                 if (err) {
-                    console.log(err);
+										console.log(err);
+										req.flash("error", err);
                 } else {
-                    console.log("Review updated successfully");
+										console.log("Review updated successfully");
+										req.flash("success", "Review updated successfully");
                 }
             });
         }

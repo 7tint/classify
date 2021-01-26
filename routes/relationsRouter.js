@@ -66,11 +66,13 @@ router.get("/assign-courses", function(req, res) {
 	Department.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
+			req.flash("error", err);
 		}
 		else {
 			Course.find({}, function(err, courses) {
 				if (err) {
 					console.log(err);
+					req.flash("error", err);
 				}
 				else {
 					res.render("relations/department-course", {departments, courses});
@@ -85,11 +87,13 @@ router.get("/assign-teachers", function(req, res) {
 	Course.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
+			req.flash("error", err);
 		}
 		else {
 			Teacher.find({}, function(err, courses) {
 				if (err) {
 					console.log(err);
+					req.flash("error", err);
 				}
 				else {
 					res.render("relations/course-teacher", { departments, courses });
@@ -108,6 +112,7 @@ router.put("/assign-courses", async function(req, res) {
 
 	if (courses.length === 0) {
 		console.log("ERROR please create courses before attempting to assign them to departments!");
+		req.flash("error", "ERROR please create courses before attempting to assign them to departments!");
 		res.redirect("/assign-courses");
 	}
 
@@ -118,6 +123,7 @@ router.put("/assign-courses", async function(req, res) {
 					await Department.findOne({_id: department}, function(err, department) {
 						if (err || department === null || department === undefined || !department) {
 							console.log(err);
+							req.flash("error", err);
 							isValid = false;
 						}
 					});
@@ -130,6 +136,7 @@ router.put("/assign-courses", async function(req, res) {
 
 		if (!isValid) {
 			console.log("ERROR in departments submitted!");
+			req.flash("error", "ERROR in departments submitted!");
 			res.redirect("/assign-courses");
 		}
 
@@ -138,6 +145,7 @@ router.put("/assign-courses", async function(req, res) {
 				await Course.findOne({code: course}, function(err, course) {
 					if (err || course === null || course === undefined || !course) {
 						console.log(err);
+						req.flash("error", err);
 						isValid = false;
 					}
 					else {
@@ -153,12 +161,14 @@ router.put("/assign-courses", async function(req, res) {
 
 			if (!isValid) {
 				console.log("ERROR in course codes submitted!");
+				req.flash("error", "ERROR in course codes submitted!");
 				res.redirect("/assign-courses");
 			}
 
 			else {
 				if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
 					console.log("ERROR (array mismatch) while updating course departments!");
+					req.flash("error", "ERROR (array mismatch) while updating course departments!");
 					res.redirect("/assign-courses");
 				}
 
@@ -167,6 +177,7 @@ router.put("/assign-courses", async function(req, res) {
 						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
 							if (err) {
 								console.log(err);
+								req.flash("error", err);
 							}
 						});
 					});
@@ -193,7 +204,8 @@ router.put("/teacher/:code", function(req, res) {
   // Search for existing courses with the course code to check for duplicates
   Course.find({code: course.code}, function(err, searchResults) {
     if (err) {
-      console.log(err);
+			console.log(err);
+			req.flash("error", err);
     }
     // If no OTHER COURSE results are found, proceed
     else if (!searchResults.length || searchResults[0].code === req.params.code) {
@@ -204,7 +216,8 @@ router.put("/teacher/:code", function(req, res) {
             // Remove old course department
             Course.findOneAndUpdate({code: req.params.code}, {$unset: {department: ""}}, function(err, updatedCourse) {
               if (err) {
-                console.log("ERROR while updating course object!");
+								console.log("ERROR while updating course object!");
+								req.flash("error", "ERROR while updating course object!");
                 console.log(err);
                 // Redirect to admin courses with an error message
               }
@@ -214,7 +227,8 @@ router.put("/teacher/:code", function(req, res) {
                 }
                 Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse) {
                   if (err) {
-                    console.log("ERROR while updating course object!");
+										console.log("ERROR while updating course object!");
+										req.flash("error", "ERROR while updating course object!");
                     console.log(err);
                     // Redirect to admin courses with an error message
                   }
@@ -222,7 +236,8 @@ router.put("/teacher/:code", function(req, res) {
                     if (!(searchResults[0].department === undefined)) {
                       await Department.findOneAndUpdate({_id: searchResults[0].department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                         if (err) {
-                          console.log("ERROR while adding course to department!");
+													console.log("ERROR while adding course to department!");
+													req.flash("error", "ERROR while adding course to department!");
                           console.log(err);
                         }
                       });
@@ -230,12 +245,14 @@ router.put("/teacher/:code", function(req, res) {
                     if (!(course.department === undefined)) {
                       await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                         if (err) {
-                          console.log("ERROR while adding course to department!");
+													console.log("ERROR while adding course to department!");
+													req.flash("error", "ERROR while adding course to department!");
                           console.log(err);
                         }
                       });
                     }
-                    console.log("Course updated!");
+										console.log("Course updated!");
+										req.flash("success", "Course updated!");
                     res.redirect("/courses");
                   }
                 });
@@ -244,7 +261,8 @@ router.put("/teacher/:code", function(req, res) {
           });
         }
         else {
-          console.log("Course prerequisites is not valid.");
+					console.log("Course prerequisites is not valid.");
+					req.flash("error", "Course prerequisites is not valid.");
           let url = "/courses/" + course.code + "/edit";
           res.redirect(url);
           // Redirect to admin courses with an error message
@@ -253,7 +271,8 @@ router.put("/teacher/:code", function(req, res) {
     }
     // If course code already exists, display error message
     else {
-      console.log("Course code already exists!");
+			console.log("Course code already exists!");
+			req.flash("error", "Course already exists!");
       let url = "/courses/" + course.code + "/edit";
       res.redirect(url);
       // Redirect to admin courses with an error message
