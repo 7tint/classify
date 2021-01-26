@@ -334,6 +334,7 @@ router.put("/:code", function(req, res) {
         // If course code already exists, display error message
         else {
           console.log("Course code already exists!");
+          req.flash("error", "Course code already exists!");
           let url = "/courses/" + req.params.code + "/edit";
           res.redirect(url);
           // Redirect to admin courses with an error message

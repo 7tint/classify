@@ -1,0 +1,27 @@
+<div class="fixed flex justify-center w-full p-2 top-0 mt-2 pointer-events-none transition transition-opacity duration-500 ease-in-out z-50" id="alert">
+  <% if(error && error.length > 0) { %>
+    <div class="alert alert-danger" role="alert">
+      <%= error %> 
+    </div>
+  <% } %>
+
+  <% if(success && success.length > 0) { %>
+    <div class="alert alert-success" role="alert">
+      <%= success %> 
+    </div>
+  <% } %>
+
+  <script type="text/javascript">
+    function closeAlert() {
+      let alert = document.getElementById("alert");
+      alert.style.opacity = 0;
+      setTimeout(function() {
+        alert.remove();
+      }, 500);
+    }
+
+    setTimeout(function() {
+      closeAlert();
+    }, 5000);
+  </script>
+</div>
