@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
 const Department = require("./../models/departmentModel");
+const Review = require("./../models/reviewModel");
 const ObjectId = require('mongoose').Types.ObjectId;
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
@@ -85,7 +86,6 @@ function checkPrereq(prerequisites, code, callback) {
 //     });
 //   }
 // }
-
 
 
 router.get("/", function(req, res) {
@@ -365,6 +365,95 @@ router.delete("/:code", function(req, res) {
       }
     });
   });
+});
+
+/* ------------ START OF COURSE REVIEW ROUTES ----------------- */
+
+router.get("/:code/reviews/new", function(req, res) {
+  Course.findOne({code: req.params.code}, function(err, course) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("reviews/new", {course});
+      }
+  });
+});
+
+router.get("/:teacher/:id/edit", function(req, res) {
+	Course.findOne({code: req.params.code}, function(err, course) {
+        if (err || course === null || course === undefined || !course) {
+            console.log("Review Not Found!");
+            res.redirect("/courses/:code");
+        }
+        else {
+            Review.findOne({_id: review.course}, function(err, review) {
+            if (err) {
+                console.log(err);
+            }
+                else {
+                res.render("reviews/edit", {review, course});
+                }
+            });
+        }
+	});
+});
+  
+router.post("/:code/review", function(req, res) {
+	var review = {
+        email: req.body.email,
+        isCourseReview: true,
+        isTeacherReview: false,
+        course: req.params.code,
+        metric1: req.body.metric1,
+        metric2: req.body.metric2,
+        metric3: req.body.metric3,
+        commentText: req.body.commentText,
+        createdAt: new Date().toLocaleDateString(),
+        isAnonymous: req.body.isAnonymous
+	};
+  
+	Review.create(review, function(err) {
+	    if (err) {
+		    console.log("ERROR while creating review object!");
+		    console.log(err);
+	    }
+	    else {
+		    console.log("Review created!");
+		    res.redirect("/:code");
+	    }
+	});
+  
+	  // could limit people to certain num of comments here
+  });
+  
+router.put("/:code/:id", function(req, res) {
+	var review = {
+        email: req.body.email,
+        isCourseReview: true,
+        course: req.params.code,
+        metric1: req.body.metric1,
+        metric2: req.body.metric2,
+        metric3: req.body.metric3,
+        commentText: req.body.commentText,
+        createdAt: new Date().toLocaleDateString(),
+        isAnonymous: req.body.isAnonymous
+	};
+  
+	Course.findOne({code: req.params.code}, function(err, foundCourse) {
+        if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
+            console.log("Course not found!");
+            res.redirect("/courses");
+        }
+        else { 
+            Review.findOneAndUpdate({_id: review.course}, function(err, foundReview) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("Review updated successfully");
+                }
+            });
+        }
+	});
 });
 
 module.exports = router;

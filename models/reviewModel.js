@@ -5,6 +5,20 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  isTeacherReview: {
+    type: Boolean,
+    required: true
+  },
+  isCourseReview: {
+    type: Boolean,
+    required: true
+  },
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId
+  },
+  course: {
+    type: mongoose.Schema.Types.ObjectId
+  },
   metric1: {
     type: Number,
     get: v => Math.round(v),
