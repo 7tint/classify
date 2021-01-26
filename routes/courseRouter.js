@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
 const Department = require("./../models/departmentModel");
+const ObjectId = require('mongoose').Types.ObjectId;
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
   if (prereq != code) {
@@ -98,10 +99,14 @@ router.get("/", function(req, res) {
       }
       else {
         let promises = courses.map(async function(course) {
-          if (!(course.department === undefined)) {
-            await Department.findOne({_id: course.department}, function(err, department) {
-              course.departmentName = department.name;
-            });
+          if (course.department) {
+            if (ObjectId.isValid(course.department)) {
+              await Department.findOne({_id: course.department}, function(err, department) {
+                if (department) {
+                  course.departmentName = department.name;
+                }
+              });
+            }
           }
         });
 
