@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
+const Preferences = require("./../models/preferencesModel.js");
 
 const reviewSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true
-  },
-  isTeacherReview: {
-    type: Boolean,
     required: true
   },
   isCourseReview: {
@@ -14,10 +11,16 @@ const reviewSchema = new mongoose.Schema({
     required: true
   },
   teacher: {
-    type: mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId,
+    required: function() { 
+      return this.isCourseReview === false;
+    }
   },
   course: {
-    type: mongoose.Schema.Types.ObjectId
+    type: mongoose.Schema.Types.ObjectId,
+    required: function() { 
+      return this.isCourseReview === true;
+    }
   },
   metric1: {
     type: Number,
@@ -46,11 +49,16 @@ const reviewSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
+    required: true,
     default: Date.now
   },
   isAnonymous: {
     type: Boolean,
     required: true
+  },
+  isApproved: {
+    type: Boolean,
+    required: true,
   }
 });
 

@@ -16,8 +16,13 @@ const preferencesSchema = new mongoose.Schema({
     },
   	hasComments: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    }, 
+    approveComments: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   teacher: {
     hasMetrics: {
@@ -26,8 +31,13 @@ const preferencesSchema = new mongoose.Schema({
     },
   	hasComments: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    }, 
+    approveComments: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   }
 });
 

@@ -4,6 +4,7 @@ const Course = require('./../models/courseModel');
 const Department = require("./../models/departmentModel");
 const Review = require("./../models/reviewModel");
 const ObjectId = require('mongoose').Types.ObjectId;
+const Preferences = require("./../models/preferencesModel");
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
   if (prereq != code) {
@@ -403,74 +404,101 @@ router.get("/:code/reviews/new", function(req, res) {
         console.log(err);
         req.flash("error", err);
       } else {
-        res.render("reviews/new", {course});
+        res.render("reviews/course/new", {course});
       }
   });
-});
-
-router.get("/:teacher/:id/edit", function(req, res) {
-	Course.findOne({code: req.params.code}, function(err, course) {
-        if (err || course === null || course === undefined || !course) {
-            console.log("Review Not Found!");
-            req.flash("error", "Review not found!");
-            res.redirect("/courses/:code");
-        }
-        else {
-            Review.findOne({_id: review.course}, function(err, review) {
-            if (err) {
-                console.log(err);
-                req.flash("error", err);
-            }
-                else {
-                res.render("reviews/edit", {review, course});
-                }
-            });
-        }
-	});
 });
   
 router.post("/:code/review", function(req, res) {
 	var review = {
-        email: req.body.email,
+        email: "email@domain.com",
         isCourseReview: true,
-        isTeacherReview: false,
-        course: req.params.code,
         metric1: req.body.metric1,
         metric2: req.body.metric2,
         metric3: req.body.metric3,
         commentText: req.body.commentText,
-        createdAt: new Date().toLocaleDateString(),
-        isAnonymous: req.body.isAnonymous
-	};
+        isAnonymous: req.body.isAnonymous,
+  };
   
-	Review.create(review, function(err) {
-	    if (err) {
-        console.log("ERROR while creating review object!");
-        req.flash("error", "ERROR while creating review object!");
-		    console.log(err);
-	    }
-	    else {
-        console.log("Review created!");
-        req.flash("success", "Review created!");
-		    res.redirect("/:code");
-	    }
-	});
-  
-	  // could limit people to certain num of comments here
+  Preferences.findOne({}, function(err, preferences) {
+    if (preferences.course.approveComments === false) {
+      review.isApproved = true;
+    } else {
+      review.isApproved = false;
+    }
+  });
+    
+	Course.findOne({code: req.params.code}, function(err, foundCourse) {
+    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
+        console.log("Course not found!");
+        req.flash("error", "Course not found!");
+        res.redirect("/courses");
+    } else {
+      review.course = foundCourse.id;
+
+      Review.create(review, function(err) {
+        if (err) {
+          console.log("ERROR while creating review object!");
+          req.flash("error", "ERROR while creating review object!");
+          console.log(err);
+        }
+        else {
+          console.log("Review created!");
+          req.flash("success", "Review created!");
+          res.redirect("/courses");
+        }
+    });
+    }
   });
   
-router.put("/:code/:id", function(req, res) {
+	  // could limit people to certain num of comments here
+});
+
+router.get("/:code/:id/edit", function(req, res) {
+  Course.findOne({code: req.params.code}, function(err, course) {
+        if (err || course === null || course === undefined || !course) {
+            console.log("Review Not Found!");
+            req.flash("error", "Review not found!");
+            res.redirect("/courses/");
+        }
+        else {
+          Review.findOne({_id: req.params.id}, function(err, review) {
+            if (err) {
+                console.log(err);
+                req.flash("error", err);
+            }
+            else {
+                res.render("reviews/course/edit", {review, course,
+                  metric1: review.metric1,
+                  metric2: review.metric2,
+                  metric3: review.metric3,
+                  isAnonymous: review.isAnonymous,
+                });
+              }
+          });
+        }
+  });
+});
+
+router.put("/:code/:id/edit", function(req, res) {
 	var review = {
-        email: req.body.email,
+        email: "email@domain.com",
         isCourseReview: true,
-        course: req.params.code,
         metric1: req.body.metric1,
         metric2: req.body.metric2,
         metric3: req.body.metric3,
         commentText: req.body.commentText,
-        createdAt: new Date().toLocaleDateString(),
-        isAnonymous: req.body.isAnonymous
-	};
+        isAnonymous: req.body.isAnonymous,
+  };
+
+  // this doesnt work anywhere
+  Preferences.findOne({}, function(err, preferences) {
+    if (preferences.course.approveComments === false) {
+      review.isApproved = true;
+    } else {
+      review.isApproved = false;
+    }
+  });
   
 	Course.findOne({code: req.params.code}, function(err, foundCourse) {
         if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
@@ -479,13 +507,16 @@ router.put("/:code/:id", function(req, res) {
             res.redirect("/courses");
         }
         else { 
-            Review.findOneAndUpdate({_id: review.course}, function(err, foundReview) {
+          review.course = foundCourse.id;
+
+          Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
                 if (err) {
                     console.log(err);
                     req.flash("error", err);
                 } else {
                     console.log("Review updated successfully");
                     req.flash("success", "Review updated successfully!");
+                    res.redirect("/courses");
                 }
             });
         }

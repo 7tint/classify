@@ -5,6 +5,8 @@
       <a href='/teachers' class="btn btn-secondary">All Teachers</a>
       <br/>
       <button type="button" class="btn btn-primary"><a class="text-white" href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/edit">Edit Teacher</a></button>
+      <br/>
+      <button type="button" class="btn btn-danger"><a class="text-white" href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/reviews/new">Add Review</a></button>
   </div>
 
 <%- include('../partials/footer'); -%>

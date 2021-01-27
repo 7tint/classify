@@ -17,11 +17,13 @@ router.get("/", function(req, res) {
           isPublic: true,
         	course: {
             hasMetrics: true,
-            hasComments: true
+            hasComments: true,
+            approveComments: false,
           },
           teacher: {
             hasMetrics: true,
-            hasComments: true
+            hasComments: true,
+            approveComments: false,
           },
           isAnonymous: true
         };
@@ -48,7 +50,9 @@ router.get("/", function(req, res) {
           courseCommentsVar: retrievedPreferences.course.hasComments,
           teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
           teacherCommentsVar: retrievedPreferences.teacher.hasComments,
-          isAnonymousVar: retrievedPreferences.isAnonymous
+          isAnonymousVar: retrievedPreferences.isAnonymous,
+          approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
+          approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
         });
       }
     }
@@ -69,11 +73,13 @@ router.get("/edit", function(req, res) {
           isPublic: true,
         	course: {
             hasMetrics: true,
-            hasComments: true
+            hasComments: true,
+            approveComments: false,
           },
           teacher: {
             hasMetrics: true,
-            hasComments: true
+            hasComments: true,
+            approveComments: false,
           },
           isAnonymous: true
         };
@@ -100,7 +106,9 @@ router.get("/edit", function(req, res) {
           courseCommentsVar: retrievedPreferences.course.hasComments,
           teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
           teacherCommentsVar: retrievedPreferences.teacher.hasComments,
-          isAnonymousVar: retrievedPreferences.isAnonymous
+          isAnonymousVar: retrievedPreferences.isAnonymous,
+          approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
+          approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
         });
       }
     }
@@ -112,11 +120,13 @@ router.put("/", function(req, res) {
     isPublic: req.body.isPublic,
   	course: {
       hasMetrics: req.body.course_hasMetrics,
-      hasComments: req.body.course_hasComments
+      hasComments: req.body.course_hasComments,
+      approveComments: req.body.approveCourseComments,
     },
     teacher: {
       hasMetrics: req.body.teacher_hasMetrics,
-      hasComments: req.body.teacher_hasComments
+      hasComments: req.body.teacher_hasComments,
+      approveComments: req.body.approveTeacherComments,
     }
   };
 

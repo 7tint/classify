@@ -48,6 +48,17 @@
       </div>
     </div>
     <div class="form-group">
+      <div class="pr-3">Approve Course Comments:</div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="approveCourseComments" id="approveCourseComments-1" value="true" required disabled>
+        <label class="form-check-label" for="approveCourseComments-1">True</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="approveCourseComments" id="approveCourseComments-2" value="false" disabled>
+        <label class="form-check-label" for="approveCourseComments-2">False</label>
+      </div>
+    </div>
+    <div class="form-group">
       <div class="pr-3">Teacher Metrics:</div>
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="radio" name="teacher_hasMetrics" id="teacher-hasMetrics-1" value="true" required disabled>
@@ -78,6 +89,17 @@
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="radio" name="isAnonymous" id="anonymousReviews-2" value="false" disabled>
         <label class="form-check-label" for="anonymousReviews-2">False</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="pr-3">Approve Teacher Reviews:</div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="approveTeacherComments" id="approveTeacherComments-1" value="true" required disabled>
+        <label class="form-check-label" for="approveTeacherComments-1">True</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="approveTeacherComments" id="approveTeacherComments-2" value="false" disabled>
+        <label class="form-check-label" for="approveTeacherComments-2">False</label>
       </div>
     </div>
   </form>
@@ -117,6 +139,18 @@
       document.getElementById("anonymousReviews-1").checked = true;
     } else {
       document.getElementById("anonymousReviews-2").checked = true;
+    }
+
+    if (<%= approveTeacherCommentsVar %>) {
+      document.getElementById("approveTeacherComments-1").checked = true;
+    } else {
+      document.getElementById("approveTeacherComments-2").checked = true;
+    }
+
+    if (<%= approveCourseCommentsVar %>) {
+      document.getElementById("approveCourseComments-1").checked = true;
+    } else {
+      document.getElementById("approveCourseComments-2").checked = true;
     }
   </script>
 <%- include('../partials/footer'); -%>
