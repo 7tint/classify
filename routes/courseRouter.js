@@ -477,7 +477,7 @@ router.get("/:code/:id/edit", function(req, res) {
                 });
                } else {
                 console.log("Not a valid course review");
-                req.flash("Not a valid course review!");
+                req.flash("error", "Not a valid course review!");
                 res.redirect("/courses");
               }
             }
@@ -520,9 +520,9 @@ router.put("/:code/:id/edit", function(req, res) {
                     console.log(err);
                     req.flash("error", err);
                 } else {
-                    console.log("Review updated successfully");
-                    req.flash("success", "Review updated successfully!");
-                    res.redirect("/courses");
+                      console.log("Review updated successfully");
+                      req.flash("success", "Review updated successfully!");
+                      res.redirect("/courses");
                 }
             });
         }

@@ -266,7 +266,7 @@ router.get("/:name/:id/edit", function(req, res) {
                         });
                     } else {
                         console.log("Not a valid teacher review");
-                        req.flash("Not a valid teacher review!");
+                        req.flash("error", "Not a valid teacher review!");
                         res.redirect("/teachers");
                     }
                 }
@@ -307,12 +307,13 @@ router.put("/:name/:id/edit", function(req, res) {
 
             Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
                 if (err) {
-										console.log(err);
-										req.flash("error", err);
-                } else {
-										console.log("Review updated successfully");
-                                        req.flash("success", "Review updated successfully");
-                                        res.redirect("/teachers");
+					console.log(err);
+					req.flash("error", err);
+                } else {    
+                    console.log("Review updated successfully");
+                    req.flash("success", "Review updated successfully");
+                    res.redirect("/teachers");
+                    } 
                 }
             });
         }
