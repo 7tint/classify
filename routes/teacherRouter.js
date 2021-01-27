@@ -252,17 +252,23 @@ router.get("/:name/:id/edit", function(req, res) {
         }
         else {
             Review.findOne({_id: req.params.id}, function(err, review) {
-            if (err) {
-								console.log(err);
-								req.flash("error", err);
-            }
-            else {
-                res.render("reviews/teacher/edit", {review, teacher,
-                    metric1: review.metric1,
-                    metric2: review.metric2,
-                    metric3: review.metric3,
-                    isAnonymous: review.isAnonymous,
-                });
+                if (err) {
+                                    console.log(err);
+                                    req.flash("error", err);
+                }
+                else {
+                    if (review.isCourseReview === false) {
+                        res.render("reviews/teacher/edit", {review, teacher,
+                            metric1: review.metric1,
+                            metric2: review.metric2,
+                            metric3: review.metric3,
+                            isAnonymous: review.isAnonymous,
+                        });
+                    } else {
+                        console.log("Not a valid teacher review");
+                        req.flash("Not a valid teacher review!");
+                        res.redirect("/teachers");
+                    }
                 }
             });
         }

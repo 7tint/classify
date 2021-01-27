@@ -468,13 +468,19 @@ router.get("/:code/:id/edit", function(req, res) {
                 req.flash("error", err);
             }
             else {
+              if (review.isCourseReview === true) {
                 res.render("reviews/course/edit", {review, course,
                   metric1: review.metric1,
                   metric2: review.metric2,
                   metric3: review.metric3,
                   isAnonymous: review.isAnonymous,
                 });
+               } else {
+                console.log("Not a valid course review");
+                req.flash("Not a valid course review!");
+                res.redirect("/courses");
               }
+            }
           });
         }
   });
