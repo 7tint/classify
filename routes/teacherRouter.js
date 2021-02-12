@@ -321,24 +321,31 @@ router.post("/:name/review", async function(req, res) {
 		}
 	});
 
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
-		if (err || teacher === null || teacher === undefined || !teacher) {
+	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
+		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
 			console.log("Teacher Not Found!");
 			req.flash("error", "Teacher Not Found!");
 			res.redirect("/teachers");
 		} else {
-			review.teacher = teacher.id;
+			review.teacher = foundTeacher._id;
 
-			Review.create(review, function(err) {
+			Review.create(review, function(err, newReview) {
 				if (err) {
 					console.log("ERROR while creating review object!");
 					req.flash("error", "ERROR while creating review object!");
 					console.log(err);
 				}
 				else {
-					console.log("Review created!");
-					req.flash("success", "Review created!");
-					res.redirect("/teachers");
+					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: newReview._id}}, function(err, updatedTeacher) {
+            if (err) {
+              console.log("ERROR while adding review to teacher!");
+              req.flash("error", "ERROR while adding review to teacher!");
+            } else {
+              console.log("Teacher updated!");
+              req.flash("success", "Teacher updated!");
+              res.redirect("/teachers");
+            }
+          });
 				}
 			});
 		}
@@ -414,12 +421,49 @@ router.put("/:name/:id/edit", async function(req, res) {
 					console.log(err);
 					req.flash("error", err);
 				} else {
-					console.log("Review updated successfully");
-					req.flash("success", "Review updated successfully");
-					res.redirect("/teachers");
+					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: newReview._id}}, function(err, updatedTeacher) {
+            if (err) {
+              console.log("ERROR while adding review to teacher!");
+              req.flash("error", "ERROR while adding review to teacher!");
+            } else {
+              console.log("Teacher updated!");
+              req.flash("success", "Teacher updated!");
+              res.redirect("/teachers");
+            }
+          });
 				}
 			});
 		}
+	});
+});
+
+router.delete("/:name/:id", function(req, res) {
+	const nameObject = convertNametoObj(req.params.name);
+
+	Review.findOne({_id: req.params.id}, function(err, foundReview) {
+		if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === true) {
+			console.log("Review not found!");
+			req.flash("error", "Review not found!");
+			res.redirect("/teachers");
+		}
+		Review.deleteOne({_id: foundReview._id}, function(err, review) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+			}
+			else {
+				Teacher.findOneAndUpdate({_id: foundReview.teacher}, {$pull: {reviews: foundReview._id}}, function(err, updatedTeacher) {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+					} else {
+						console.log("Deleted review: " + foundReview._id);
+						req.flash("success", "Deleted review: " + foundReview._id);
+						res.redirect("/teachers");
+					}
+				});
+			}
+		});
 	});
 });
 

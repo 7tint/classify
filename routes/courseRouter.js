@@ -552,7 +552,7 @@ router.post("/:code/review", async function(req, res) {
       req.flash("error", "Course not found!");
       res.redirect("/courses");
     } else {
-      review.course = foundCourse.id;
+      review.course = foundCourse._id;
 
       Review.create(review, function(err, newReview) {
         if (err) {
@@ -578,8 +578,8 @@ router.post("/:code/review", async function(req, res) {
 });
 
 router.get("/:code/:id/edit", function(req, res) {
-  Course.findOne({code: req.params.code}, function(err, course) {
-    if (err || course === null || course === undefined || !course) {
+  Course.findOne({code: req.params.code}, function(err, foundCourse) {
+    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
       console.log("Review Not Found!");
       req.flash("error", "Review not found!");
       res.redirect("/courses/");
@@ -592,7 +592,8 @@ router.get("/:code/:id/edit", function(req, res) {
         }
         else {
           if (review.isCourseReview === true) {
-            res.render("reviews/course/edit", {review, course,
+            res.render("reviews/course/edit", {review,
+              course: foundCourse,
               metric1: review.metric1,
               metric2: review.metric2,
               metric3: review.metric3,
@@ -657,26 +658,26 @@ router.put("/:code/:id/edit", async function(req, res) {
     }
   });
 
-  router.delete("/:code/reviews/:id", function(req, res) {
+  router.delete("/:code/:id", function(req, res) {
     Review.findOne({_id: req.params.id}, function(err, foundReview) {
-      if (err || foundReview === null || foundReview === undefined || !foundReview) {
+      if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === false) {
         console.log("Review not found!");
         req.flash("error", "Review not found!");
         res.redirect("/courses");
       }
-      Review.deleteOne({_id: req.params.id}, function(err, review) {
+      Review.deleteOne({_id: foundReview._id}, function(err, review) {
         if (err) {
           console.log(err);
           req.flash("error", err);
         }
         else {
-          Course.findOneAndUpdate({_id: foundReview.course}, {$pull: {courses: foundReview._id}}, function(err, updatedCourse) {
+          Course.findOneAndUpdate({_id: foundReview.course}, {$pull: {reviews: foundReview._id}}, function(err, updatedCourse) {
             if (err) {
               console.log(err);
               req.flash("error", err);
             } else {
-              console.log("Deleted review: " + req.params.id);
-              req.flash("success", "Deleted review: " + req.params.id);
+              console.log("Deleted review: " + foundReview._id);
+              req.flash("success", "Deleted review: " + foundReview._id);
               res.redirect("/courses");
             }
           });
