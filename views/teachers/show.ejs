@@ -2,6 +2,16 @@
 
   <div class="container">
       <p><%= teacher.name.firstName %> <%= teacher.name.lastName %> </p>
+      <% if (reviews.length > 0) { %>
+        <% reviews.forEach(function(review) { %>
+          <%= review %> <br/><br/>
+          <button type="button" class="btn btn-secondary"><a class="text-white" href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/<%=review._id%>/edit">Edit Review</a></button>
+          <form action="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/<%=review._id%>?_method=DELETE" method="POST">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        <% }); %>
+      <% } %>
+      <br/><br/>
       <a href='/teachers' class="btn btn-secondary">All Teachers</a>
       <br/>
       <button type="button" class="btn btn-primary"><a class="text-white" href="/teachers/<%= teacher.name.firstName %>_<%= teacher.name.lastName %>/edit">Edit Teacher</a></button>

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router({mergeParams: true});
 const Course = require("./../models/courseModel");
+const Teacher = require("./../models/teacherModel");
 const Department = require("./../models/departmentModel");
 const Review = require("./../models/reviewModel");
 const ObjectId = require("mongoose").Types.ObjectId;
@@ -331,20 +332,29 @@ router.post("/", function(req, res) {
 });
 
 router.get("/:code", function(req, res) {
-  Course.findOne({code: req.params.code}, function(err, course) {
+  Course.findOne({code: req.params.code}, async function(err, course) {
     if (err || course === null || course === undefined || !course) {
       console.log("Course not found!");
       req.flash("Course not found!", err);
       res.redirect("/courses");
     }
     else {
-      if (!(course.department === undefined)) {
+      const reviews = new Array();
+
+      if (course.reviews) {
+        await Promise.all(course.reviews.map(async function(review) {
+          let foundReview = await Review.findOne({_id: review});
+          reviews.push(foundReview);
+        }));
+      }
+
+      if (course.department) {
         Department.findOne({_id: course.department}, function(err, department) {
-          res.render("courses/show", {course, department});
+          res.render("courses/show", {course, department, reviews});
         });
       }
       else {
-        res.render("courses/show", {course, department: undefined});
+        res.render("courses/show", {course, department: undefined, reviews});
       }
     }
   });
@@ -437,7 +447,7 @@ router.put("/:code", function(req, res) {
                             res.redirect(url);
                           }
                           else {
-                            if (!(updatedCourse.department === undefined)) {
+                            if (updatedCourse.department) {
                               // Remove course from old department
                               await Department.findOneAndUpdate({_id: updatedCourse.department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                                 if (err) {
@@ -447,7 +457,7 @@ router.put("/:code", function(req, res) {
                                 }
                               });
                             }
-                            if (!(course.department === undefined)) {
+                            if (course.department) {
                               // Add course to new department
                               await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                                 if (err) {
@@ -493,24 +503,47 @@ router.delete("/:code", function(req, res) {
       req.flash("error", "Course not found!");
       res.redirect("/courses");
     }
-    Course.deleteOne({code: req.params.code}, function(err, course) {
-      if (err) {
-        console.log(err);
-        req.flash("error", err);
-      }
-      else {
-        Department.findOneAndUpdate({_id: foundCourse.department}, {$pull: {courses: foundCourse._id}}, function(err, updatedDepartment) {
-          if (err) {
-            console.log(err);
-            req.flash("error", err);
-          } else {
-            console.log("Deleted: " + req.params.code);
-            req.flash("success", "Deleted: " + req.params.code);
-            res.redirect("/courses");
-          }
-        });
-      }
-    });
+    else {
+      Course.deleteOne({code: req.params.code}, async function(err, course) {
+        if (err) {
+          console.log(err);
+          req.flash("error", err);
+        }
+        else {
+          if (foundCourse.teachers) {
+    				await Promise.all(foundCourse.teachers.map(async function(teacher) {
+    					await Teacher.findOneAndUpdate({_id: teacher}, {$pull: {courses: foundCourse._id}}, function(err, updatedTeacher) {
+    						if (err) {
+    							console.log(err);
+    							req.flash("error", err);
+    						}
+    						else {
+    							console.log("Course removed from " + teacher + "!");
+    						}
+    					});
+    				}));
+    			}
+          Department.findOneAndUpdate({_id: foundCourse.department}, {$pull: {courses: foundCourse._id}}, async function(err, updatedDepartment) {
+            if (err) {
+              console.log(err);
+              req.flash("error", err);
+            } else {
+              if (foundCourse.reviews) {
+    						await Promise.all(foundCourse.reviews.map(async function(review) {
+    							await Review.deleteOne({_id: review}, function(err, deletedReview) {
+    								console.log(err);
+    								req.flash("error", err);
+    							});
+    						}));
+    					}
+              console.log("Deleted: " + req.params.code);
+              req.flash("success", "Deleted: " + req.params.code);
+              res.redirect("/courses");
+            }
+          });
+        }
+      });
+    }
   });
 });
 
@@ -551,7 +584,8 @@ router.post("/:code/review", async function(req, res) {
       console.log("Course not found!");
       req.flash("error", "Course not found!");
       res.redirect("/courses");
-    } else {
+    }
+    else {
       review.course = foundCourse._id;
 
       Review.create(review, function(err, newReview) {
@@ -648,8 +682,8 @@ router.put("/:code/:id/edit", async function(req, res) {
               console.log("ERROR while adding review to course!");
               req.flash("error", "ERROR while adding review to course!");
             } else {
-              console.log("Course updated!");
-              req.flash("success", "Course updated!");
+              console.log("Review updated!");
+              req.flash("success", "Review updated!");
               res.redirect("/courses");
             }
           });
@@ -657,14 +691,16 @@ router.put("/:code/:id/edit", async function(req, res) {
       });
     }
   });
+});
 
-  router.delete("/:code/:id", function(req, res) {
-    Review.findOne({_id: req.params.id}, function(err, foundReview) {
-      if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === false) {
-        console.log("Review not found!");
-        req.flash("error", "Review not found!");
-        res.redirect("/courses");
-      }
+router.delete("/:code/:id", function(req, res) {
+  Review.findOne({_id: req.params.id}, function(err, foundReview) {
+    if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === false) {
+      console.log("Review not found!");
+      req.flash("error", "Review not found!");
+      res.redirect("/courses");
+    }
+    else {
       Review.deleteOne({_id: foundReview._id}, function(err, review) {
         if (err) {
           console.log(err);
@@ -683,7 +719,7 @@ router.put("/:code/:id/edit", async function(req, res) {
           });
         }
       });
-    });
+    }
   });
 });
 

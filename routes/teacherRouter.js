@@ -102,7 +102,6 @@ router.post("/", function(req, res) {
 								}
 							});
 						}));
-
 						console.log("Teacher created!");
 						req.flash("success", "Teacher created!");
 						res.redirect("/teachers");
@@ -120,14 +119,22 @@ router.post("/", function(req, res) {
 
 router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
+	Teacher.findOne({name: nameObject}, async function(err, teacher) {
 		if (err || teacher === null || teacher === undefined || !teacher) {
 			console.log("Teacher not found!");
 			req.flash("error", "Teacher not found!");
 			res.redirect("/teachers");
 		}
 		else {
-			res.render("teachers/show", { teacher });
+			const reviews = new Array();
+
+      if (teacher.reviews) {
+        await Promise.all(teacher.reviews.map(async function(review) {
+          let foundReview = await Review.findOne({_id: review});
+          reviews.push(foundReview);
+        }));
+      }
+			res.render("teachers/show", {teacher, reviews});
 		}
 	});
 });
@@ -326,7 +333,8 @@ router.post("/:name/review", async function(req, res) {
 			console.log("Teacher Not Found!");
 			req.flash("error", "Teacher Not Found!");
 			res.redirect("/teachers");
-		} else {
+		}
+		else {
 			review.teacher = foundTeacher._id;
 
 			Review.create(review, function(err, newReview) {
@@ -421,13 +429,13 @@ router.put("/:name/:id/edit", async function(req, res) {
 					console.log(err);
 					req.flash("error", err);
 				} else {
-					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: newReview._id}}, function(err, updatedTeacher) {
+					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedTeacher) {
             if (err) {
               console.log("ERROR while adding review to teacher!");
               req.flash("error", "ERROR while adding review to teacher!");
             } else {
-              console.log("Teacher updated!");
-              req.flash("success", "Teacher updated!");
+              console.log("Review updated!");
+              req.flash("success", "Revieww updated!");
               res.redirect("/teachers");
             }
           });
@@ -446,24 +454,26 @@ router.delete("/:name/:id", function(req, res) {
 			req.flash("error", "Review not found!");
 			res.redirect("/teachers");
 		}
-		Review.deleteOne({_id: foundReview._id}, function(err, review) {
-			if (err) {
-				console.log(err);
-				req.flash("error", err);
-			}
-			else {
-				Teacher.findOneAndUpdate({_id: foundReview.teacher}, {$pull: {reviews: foundReview._id}}, function(err, updatedTeacher) {
-					if (err) {
-						console.log(err);
-						req.flash("error", err);
-					} else {
-						console.log("Deleted review: " + foundReview._id);
-						req.flash("success", "Deleted review: " + foundReview._id);
-						res.redirect("/teachers");
-					}
-				});
-			}
-		});
+		else {
+			Review.deleteOne({_id: foundReview._id}, function(err, review) {
+				if (err) {
+					console.log(err);
+					req.flash("error", err);
+				}
+				else {
+					Teacher.findOneAndUpdate({_id: foundReview.teacher}, {$pull: {reviews: foundReview._id}}, function(err, updatedTeacher) {
+						if (err) {
+							console.log(err);
+							req.flash("error", err);
+						} else {
+							console.log("Deleted review: " + foundReview._id);
+							req.flash("success", "Deleted review: " + foundReview._id);
+							res.redirect("/teachers");
+						}
+					});
+				}
+			});
+		}
 	});
 });
 
