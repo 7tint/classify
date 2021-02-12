@@ -294,7 +294,7 @@ router.post("/", function(req, res) {
               }
               else {
                 if (course.department) {
-                  Department.findOneAndUpdate({_id: course.department}, {$push: {courses: newCourse._id}}, function(err, updatedDepartment) {
+                  Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: newCourse._id}}, function(err, updatedDepartment) {
                     if (err) {
                       console.log("ERROR while adding course to department!");
                       console.log(err);
@@ -554,16 +554,23 @@ router.post("/:code/review", async function(req, res) {
     } else {
       review.course = foundCourse.id;
 
-      Review.create(review, function(err) {
+      Review.create(review, function(err, newReview) {
         if (err) {
           console.log("ERROR while creating review object!");
           req.flash("error", "ERROR while creating review object!");
           console.log(err);
         }
         else {
-          console.log("Review created!");
-          req.flash("success", "Review created!");
-          res.redirect("/courses");
+          Course.findOneAndUpdate({code: req.params.code}, {$addToSet: {reviews: newReview._id}}, function(err, updatedCourse) {
+            if (err) {
+              console.log("ERROR while adding review to course!");
+              req.flash("error", "ERROR while adding review to course!");
+            } else {
+              console.log("Course updated!");
+              req.flash("success", "Course updated!");
+              res.redirect("/courses");
+            }
+          });
         }
       });
     }
@@ -635,12 +642,47 @@ router.put("/:code/:id/edit", async function(req, res) {
           console.log(err);
           req.flash("error", err);
         } else {
-          console.log("Review updated successfully");
-          req.flash("success", "Review updated successfully!");
-          res.redirect("/courses");
+          Course.findOneAndUpdate({code: req.params.code}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedCourse) {
+            if (err) {
+              console.log("ERROR while adding review to course!");
+              req.flash("error", "ERROR while adding review to course!");
+            } else {
+              console.log("Course updated!");
+              req.flash("success", "Course updated!");
+              res.redirect("/courses");
+            }
+          });
         }
       });
     }
+  });
+
+  router.delete("/:code/reviews/:id", function(req, res) {
+    Review.findOne({_id: req.params.id}, function(err, foundReview) {
+      if (err || foundReview === null || foundReview === undefined || !foundReview) {
+        console.log("Review not found!");
+        req.flash("error", "Review not found!");
+        res.redirect("/courses");
+      }
+      Review.deleteOne({_id: req.params.id}, function(err, review) {
+        if (err) {
+          console.log(err);
+          req.flash("error", err);
+        }
+        else {
+          Course.findOneAndUpdate({_id: foundReview.course}, {$pull: {courses: foundReview._id}}, function(err, updatedCourse) {
+            if (err) {
+              console.log(err);
+              req.flash("error", err);
+            } else {
+              console.log("Deleted review: " + req.params.id);
+              req.flash("success", "Deleted review: " + req.params.id);
+              res.redirect("/courses");
+            }
+          });
+        }
+      });
+    });
   });
 });
 
