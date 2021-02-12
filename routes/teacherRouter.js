@@ -68,15 +68,17 @@ router.post("/", function(req, res) {
 			req.flash("error", err);
 		}
 		else if (!searchResults.length) {
-			await Promise.all(teacher.courses.map(async function(course) {
-				let foundCourse = await Course.findOne({code: course});
-				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
-					req.flash("error", "Oops! Something went wrong.");
-					isValid = false;
-				} else {
-					courseids.push(foundCourse._id);
-				}
-			}));
+			if (teacher.courses) {
+				await Promise.all(teacher.courses.map(async function(course) {
+					let foundCourse = await Course.findOne({code: course});
+					if (foundCourse === null || foundCourse === undefined || !foundCourse) {
+						req.flash("error", "Oops! Something went wrong.");
+						isValid = false;
+					} else {
+						courseids.push(foundCourse._id);
+					}
+				}));
+			}
 
 			if (isValid) {
 				teacher.courses = courseids;
@@ -260,12 +262,20 @@ router.delete("/:name", function(req, res) {
 					});
 				}));
 			}
-			Teacher.deleteOne({name: nameObject}, function(err, deletedTeacher) {
+			Teacher.deleteOne({name: nameObject}, async function(err, deletedTeacher) {
 				if (err) {
 					console.log(err);
 					req.flash("error", err);
 				}
 				else {
+					if (foundTeacher.reviews) {
+						await Promise.all(foundTeacher.reviews.map(async function(review) {
+							await Review.deleteOne({_id: review}, function(err, deletedReview) {
+								console.log(err);
+								req.flash("error", err);
+							});
+						}));
+					}
 					console.log("Deleted: " + nameObject.firstName + "" + nameObject.lastName);
 					req.flash("success", "Deleted: " + nameObject.firstName + "" + nameObject.lastName);
 					res.redirect("/teachers");
