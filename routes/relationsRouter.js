@@ -62,7 +62,7 @@ function updateCourseDepartmentsHelper(course, department, oldDepartment, callba
 }
 
 // get add course to department
-router.get("/assign-courses", function(req, res) {
+router.get("/manage-courses", function(req, res) {
 	Department.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
@@ -83,7 +83,7 @@ router.get("/assign-courses", function(req, res) {
 });
 
 // get add teacher to course
-router.get("/assign-teachers", function(req, res) {
+router.get("/manage-teachers", function(req, res) {
 	Course.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
@@ -104,7 +104,7 @@ router.get("/assign-teachers", function(req, res) {
 });
 
 // put add course to department
-router.put("/assign-courses", async function(req, res) {
+router.put("/manage-courses", async function(req, res) {
 	const courses = req.body.courses;
 	const departments = req.body.departments;
 	var oldDepartments = new Array();
@@ -113,7 +113,7 @@ router.put("/assign-courses", async function(req, res) {
 	if (courses.length === 0) {
 		console.log("ERROR please create courses before attempting to assign them to departments!");
 		req.flash("error", "ERROR please create courses before attempting to assign them to departments!");
-		res.redirect("/assign-courses");
+		res.redirect("/manage-courses");
 	}
 
 	else {
@@ -134,7 +134,7 @@ router.put("/assign-courses", async function(req, res) {
 		if (!isValid) {
 			console.log("ERROR in departments submitted!");
 			req.flash("error", "ERROR in departments submitted!");
-			res.redirect("/assign-courses");
+			res.redirect("/manage-courses");
 		}
 
 		else {
@@ -156,14 +156,14 @@ router.put("/assign-courses", async function(req, res) {
 			if (!isValid) {
 				console.log("ERROR in course codes submitted!");
 				req.flash("error", "ERROR in course codes submitted!");
-				res.redirect("/assign-courses");
+				res.redirect("/manage-courses");
 			}
 
 			else {
 				if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
 					console.log("ERROR (array mismatch) while updating course departments!");
 					req.flash("error", "ERROR (array mismatch) while updating course departments!");
-					res.redirect("/assign-courses");
+					res.redirect("/manage-courses");
 				}
 
 				else {
@@ -176,7 +176,7 @@ router.put("/assign-courses", async function(req, res) {
 						});
 					});
 					await Promise.all(updateCourseDepartments);
-					res.redirect("/assign-courses");
+					res.redirect("/manage-courses");
 				}
 			}
 		}
