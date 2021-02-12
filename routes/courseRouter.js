@@ -203,6 +203,7 @@ router.put("/manage", async function(req, res) {
 						});
 					});
 					await Promise.all(updateCourseDepartments);
+          req.flash("success", "Courses updated successfully!");
           console.log("Courses updated successfully!");
 					res.redirect("/courses/manage");
 				}
