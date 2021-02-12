@@ -1,9 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router({mergeParams: true});
-const Course = require('./../models/courseModel');
+const Course = require("./../models/courseModel");
 const Department = require("./../models/departmentModel");
 const Review = require("./../models/reviewModel");
-const ObjectId = require('mongoose').Types.ObjectId;
+const ObjectId = require("mongoose").Types.ObjectId;
 const Preferences = require("./../models/preferencesModel");
 
 async function asyncCheckPrereqHelper(prereq, code, isValid, callback) {
@@ -43,11 +43,11 @@ function checkPrereq(prerequisites, code, callback) {
     var i = 0;
     prerequisites.forEach(function(prereq, index, prerequisites) {
       asyncCheckPrereqHelper(prereq, code, isValid, function(data) {
-         i++;
-         isValid = isValid && data;
-         if (i === prerequisites.length) {
-           callback(isValid);
-         }
+        i++;
+        isValid = isValid && data;
+        if (i === prerequisites.length) {
+          callback(isValid);
+        }
       });
     });
   }
@@ -400,39 +400,39 @@ router.delete("/:code", function(req, res) {
 
 router.get("/:code/reviews/new", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
-      if (err) {
-        console.log(err);
-        req.flash("error", err);
-      } else {
-        res.render("reviews/course/new", {course});
-      }
+    if (err) {
+      console.log(err);
+      req.flash("error", err);
+    } else {
+      res.render("reviews/course/new", {course});
+    }
   });
 });
-  
-router.post("/:code/review", function(req, res) {
-	var review = {
-        email: "email@domain.com",
-        isCourseReview: true,
-        metric1: req.body.metric1,
-        metric2: req.body.metric2,
-        metric3: req.body.metric3,
-        commentText: req.body.commentText,
-        isAnonymous: req.body.isAnonymous,
+
+router.post("/:code/review", async function(req, res) {
+  var review = {
+    email: "email@domain.com",
+    isCourseReview: true,
+    metric1: req.body.metric1,
+    metric2: req.body.metric2,
+    metric3: req.body.metric3,
+    commentText: req.body.commentText,
+    isAnonymous: req.body.isAnonymous,
   };
-  
-  Preferences.findOne({}, function(err, preferences) {
+
+  await Preferences.findOne({}, function(err, preferences) {
     if (preferences.course.approveComments === false) {
       review.isApproved = true;
     } else {
       review.isApproved = false;
     }
   });
-    
-	Course.findOne({code: req.params.code}, function(err, foundCourse) {
+
+  Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-        console.log("Course not found!");
-        req.flash("error", "Course not found!");
-        res.redirect("/courses");
+      console.log("Course not found!");
+      req.flash("error", "Course not found!");
+      res.redirect("/courses");
     } else {
       review.course = foundCourse.id;
 
@@ -447,86 +447,83 @@ router.post("/:code/review", function(req, res) {
           req.flash("success", "Review created!");
           res.redirect("/courses");
         }
-    });
+      });
     }
   });
-  
-	  // could limit people to certain num of comments here
 });
 
 router.get("/:code/:id/edit", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
-        if (err || course === null || course === undefined || !course) {
-            console.log("Review Not Found!");
-            req.flash("error", "Review not found!");
-            res.redirect("/courses/");
+    if (err || course === null || course === undefined || !course) {
+      console.log("Review Not Found!");
+      req.flash("error", "Review not found!");
+      res.redirect("/courses/");
+    }
+    else {
+      Review.findOne({_id: req.params.id}, function(err, review) {
+        if (err) {
+          console.log(err);
+          req.flash("error", err);
         }
         else {
-          Review.findOne({_id: req.params.id}, function(err, review) {
-            if (err) {
-                console.log(err);
-                req.flash("error", err);
-            }
-            else {
-              if (review.isCourseReview === true) {
-                res.render("reviews/course/edit", {review, course,
-                  metric1: review.metric1,
-                  metric2: review.metric2,
-                  metric3: review.metric3,
-                  isAnonymous: review.isAnonymous,
-                });
-               } else {
-                console.log("Not a valid course review");
-                req.flash("error", "Not a valid course review!");
-                res.redirect("/courses");
-              }
-            }
-          });
+          if (review.isCourseReview === true) {
+            res.render("reviews/course/edit", {review, course,
+              metric1: review.metric1,
+              metric2: review.metric2,
+              metric3: review.metric3,
+              isAnonymous: review.isAnonymous,
+            });
+          } else {
+            console.log("Not a valid course review!");
+            req.flash("error", "Not a valid course review!");
+            res.redirect("/courses");
+          }
         }
+      });
+    }
   });
 });
 
-router.put("/:code/:id/edit", function(req, res) {
-	var review = {
-        email: "email@domain.com",
-        isCourseReview: true,
-        metric1: req.body.metric1,
-        metric2: req.body.metric2,
-        metric3: req.body.metric3,
-        commentText: req.body.commentText,
-        isAnonymous: req.body.isAnonymous,
+router.put("/:code/:id/edit", async function(req, res) {
+  var review = {
+    email: "email@domain.com",
+    isCourseReview: true,
+    metric1: req.body.metric1,
+    metric2: req.body.metric2,
+    metric3: req.body.metric3,
+    commentText: req.body.commentText,
+    isAnonymous: req.body.isAnonymous,
   };
 
-  // this doesnt work anywhere
-  Preferences.findOne({}, function(err, preferences) {
+  await Preferences.findOne({}, function(err, preferences) {
     if (preferences.course.approveComments === false) {
       review.isApproved = true;
     } else {
       review.isApproved = false;
     }
   });
-  
-	Course.findOne({code: req.params.code}, function(err, foundCourse) {
-        if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-            console.log("Course not found!");
-            req.flash("error", "Course not found!");
-            res.redirect("/courses");
-        }
-        else { 
-          review.course = foundCourse.id;
 
-          Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
-                if (err) {
-                    console.log(err);
-                    req.flash("error", err);
-                } else {
-                      console.log("Review updated successfully");
-                      req.flash("success", "Review updated successfully!");
-                      res.redirect("/courses");
-                }
-            });
+  Course.findOne({code: req.params.code}, function(err, foundCourse) {
+    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
+      console.log("Course not found!");
+      req.flash("error", "Course not found!");
+      res.redirect("/courses");
+    }
+    else {
+      review.course = foundCourse.id;
+
+      Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
+        if (err) {
+          console.log(err);
+          req.flash("error", err);
+        } else {
+          console.log("Review updated successfully");
+          req.flash("success", "Review updated successfully!");
+          res.redirect("/courses");
         }
-	});
+      });
+    }
+  });
 });
 
 module.exports = router;
