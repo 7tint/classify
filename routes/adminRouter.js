@@ -13,7 +13,7 @@ router.get("/", function(req, res) {
     else {
       if (retrievedPreferences === null) {
         // Create default preferences object.
-        var defaultPreferences = {
+        const defaultPreferences = {
           isPublic: true,
         	course: {
             hasMetrics: true,
@@ -69,7 +69,7 @@ router.get("/edit", function(req, res) {
     else {
       if (retrievedPreferences === null) {
         // Create default preferences object.
-        var defaultPreferences = {
+        const defaultPreferences = {
           isPublic: true,
         	course: {
             hasMetrics: true,
@@ -118,6 +118,7 @@ router.get("/edit", function(req, res) {
 router.put("/", function(req, res) {
   var preferences = {
     isPublic: req.body.isPublic,
+    isAnonymous: req.body.isAnonymous,
   	course: {
       hasMetrics: req.body.course_hasMetrics,
       hasComments: req.body.course_hasComments,
@@ -131,14 +132,19 @@ router.put("/", function(req, res) {
   };
 
   // If there are no course/teacher metrics and comments, set anonymous reviews as true as default.
-  if (((preferences.course.hasMetrics === 'false') && (preferences.course.hasComments === 'false')) &&
-      ((preferences.teacher.hasMetrics === 'false') && (preferences.teacher.hasComments === 'false'))) {
+  if (((preferences.course.hasMetrics === "false") && (preferences.course.hasComments === "false")) &&
+      ((preferences.teacher.hasMetrics === "false") && (preferences.teacher.hasComments === "false"))) {
     console.log("Metrics and comments are disabled.");
     preferences.isAnonymous = true;
   }
 
-  else {
-    preferences.isAnonymous = req.body.isAnonymous;
+  // If comments are off, put approveComments as true as default.
+  if (preferences.course.hasComments === "false") {
+    preferences.course.approveComments = true;
+  }
+
+  if (preferences.teacher.hasComments === "false") {
+    preferences.teacher.approveComments = true;
   }
 
   // Replace one existing preference object
