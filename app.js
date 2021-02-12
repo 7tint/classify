@@ -82,14 +82,12 @@ const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
 const teacherRouter = require("./routes/teacherRouter.js");
 const departmentRouter = require("./routes/departmentRouter.js");
-const relationsRouter = require("./routes/relationsRouter.js");
 
 // Routes
 app.use("/admin", adminRouter);
 app.use("/courses", courseRouter);
 app.use("/teachers", teacherRouter);
 app.use("/departments", departmentRouter);
-app.use("/", relationsRouter);
 
 app.get("/", function(req, res) {
 	res.render("home");
