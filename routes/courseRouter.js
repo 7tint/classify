@@ -389,12 +389,13 @@ router.put("/:code", function(req, res) {
     department: req.body.courseDepartment,
     prereq: req.body.coursePrerequisites
   };
+  let url = "/courses/" + req.params.code + "/edit";
 
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
       console.log("Course not found!");
       req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      res.redirect(url);
     }
     else {
       // Search for existing courses with the course code to check for duplicates
@@ -402,6 +403,7 @@ router.put("/:code", function(req, res) {
         if (err) {
           console.log(err);
           req.flash("error", err);
+          res.redirect(url);
         }
         // If no OTHER COURSE results are found, proceed
         else if (searchResults.length === 0 || searchResults[0].code === req.params.code) {
@@ -410,6 +412,7 @@ router.put("/:code", function(req, res) {
             if (err || department === null || department === undefined || !department) {
               console.log("Department is not valid!");
               req.flash("error", "Department is not valid!");
+              res.redirect(url);
             }
             else {
               // Check that the course prerequisites is valid
@@ -421,8 +424,7 @@ router.put("/:code", function(req, res) {
                       if (err) {
                         console.log("ERROR while updating course object!");
                         req.flash("error", "ERROR while updating course object!");
-                        console.log(err);
-                        // Redirect to admin courses with an error message
+                        res.redirect(url);
                       }
                       else {
                         if (count === 0 || count === undefined) {
@@ -432,8 +434,7 @@ router.put("/:code", function(req, res) {
                           if (err) {
                             console.log("ERROR while updating course object!");
                             req.flash("error", "ERROR while updating course object!");
-                            console.log(err);
-                            // Redirect to admin courses with an error message
+                            res.redirect(url);
                           }
                           else {
                             if (!(updatedCourse.department === undefined)) {
@@ -442,7 +443,7 @@ router.put("/:code", function(req, res) {
                                 if (err) {
                                   console.log("ERROR while adding course to department!");
                                   req.flash("error", "ERROR while adding course to department!");
-                                  console.log(err);
+                                  res.redirect(url);
                                 }
                               });
                             }
@@ -452,7 +453,7 @@ router.put("/:code", function(req, res) {
                                 if (err) {
                                   console.log("ERROR while adding course to department!");
                                   req.flash("error", "ERROR while adding course to department!");
-                                  console.log(err);
+                                  res.redirect(url);
                                 }
                               });
                             }
@@ -468,9 +469,7 @@ router.put("/:code", function(req, res) {
                 else {
                   console.log("Course prerequisites is not valid!");
                   req.flash("error", "Course prerequisites is not valid!");
-                  let url = "/courses/" + req.params.code + "/edit";
                   res.redirect(url);
-                  // Redirect to admin courses with an error message
                 }
               });
             }
@@ -480,9 +479,7 @@ router.put("/:code", function(req, res) {
         else {
           console.log("Course code already exists!");
           req.flash("error", "Course code already exists!");
-          let url = "/courses/" + req.params.code + "/edit";
           res.redirect(url);
-          // Redirect to admin courses with an error message
         }
       });
     }

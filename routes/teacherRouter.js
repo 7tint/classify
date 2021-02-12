@@ -89,7 +89,7 @@ router.post("/", function(req, res) {
 					}
 					else {
 						await Promise.all(teacher.courses.map(async function(course) {
-							await Course.findOneAndUpdate({_id: course}, {$push: {teachers: newTeacher._id}}, function(err, updatedCourse) {
+							await Course.findOneAndUpdate({_id: course}, {$addToSet: {teachers: newTeacher._id}}, function(err, updatedCourse) {
 								if (err) {
 									console.log(err);
 									req.flash("error", err);
@@ -208,7 +208,7 @@ router.put("/:name", function(req, res) {
 								}
 								if (teacher.courses) {
 									await Promise.all(teacher.courses.map(async function(course) {
-										await Course.findOneAndUpdate({_id: course}, {$push: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
+										await Course.findOneAndUpdate({_id: course}, {$addToSet: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
 											if (err) {
 												console.log(err);
 												req.flash("error", err);
