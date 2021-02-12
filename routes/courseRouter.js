@@ -409,7 +409,7 @@ router.put("/:code", function(req, res) {
         else if (searchResults.length === 0 || searchResults[0].code === req.params.code) {
           // Check that department exists
           Department.findOne({_id: course.department}, function(err, department) {
-            if (err || department === null || department === undefined || !department) {
+            if (course.department && (err || department === null || department === undefined || !department)) {
               console.log("Department is not valid!");
               req.flash("error", "Department is not valid!");
               res.redirect(url);
