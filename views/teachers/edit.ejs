@@ -74,12 +74,56 @@
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="form-group">
-          <label for="code">Profile Picture</label>
-          <input type="text" class="form-control" name="profilePicture" id="profilepicture" placeholder="Profile Picture" value="<%= teacher.profilePicture %>" required>
+      <div class="form-row">
+        <div class="col">
+          <div class="form-group">
+            <label for="profile-picture">Profile Picture</label>
+            <input type="text" class="form-control" name="profilePicture" id="profile-picture" placeholder="Profile Picture">
+          </div>
         </div>
       </div>
+      <div class="form-row">
+        <div class="col">
+          <div class="form-group">
+            <script type="text/javascript">
+              $(document).ready(function() {
+                  $('#courses').multiselect({
+                      enableFiltering: true,
+                      filterBehavior: 'value',
+                      enableCaseInsensitiveFiltering: true
+                  });
+              });
+            </script>
+            <div class="mt-2 mb-4">
+              <label for="courses">Teacher's Courses</label> <br/>
+              <select class="mb-3" id="courses" multiple="multiple" name="courses[]">
+                <% courses.forEach(function(course) { %>
+                  <% if (teacher.courses.length > 0) { %>
+                    <% for (let i = 0; i < teacher.courses.length; i++) { %>
+                      <% if (course._id.toString() === teacher.courses[i].toString()) { %>
+                        <option selected value=<%= course.code %>><%= course.code %></option>
+                        <% break; %>
+                      <% } else if (i === teacher.courses.length - 1) { %>
+                        <option value=<%= course.code %>><%= course.code %></option>
+                      <% } %>
+                    <% } %>
+                  <% } else { %>
+                    <option value=<%= course.code %>><%= course.code %></option>
+                  <% } %>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+<!-- 
+      <% for (let i = 0; i < teacher.courses.length; i++) { %>
+        <%= teacher.courses[i] %><br/>
+      <% }%>
+      <br/>
+      <% courses.forEach(function(course) { %>
+        <%= course._id %> <br/>
+      <% }); %> -->
       <button type="submit" class="btn btn-primary">Edit Teacher</button>
     </form>
   </div>

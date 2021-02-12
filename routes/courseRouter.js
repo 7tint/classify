@@ -149,7 +149,6 @@ router.put("/manage", async function(req, res) {
 				if (await ObjectId.isValid(department)) {
 					let foundDepartment = await Department.findOne({_id: department});
 					if (foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
-						req.flash("error", "Oops! Something went wrong.");
 						isValid = false;
 					}
 				} else {
@@ -168,7 +167,6 @@ router.put("/manage", async function(req, res) {
 			await Promise.all(courses.map(async function(course) {
 				let foundCourse = await Course.findOne({code: course});
 				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
-					req.flash("error", "Oops! Something went wrong.");
 					isValid = false;
 				}
 				else {
@@ -194,15 +192,15 @@ router.put("/manage", async function(req, res) {
 				}
 
 				else {
-					let updateCourseDepartments = courses.map(async function(course, i) {
+					await Promise.all(courses.map(async function(course, i) {
 						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
 							if (err) {
 								console.log(err);
 								req.flash("error", "Oops! Something went wrong.");
+                res.redirect("/courses/manage");
 							}
 						});
-					});
-					await Promise.all(updateCourseDepartments);
+					}));
           req.flash("success", "Courses updated successfully!");
           console.log("Courses updated successfully!");
 					res.redirect("/courses/manage");
@@ -225,7 +223,7 @@ router.get("/", function(req, res) {
         res.render("courses/index", {courses});
       }
       else {
-        let promises = courses.map(async function(course) {
+        await Promise.all(courses.map(async function(course) {
           if (course.department) {
             if (ObjectId.isValid(course.department)) {
               let foundDepartment = await Department.findOne({_id: course.department});
@@ -234,9 +232,8 @@ router.get("/", function(req, res) {
               }
             }
           }
-        });
+        }));
 
-        await Promise.all(promises);
         res.render("courses/index", {courses});
       }
     }

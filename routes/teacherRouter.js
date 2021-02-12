@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const Teacher = require("./../models/teacherModel");
 const Review = require("./../models/reviewModel");
+const Course = require("./../models/courseModel");
 const Preferences = require("./../models/preferencesModel");
 
 function convertNametoObj(name) {
@@ -43,7 +44,9 @@ router.get("/", function(req, res) {
 });
 
 router.get("/new", function(req, res) {
-	res.render("teachers/new");
+	Course.find({}, function(err, courses) {
+		res.render("teachers/new", {courses});
+	})
 });
 
 router.post("/", function(req, res) {
@@ -53,27 +56,57 @@ router.post("/", function(req, res) {
 			lastName: req.body.teacherLastName
 		},
 		preferredTitle: req.body.preferredTitle,
-		profilePicture: req.body.profilePicture
+		profilePicture: req.body.profilePicture,
+		courses: req.body.courses
 	};
+	let isValid = true;
+	let courseids = new Array();
 
-	Teacher.find({ name: new RegExp(`^${teacher.name}$`, 'i') }, function(err, searchResults) {
+	Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, async function(err, searchResults) {
 		if (err) {
 			console.log(err);
 			req.flash("error", err);
 		}
 		else if (!searchResults.length) {
-			Teacher.create(teacher, function(err, newTeacher) {
-				if (err) {
-					console.log("ERROR while creating teacher object!");
-					req.flash("error", "ERROR while creating teacher object!");
-					console.log(err);
+			await Promise.all(teacher.courses.map(async function(course) {
+				let foundCourse = await Course.findOne({code: course});
+				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
+					req.flash("error", "Oops! Something went wrong.");
+					isValid = false;
+				} else {
+					courseids.push(foundCourse._id);
 				}
-				else {
-					console.log("Teacher created!");
-					req.flash("success", "Teacher created!");
-					res.redirect("/teachers");
-				}
-			});
+			}));
+
+			if (isValid) {
+				teacher.courses = courseids;
+
+				Teacher.create(teacher, async function(err, newTeacher) {
+					if (err) {
+						console.log("ERROR while creating teacher object!");
+						req.flash("error", "ERROR while creating teacher object!");
+						console.log(err);
+					}
+					else {
+						await Promise.all(teacher.courses.map(async function(course) {
+							await Course.findOneAndUpdate({_id: course}, {$push: {teachers: newTeacher._id}}, function(err, updatedCourse) {
+								if (err) {
+									console.log(err);
+									req.flash("error", err);
+								}
+								else {
+									console.log("Teacher added to " + course + "!");
+									req.flash("Teacher added to " + course + "!");
+								}
+							});
+						}));
+
+						console.log("Teacher created!");
+						req.flash("success", "Teacher created!");
+						res.redirect("/teachers");
+					}
+				});
+			}
 		}
 		else {
 			console.log("Teacher already exists!");
@@ -106,7 +139,9 @@ router.get("/:name/edit", function(req, res) {
 			res.redirect("/teachers");
 		}
 		else {
-			res.render("teachers/edit", { teacher });
+			Course.find({}, function(err, courses) {
+				res.render("teachers/edit", { teacher, courses });
+			});
 		}
 	});
 });
@@ -119,36 +154,84 @@ router.put("/:name", function(req, res) {
 			lastName: req.body.teacherLastName
 		},
 		prefferedTitle: req.body.prefferedTitle,
-		profilePicture: req.body.profilePicture
+		profilePicture: req.body.profilePicture,
+		courses: req.body.courses
 	};
+	let isValid = true;
+	let courseids = new Array();
 
-	Teacher.findOne({name: nameObject}, function(err, teacherFound) {
-		if (err || teacherFound === null || teacherFound === undefined || !teacherFound) {
+	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
+		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
 			console.log("Teacher not found!");
 			req.flash("error", "Teacher not found!");
 			res.redirect("/teachers");
 		}
 		else {
-			Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, function(err, searchResults) {
+			Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, async function(err, searchResults) {
 				if (err) {
 					console.log(err);
 					req.flash("error", err);
 				}
 				else if (!searchResults.length) {
-					Teacher.findOneAndUpdate({name: nameObject}, teacher, function(err) {
-						if (err) {
-							console.log(err);
-							req.flash("error", err);
-						}
-						else {
-							res.redirect("/teachers");
-						}
-					});
+					if (teacher.courses) {
+						await Promise.all(teacher.courses.map(async function(course) {
+							let foundCourse = await Course.findOne({code: course});
+							if (foundCourse === null || foundCourse === undefined || !foundCourse) {
+								isValid = false;
+							} else {
+								courseids.push(foundCourse._id);
+							}
+						}));
+					}
+
+					if (isValid) {
+						teacher.courses = courseids;
+
+						Teacher.findOneAndUpdate({name: nameObject}, teacher, async function(err, updatedTeacher) {
+							if (err) {
+								console.log(err);
+								req.flash("error", err);
+							}
+							else {
+								if (foundTeacher.courses) {
+									await Promise.all(foundTeacher.courses.map(async function(course) {
+										await Course.findOneAndUpdate({_id: course}, {$pull: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
+											if (err) {
+												console.log(err);
+												req.flash("error", err);
+											}
+											else {
+												console.log("Teacher removed from " + course + "!");
+											}
+										});
+									}));
+								}
+								if (teacher.courses) {
+									await Promise.all(teacher.courses.map(async function(course) {
+										await Course.findOneAndUpdate({_id: course}, {$push: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
+											if (err) {
+												console.log(err);
+												req.flash("error", err);
+											}
+											else {
+												console.log("Teacher added to " + course + "!");
+											}
+										});
+									}));
+								}
+								req.flash("Teacher updated!");
+								res.redirect("/teachers");
+							}
+						});
+					} else {
+						req.flash("error", "Oops! Something went wrong.");
+						res.redirect("/teachers");
+					}
 				}
 				else {
 					console.log("Teacher already exists!");
 					req.flash("error", "Teacher already exists!");
-					res.redirect("/teachers/new");
+					res.redirect("/teachers");
 				}
 			});
 		}
@@ -157,14 +240,27 @@ router.put("/:name", function(req, res) {
 
 router.delete("/:name", function(req, res) {
 	var nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
-		if (err || teacher === null || teacher === undefined || !teacher) {
+	Teacher.findOne({name: nameObject}, async function(err, foundTeacher) {
+		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
 			console.log("Teacher not found!");
 			req.flash("error", "Teacher not found!");
 			res.redirect("/teachers");
 		}
 		else {
-			Teacher.deleteOne({ name: nameObject }, function(err, deletedTeacher) {
+			if (foundTeacher.courses) {
+				await Promise.all(foundTeacher.courses.map(async function(course) {
+					await Course.findOneAndUpdate({_id: course}, {$pull: {teachers: foundTeacher._id}}, function(err, updatedCourse) {
+						if (err) {
+							console.log(err);
+							req.flash("error", err);
+						}
+						else {
+							console.log("Teacher removed from " + course + "!");
+						}
+					});
+				}));
+			}
+			Teacher.deleteOne({name: nameObject}, function(err, deletedTeacher) {
 				if (err) {
 					console.log(err);
 					req.flash("error", err);

@@ -18,6 +18,12 @@ const teacherSchema = new mongoose.Schema({
 	profilePicture: {
 		type: String
 	},
+	courses: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Course"
+		}
+	],
 	reviews: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

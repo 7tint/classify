@@ -74,10 +74,35 @@
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="form-group">
-          <label for="profile-picture">Profile Picture</label>
-          <input type="text" class="form-control" name="profilePicture" id="profile-picture" placeholder="Profile Picture" required>
+      <div class="form-row">
+        <div class="col">
+          <div class="form-group">
+            <label for="profile-picture">Profile Picture</label>
+            <input type="text" class="form-control" name="profilePicture" id="profile-picture" placeholder="Profile Picture">
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="col">
+          <div class="form-group">
+            <script type="text/javascript">
+              $(document).ready(function() {
+                  $('#courses').multiselect({
+                      enableFiltering: true,
+                      filterBehavior: 'value',
+                      enableCaseInsensitiveFiltering: true
+                  });
+              });
+            </script>
+            <div class="mt-2 mb-4">
+              <label for="courses">Teacher's Courses</label> <br/>
+              <select class="mb-3" id="courses" multiple="multiple" name="courses[]">
+                <% courses.forEach(function(course){ %>
+                  <option value=<%= course.code %>><%= course.code %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary">Add Teacher</button>
