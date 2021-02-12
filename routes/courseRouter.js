@@ -103,11 +103,10 @@ router.get("/", function(req, res) {
         let promises = courses.map(async function(course) {
           if (course.department) {
             if (ObjectId.isValid(course.department)) {
-              await Department.findOne({_id: course.department}, function(err, department) {
-                if (department) {
-                  course.departmentName = department.name;
-                }
-              });
+              let foundDepartment = await Department.findOne({_id: course.department});
+              if (foundDepartment) {
+                course.departmentName = foundDepartment.name;
+              }
             }
           }
         });

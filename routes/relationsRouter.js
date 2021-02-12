@@ -66,13 +66,13 @@ router.get("/assign-courses", function(req, res) {
 	Department.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
-			req.flash("error", err);
+			req.flash("error", "Oops! Something went wrong.");
 		}
 		else {
 			Course.find({}, function(err, courses) {
 				if (err) {
 					console.log(err);
-					req.flash("error", err);
+					req.flash("error", "Oops! Something went wrong.");
 				}
 				else {
 					res.render("relations/department-course", {departments, courses});
@@ -87,13 +87,13 @@ router.get("/assign-teachers", function(req, res) {
 	Course.find({}, (err, departments) => {
 		if (err) {
 			console.log(err);
-			req.flash("error", err);
+			req.flash("error", "Oops! Something went wrong.");
 		}
 		else {
 			Teacher.find({}, function(err, courses) {
 				if (err) {
 					console.log(err);
-					req.flash("error", err);
+					req.flash("error", "Oops! Something went wrong.");
 				}
 				else {
 					res.render("relations/course-teacher", { departments, courses });
@@ -117,22 +117,19 @@ router.put("/assign-courses", async function(req, res) {
 	}
 
 	else {
-		let checkDepartments = departments.map(async function(department) {
+		await Promise.all(departments.map(async function(department) {
 			if (department) {
-				if (ObjectId.isValid(department)) {
-					await Department.findOne({_id: department}, function(err, department) {
-						if (err || department === null || department === undefined || !department) {
-							console.log(err);
-							req.flash("error", err);
-							isValid = false;
-						}
-					});
+				if (await ObjectId.isValid(department)) {
+					let foundDepartment = await Department.findOne({_id: department});
+					if (foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
+						req.flash("error", "Oops! Something went wrong.");
+						isValid = false;
+					}
 				} else {
 					isValid = false;
 				}
 			}
-		});
-		await Promise.all(checkDepartments);
+		}));
 
 		if (!isValid) {
 			console.log("ERROR in departments submitted!");
@@ -141,23 +138,20 @@ router.put("/assign-courses", async function(req, res) {
 		}
 
 		else {
-			let getOldDepartments = courses.map(async function(course) {
-				await Course.findOne({code: course}, function(err, course) {
-					if (err || course === null || course === undefined || !course) {
-						console.log(err);
-						req.flash("error", err);
-						isValid = false;
+			await Promise.all(courses.map(async function(course) {
+				let foundCourse = await Course.findOne({code: course});
+				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
+					req.flash("error", "Oops! Something went wrong.");
+					isValid = false;
+				}
+				else {
+					if (foundCourse.department === undefined) {
+						oldDepartments.push("");
+					} else {
+						oldDepartments.push(foundCourse.department);
 					}
-					else {
-						if (course.department === undefined) {
-							oldDepartments.push("");
-						} else {
-							oldDepartments.push(course.department);
-						}
-					}
-				});
-			});
-			await Promise.all(getOldDepartments);
+				}
+			}));
 
 			if (!isValid) {
 				console.log("ERROR in course codes submitted!");
@@ -177,7 +171,7 @@ router.put("/assign-courses", async function(req, res) {
 						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
 							if (err) {
 								console.log(err);
-								req.flash("error", err);
+								req.flash("error", "Oops! Something went wrong.");
 							}
 						});
 					});
@@ -205,7 +199,7 @@ router.put("/teacher/:code", function(req, res) {
   Course.find({code: course.code}, function(err, searchResults) {
     if (err) {
 			console.log(err);
-			req.flash("error", err);
+			req.flash("error", "Oops! Something went wrong.");
     }
     // If no OTHER COURSE results are found, proceed
     else if (!searchResults.length || searchResults[0].code === req.params.code) {
