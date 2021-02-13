@@ -3,6 +3,10 @@ const router = express.Router({mergeParams: true});
 const Course = require('./../models/courseModel');
 const Department = require("./../models/departmentModel");
 
+function badStr(str) {
+  return str.includes("/");
+}
+
 router.get("/", (req, res) => {
 	Department.find({}, (err, departments) => {
 		if (err) {
@@ -20,32 +24,37 @@ router.get("/new", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-	const department = {
-		name: req.body.departmentName,
-		description: req.body.departmentDescription
-	};
-	Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
-		if (err) {
-			console.log(err);
-			req.flash("error", err);
-		}
-		else if (!searchResults.length) {
-			Department.create(department, (err, newDepartment) => {
-				if (err) {
-					console.log(err);
-					req.flash("error", err);
-				}
-				else {
-					res.redirect("/departments");
-				}
-			});
-		}
-		else {
-			console.log("Department already exists!");
-			req.flash("error", "Department already exists!");
-			res.redirect("/departments/new");
-		}
-	});
+	if (badStr(req.body.departmentName)) {
+    req.flash("error", "Please don't include a '/' in the department name!");
+    res.redirect("/departments/new");
+  } else {
+		const department = {
+			name: req.body.departmentName,
+			description: req.body.departmentDescription
+		};
+		Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
+			if (err) {
+				console.log(err);
+				req.flash("error", err);
+			}
+			else if (!searchResults.length) {
+				Department.create(department, (err, newDepartment) => {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+					}
+					else {
+						res.redirect("/departments");
+					}
+				});
+			}
+			else {
+				console.log("Department already exists!");
+				req.flash("error", "Department already exists!");
+				res.redirect("/departments/new");
+			}
+		});
+	}
 });
 
 router.get("/:name", (req, res) => {
@@ -75,43 +84,48 @@ router.get("/:name/edit", (req, res) => {
 });
 
 router.put("/:name", (req, res) => {
-	const department = {
-		name: req.body.departmentName,
-		description: req.body.departmentDescription
-	};
-	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
-    if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
-			console.log("Department not found!");
-			req.flash("error", "Department not found!");
-      res.redirect("/departments");
-    }
-		else {
-			Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
-				if (err) {
-					console.log(err);
-					req.flash("error", err);
-				}
-				else if (!searchResults.length) {
-					Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
-						if (err) {
-							console.log(err);
-							req.flash("error", err);
-						}
-						else {
-							console.log(updatedDepartment.name + " department updated");
-							req.flash("sucess", updatedDepartment.name + " department updated!");
-							res.redirect("/departments");
-						}
-					});
-				}
-				else {
-					console.log("Department already exists!");
-					req.flash("error", "Department already exists!");
-					res.redirect("/departments");
-				}
-			});
-		}
-	});
+	if (badStr(req.body.departmentName)) {
+    req.flash("error", "Please don't include a '/' in the department name!");
+    res.redirect("/departments");
+	} else {
+		const department = {
+			name: req.body.departmentName,
+			description: req.body.departmentDescription
+		};
+		Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
+			if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
+				console.log("Department not found!");
+				req.flash("error", "Department not found!");
+				res.redirect("/departments");
+			}
+			else {
+				Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
+					if (err) {
+						console.log(err);
+						req.flash("error", err);
+					}
+					else if (!searchResults.length) {
+						Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
+							if (err) {
+								console.log(err);
+								req.flash("error", err);
+							}
+							else {
+								console.log(updatedDepartment.name + " department updated");
+								req.flash("sucess", updatedDepartment.name + " department updated!");
+								res.redirect("/departments");
+							}
+						});
+					}
+					else {
+						console.log("Department already exists!");
+						req.flash("error", "Department already exists!");
+						res.redirect("/departments");
+					}
+				});
+			}
+		});
+	}
 });
 
 router.delete("/:name", (req, res) => {

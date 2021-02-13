@@ -55,8 +55,8 @@ router.get("/new", function(req, res) {
 
 router.post("/", function(req, res) {
 	if (badStr(req.body.teacherFirstName) || badStr(req.body.teacherLastName)) {
-		req.flash("error", "Please don't include a '/' in the course code!");
-    res.redirect("/courses/new");
+		req.flash("error", "Please don't include a '/' in the teacher's name!");
+    res.redirect("/teachers/new");
 	} else {
 		const teacher = {
 			name: {
@@ -166,8 +166,8 @@ router.get("/:name/edit", function(req, res) {
 
 router.put("/:name", function(req, res) {
 	if (badStr(req.body.teacherFirstName) || badStr(req.body.teacherLastName)) {
-		req.flash("error", "Please don't include a '/' in the course code!");
-    res.redirect("/courses/new");
+		req.flash("error", "Please don't include a '/' in the teacher's name!");
+    res.redirect("/teachers");
 	} else {
 		const nameObject = convertNametoObj(req.params.name);
 		const teacher = {
