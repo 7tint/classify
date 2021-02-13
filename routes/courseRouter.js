@@ -333,7 +333,7 @@ router.post("/", function(req, res) {
 router.get("/:code", function(req, res) {
   Course.findOne({code: req.params.code}, async function(err, course) {
     if (err || course === null || course === undefined || !course) {
-      req.flash("Course not found!", err);
+      req.flash("error", "Course not found!");
       res.redirect("/courses");
     }
     else {
@@ -470,7 +470,7 @@ router.put("/:code", function(req, res) {
                                 });
                               }
                               req.flash("success", "Course updated successfully!");
-                              res.redirect("/courses/" + req.params.code);
+                              res.redirect("/courses");
                             }
                           });
                         }

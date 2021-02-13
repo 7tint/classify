@@ -242,8 +242,8 @@ router.put("/:name", function(req, res) {
 											});
 										}));
 									}
-									req.flash("Teacher updated successfully!");
-									res.redirect("/teachers" + req.params.name);
+									req.flash("success", "Teacher updated successfully!");
+									res.redirect("/teachers");
 								}
 							});
 						} else {
