@@ -530,9 +530,11 @@ router.delete("/:code", function(req, res) {
               if (foundCourse.reviews) {
     						await Promise.all(foundCourse.reviews.map(async function(review) {
     							await Review.deleteOne({_id: review}, function(err, deletedReview) {
-    								console.log(err);
-    								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                    res.redirect("/courses");
+                    if (err) {
+      								console.log(err);
+      								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                      res.redirect("/courses");
+                    }
     							});
     						}));
     					}

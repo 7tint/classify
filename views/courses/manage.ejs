@@ -6,17 +6,7 @@
   	<div class="grid flex-start-content department-courses">
       <div>
         <p>Uncategorized:</p>
-        <div
-        name="sortableCards"
-        class="
-          grid
-          flex-start-content
-          disable-marker
-          cards clickable
-          sortable-animation
-        "
-        style="min-height: 500px;"
-        sortable>
+        <div name="sortableCards" class="grid flex-start-content disable-marker cards clickable sortable-animation" style="min-height: 500px;" sortable>
           <% courses.forEach(function(course) { %>
             <% if (course.department === undefined) { %>
               <div sortItem class="course" id=<%=course.code%>>
@@ -25,24 +15,12 @@
             <% } %>
           <% }); %>
         </div>
-
       </div>
 
       <% departments.forEach(function(department) { %>
         <div>
           <p>Department: <%= department.name %> </p>
-      		<div
-      		name="sortableCards"
-      		class="
-      			grid
-      			flex-start-content
-      			disable-marker
-      			cards clickable
-      			sortable-animation
-      		"
-          style="min-height: 500px;"
-      		sortable
-          id=<%= department._id %>>
+      		<div name="sortableCards" class="grid flex-start-content disable-marker cards clickable sortable-animation" style="min-height: 500px;" sortable id=<%= department._id %>>
             <% courses.forEach(function(course) { %>
               <% if (course.department) { %>
                 <% if (course.department.toString() === department._id.toString()) { %>
