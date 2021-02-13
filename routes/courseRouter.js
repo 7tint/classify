@@ -220,7 +220,7 @@ router.get("/", function(req, res) {
     if (err) {
       console.log(err);
       req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses");
+      res.redirect("/");
     }
     else {
       if (courses.length === 0) {
