@@ -322,10 +322,24 @@ router.post("/:name/review", async function(req, res) {
 
 	await Preferences.findOne({}, function(err, preferences) {
 		if (preferences.teacher.approveComments === false) {
-			review.isApproved = true;
-		} else {
-			review.isApproved = false;
-		}
+      review.isApproved = true;
+    } else {
+      review.isApproved = false;
+    }
+
+    if (preferences.isAnonymous === true) {
+      review.isAnonymous = true;
+    }
+
+    if (preferences.teacher.hasMetrics === false) {
+      review.metric1 = undefined;
+      review.metric2 = undefined;
+      review.metric3 = undefined;
+    }
+
+    if (preferences.teacher.hasComments === false) {
+      review.commentText = undefined;
+    }
 	});
 
 	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
@@ -409,10 +423,24 @@ router.put("/:name/:id/edit", async function(req, res) {
 
 	await Preferences.findOne({}, function(err, preferences) {
 		if (preferences.teacher.approveComments === false) {
-			review.isApproved = true;
-		} else {
-			review.isApproved = false;
-		}
+      review.isApproved = true;
+    } else {
+      review.isApproved = false;
+    }
+
+    if (preferences.isAnonymous === true) {
+      review.isAnonymous = true;
+    }
+
+    if (preferences.teacher.hasMetrics === false) {
+      review.metric1 = undefined;
+      review.metric2 = undefined;
+      review.metric3 = undefined;
+    }
+
+    if (preferences.teacher.hasComments === false) {
+      review.commentText = undefined;
+    }
 	});
 
 	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {

@@ -577,6 +577,20 @@ router.post("/:code/review", async function(req, res) {
     } else {
       review.isApproved = false;
     }
+
+    if (preferences.isAnonymous === true) {
+      review.isAnonymous = true;
+    }
+
+    if (preferences.course.hasMetrics === false) {
+      review.metric1 = undefined;
+      review.metric2 = undefined;
+      review.metric3 = undefined;
+    }
+
+    if (preferences.course.hasComments === false) {
+      review.commentText = undefined;
+    }
   });
 
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
@@ -660,6 +674,20 @@ router.put("/:code/:id/edit", async function(req, res) {
       review.isApproved = true;
     } else {
       review.isApproved = false;
+    }
+
+    if (preferences.isAnonymous === true) {
+      review.isAnonymous = true;
+    }
+
+    if (preferences.course.hasMetrics === false) {
+      review.metric1 = undefined;
+      review.metric2 = undefined;
+      review.metric3 = undefined;
+    }
+
+    if (preferences.course.hasComments === false) {
+      review.commentText = undefined;
     }
   });
 

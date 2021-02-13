@@ -12,13 +12,13 @@ const reviewSchema = new mongoose.Schema({
   },
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
-    required: function() { 
+    required: function() {
       return this.isCourseReview === false;
     }
   },
   course: {
     type: mongoose.Schema.Types.ObjectId,
-    required: function() { 
+    required: function() {
       return this.isCourseReview === true;
     }
   },
@@ -27,21 +27,18 @@ const reviewSchema = new mongoose.Schema({
     get: v => Math.round(v),
     set: v => Math.round(v),
     alias: 'i',
-    required: true
   },
   metric2: {
     type: Number,
     get: v => Math.round(v),
     set: v => Math.round(v),
     alias: 'i',
-    required: true
   },
   metric3: {
     type: Number,
     get: v => Math.round(v),
     set: v => Math.round(v),
     alias: 'i',
-    required: true
   },
   commentText: {
     type: String,
