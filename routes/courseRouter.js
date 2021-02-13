@@ -110,6 +110,10 @@ function updateCourseDepartmentsHelper(course, department, oldDepartment, callba
 	}
 }
 
+function badStr(str) {
+  return str.includes("/");
+}
+
 /* ------------ START OF MANAGE COURSES ROUTES ----------------- */
 
 router.get("/manage", function(req, res) {
@@ -261,63 +265,69 @@ router.get("/new", function(req, res) {
 });
 
 router.post("/", function(req, res) {
-  var course = {
-    name: req.body.courseName,
-    code: req.body.courseCode,
-    description: req.body.courseDescription,
-    grade: req.body.courseGrade,
-    pace: req.body.coursePace,
-    department: req.body.courseDepartment,
-    prereq: req.body.coursePrerequisites,
-  };
-
-  Course.find({code: course.code}, function(err, searchResults) {
-    if (err) {
-      console.log(err);
-      req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses");
-    }
-    else if (!searchResults.length) {
-      // Check that the course prerequisites is valid
-      checkPrereq(course.prereq, course.code, function(isValid) {
-        if (isValid) {
-          Department.countDocuments({_id: course.department}, function(err, count) {
-            if (count === 0 || count === undefined) {
-              delete course.department;
-            }
-            Course.create(course, function(err, newCourse) {
-              if (err) {
-                console.log(err);
-                req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                res.redirect("/courses");
+  if (badStr(req.body.courseCode)) {
+    console.log("/ in course code");
+    req.flash("bruh tryna crash our website with a /");
+    res.redirect("courses/new");
+  } else {
+    var course = {
+      name: req.body.courseName,
+      code: req.body.courseCode,
+      description: req.body.courseDescription,
+      grade: req.body.courseGrade,
+      pace: req.body.coursePace,
+      department: req.body.courseDepartment,
+      prereq: req.body.coursePrerequisites,
+    };
+  
+    Course.find({code: course.code}, function(err, searchResults) {
+      if (err) {
+        console.log(err);
+        req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+        res.redirect("/courses");
+      }
+      else if (!searchResults.length) {
+        // Check that the course prerequisites is valid
+        checkPrereq(course.prereq, course.code, function(isValid) {
+          if (isValid) {
+            Department.countDocuments({_id: course.department}, function(err, count) {
+              if (count === 0 || count === undefined) {
+                delete course.department;
               }
-              else {
-                if (course.department) {
-                  Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: newCourse._id}}, function(err, updatedDepartment) {
-                    if (err) {
-                      console.log(err);
-                      req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                      res.redirect("/courses");
-                    }
-                  });
+              Course.create(course, function(err, newCourse) {
+                if (err) {
+                  console.log(err);
+                  req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                  res.redirect("/courses");
                 }
-                req.flash("success", "Course created successfully!");
-                res.redirect("/courses");
-              }
+                else {
+                  if (course.department) {
+                    Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: newCourse._id}}, function(err, updatedDepartment) {
+                      if (err) {
+                        console.log(err);
+                        req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                        res.redirect("/courses");
+                      }
+                    });
+                  }
+                  req.flash("success", "Course created successfully!");
+                  res.redirect("/courses");
+                }
+              });
             });
-          });
-        }
-        else {
-          req.flash("error", "The course prerequisites submitted are not valid!");
-          res.redirect("/courses/new");
-        }
-      });
-    }
-    else {
-      req.flash("error", "The course code submitted already exists!");
-      res.redirect("/courses/new");
-    }
-  });
+          }
+          else {
+            req.flash("error", "The course prerequisites submitted are not valid!");
+            res.redirect("/courses/new");
+          }
+        });
+      }
+      else {
+        req.flash("error", "The course code submitted already exists!");
+        res.redirect("/courses/new");
+      }
+    });
+  }
 });
 
 router.get("/:code", function(req, res) {
