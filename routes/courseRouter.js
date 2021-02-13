@@ -144,7 +144,7 @@ router.put("/manage", async function(req, res) {
 	var oldDepartments = new Array();
 	var isValid = true;
 
-	if (courses.length === 0) {
+	if (!(courses) || courses.length === 0) {
 		req.flash("error", "Please create courses before assigning them to departments!");
 		res.redirect("/courses/manage");
 	}
