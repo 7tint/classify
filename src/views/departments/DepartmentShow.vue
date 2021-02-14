@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'departmentIndex'}">Departments</router-link>
+    
     <h1 class="mb-1">{{department.name}}</h1>
     <p>{{department.description}}</p>
     <!-- <div v-for="review in reviews" :key="review._id">

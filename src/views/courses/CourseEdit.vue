@@ -1,9 +1,8 @@
 <template>
   <div class="m-5">
     Courses Page <br/>
-    <a href="/">Home</a> <br/>
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
-    <a href="/admin">Admin</a>
 
     <form @submit.prevent="editCourse()">
       <h5 class="mb-3">Add Course</h5>

@@ -5,10 +5,7 @@ const departmentSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	description: {
-		type: String,
-		required: false
-	},
+	description: String,
 	courses: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

@@ -1,8 +1,7 @@
 <template>
   <div class="m-5">
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
     Departments Page <br/>
-    <a href="/">Home</a> <br/>
-    <a href="/admin">Admin</a>
 
     <div class="d-flex flex-row mt-5">
       <router-link class="btn btn-primary" :to="{name: 'departmentNew'}">New Department</router-link>

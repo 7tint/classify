@@ -116,7 +116,7 @@ function badStr(str) {
   return str.includes("/");
 }
 
-const validateCourse = (req, res, next) => {
+const validateCourse = function(req, res, next) {
   const courseSchema = Joi.object({
     course: Joi.object({
       name: Joi.string().required(),

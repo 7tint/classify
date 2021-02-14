@@ -1,5 +1,7 @@
 <template>
   <div>
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
+
     <div class="mb-3">Course Catalogue Configurations: <br/></div>
     <router-link class="btn btn-primary" :to="{name: 'preferenceEdit'}">Edit Preferences</router-link>
     <div class="form-group">

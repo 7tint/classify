@@ -1,5 +1,7 @@
 <template>
   <form @submit.prevent="editDepartment()">
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'departmentIndex'}">Departments</router-link>
     <h5 class="mb-3">Add Department</h5>
     <div class="form-row">
       <div class="col">
