@@ -34,7 +34,7 @@ function validatePreferences(req, res, next) {
 router.get("/", function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
     if (err) {
-      console.log("ERROR while retrieving preferences!");
+      // console.log("ERROR while retrieving preferences!");
       // req.flash("error", "ERROR while retrieving preferences!");
       // console.log(err);
       res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
@@ -59,14 +59,14 @@ router.get("/", function(req, res) {
 
         Preferences.create(defaultPreferences, function(err, createdPreferences) {
           if (err) {
-            console.log("ERROR while creating preferences object!");
+            // console.log("ERROR while creating preferences object!");
             // req.flash("error", "ERROR while crearing preferences object!");
             // console.log(err);
             res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             // Redirect to preferences page with an error message
           }
           else {
-            console.log("Preferences created!");
+            // console.log("Preferences created!");
             // req.flash("success", "Preferences created!");
             // res.redirect("/admin");
             res.json({preferences: createdPreferences});
@@ -182,7 +182,7 @@ router.put("/", validatePreferences, function(req, res) {
   // Replace one existing preference object
   Preferences.findOneAndUpdate({}, preferences, {upsert: true}, function(err, docs) {
     if (err) {
-      console.log("ERROR while deleting preference objects!");
+      // console.log("ERROR while deleting preference objects!");
       // req.flash("error", "ERROR while deleting preference objects!");
       // console.log(err);
       res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
