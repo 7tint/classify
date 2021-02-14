@@ -35,7 +35,7 @@
     methods: {
       postDepartment() {
         let uri = `http://127.0.0.1:3000/api/departments/`;
-        this.axios.post(uri, this.department).then(() => {
+        this.axios.post(uri, {department: this.department}).then(() => {
           this.$router.push({name: "departmentIndex"});
         });
       }

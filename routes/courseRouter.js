@@ -296,7 +296,7 @@ router.get("/", function(req, res) {
 // });
 
 router.post("/", validateCourse, function(req, res) {
-  if (badStr(req.body.code)) {
+  if (badStr(req.body.course.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses/new");
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});

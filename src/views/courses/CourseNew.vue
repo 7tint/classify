@@ -83,7 +83,7 @@
     methods: {
       postCourse() {
         let uri = `http://127.0.0.1:3000/api/courses/`;
-        this.axios.post(uri, this.course).then(() => {
+        this.axios.post(uri, {course: this.course}).then(() => {
           this.$router.push({name: "courseIndex"});
         });
       }

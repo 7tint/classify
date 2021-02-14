@@ -120,7 +120,7 @@
     methods: {
       editPreferences() {
         let uri = `http://127.0.0.1:3000/api/preferences/`;
-        this.axios.put(uri, this.preferences).then(() => {
+        this.axios.put(uri, {preferences: this.preferences}).then(() => {
           this.$router.push({name: "preferenceIndex"});
         });
       }
