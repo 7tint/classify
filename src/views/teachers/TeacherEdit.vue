@@ -57,13 +57,12 @@
       let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
       this.axios.get(uri).then((response) => {
         this.teacher = response.data.teacher;
-        console.log(this.teacher);
       });
     },
     methods: {
       editTeacher() {
         let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
-        this.axios.put(uri, this.teacher).then(() => {
+        this.axios.put(uri, {teacher: this.teacher}).then(() => {
           this.$router.push({name: "teacherShow", params: {name: this.teacher.name.firstName + '_' + this.teacher.name.lastName}});
         });
       }

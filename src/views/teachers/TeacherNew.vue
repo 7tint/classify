@@ -51,7 +51,7 @@
     methods: {
       postTeacher() {
         let uri = `http://127.0.0.1:3000/api/teachers/`;
-        this.axios.post(uri, this.teacher).then(() => {
+        this.axios.post(uri, {teacher: this.teacher}).then(() => {
           this.$router.push({name: "teacherIndex"});
         });
       }
