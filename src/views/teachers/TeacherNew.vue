@@ -5,19 +5,19 @@
       <div class="col">
         <div class="form-group">
           <label for="first-name">Teacher First Name</label>
-          <input type="text" class="form-control" v-for="teacher.firstName" id="first-name" placeholder="Teacher First Name" required>
+          <input type="text" class="form-control" v-model="teacher.firstName" id="first-name" placeholder="Teacher First Name" required>
         </div>
       </div>
       <div class="col">
           <div class="form-group">
             <label for="last-name">Teacher Last Name</label>
-            <input type="text" class="form-control" v-for="teacher.lastName" id="last-name" placeholder="Teacher Last Name" required>
+            <input type="text" class="form-control" v-model="teacher.lastName" id="last-name" placeholder="Teacher Last Name" required>
           </div>
         </div>
       <div class="col">
         <div class="form-group">
           <label for="preferred-title">Preffered Title</label>
-          <input type="text" class="form-control" v-for="teacher.preferredTitle" id="preferred-title" placeholder="Preffered Title" required>
+          <input type="text" class="form-control" v-model="teacher.preferredTitle" id="preferred-title" placeholder="Preffered Title" required>
         </div>
       </div>
     </div>
@@ -25,7 +25,7 @@
       <div class="col">
         <div class="form-group">
           <label for="profile-picture">Profile Picture</label>
-          <input type="text" class="form-control" v-for="teacher.profilePicture" id="profile-picture" placeholder="Profile Picture">
+          <input type="text" class="form-control" v-model="teacher.profilePicture" id="profile-picture" placeholder="Profile Picture">
         </div>
       </div>
     </div>

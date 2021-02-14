@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h1 class="mb-1">{{department.name}}</h1>
+    <p>{{department.description}}</p>
     <!-- <div v-for="review in reviews" :key="review._id">
       <router-link class="btn btn-primary" :to="{name: 'reviewEdit', params: {code: this.course.code, _id: review._id}}">Edit Review</router-link>
     </div> -->
