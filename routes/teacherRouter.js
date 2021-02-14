@@ -63,20 +63,12 @@ router.get("/", function(req, res) {
 // });
 
 router.post("/", function(req, res) {
-	if (badStr(req.body.name.firstName) || badStr(req.body.name.lastName)) {
+	if (badStr(req.body.teacher.name.firstName) || badStr(req.body.teacher.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/new");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
 	} else {
-		const teacher = {
-			name: {
-				firstName: req.body.name.firstName,
-				lastName: req.body.name.lastName
-			},
-			preferredTitle: req.body.preferredTitle,
-			profilePicture: req.body.profilePicture,
-			courses: req.body.courses
-		};
+		const teacher = req.body.teacher;
 		let isValid = true;
 		let courseids = new Array();
 
@@ -181,21 +173,13 @@ router.get("/:name", function(req, res) {
 // });
 
 router.put("/:name", function(req, res) {
-	if (badStr(req.body.name.firstName) || badStr(req.body.name.lastName)) {
+	if (badStr(req.body.teacher.name.firstName) || badStr(req.body.teacher.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/" + req.params.name + "/edit");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
 	} else {
 		const nameObject = convertNametoObj(req.params.name);
-		const teacher = {
-			name: {
-				firstName: req.body.name.firstName,
-				lastName: req.body.name.lastName
-			},
-			preferredTitle: req.body.preferredTitle,
-			profilePicture: req.body.profilePicture,
-			courses: req.body.courses
-		};
+		const teacher = req.body.teacher;
 		let isValid = true;
 		let courseids = new Array();
 

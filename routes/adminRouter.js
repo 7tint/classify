@@ -120,20 +120,21 @@ router.get("/", function(req, res) {
 // });
 
 router.put("/", function(req, res) {
-  var preferences = {
-    isPublic: req.body.isPublic,
-    isAnonymous: req.body.isAnonymous,
-  	course: {
-      hasMetrics: req.body.course.hasMetrics,
-      hasComments: req.body.course.hasComments,
-      approveComments: req.body.course.approveComments,
-    },
-    teacher: {
-      hasMetrics: req.body.teacher.hasMetrics,
-      hasComments: req.body.teacher.hasComments,
-      approveComments: req.body.teacher.approveComments,
-    }
-  };
+  // var preferences = {
+  //   isPublic: req.body.isPublic,
+  //   isAnonymous: req.body.isAnonymous,
+  // 	course: {
+  //     hasMetrics: req.body.course.hasMetrics,
+  //     hasComments: req.body.course.hasComments,
+  //     approveComments: req.body.course.approveComments,
+  //   },
+  //   teacher: {
+  //     hasMetrics: req.body.teacher.hasMetrics,
+  //     hasComments: req.body.teacher.hasComments,
+  //     approveComments: req.body.teacher.approveComments,
+  //   }
+  // };
+  const preferences = req.body.preferences;
 
   // If there are no course/teacher metrics and comments, set anonymous reviews as true as default.
   if (((preferences.course.hasMetrics === "false") && (preferences.course.hasComments === "false")) &&

@@ -26,15 +26,12 @@ router.get("/", (req, res) => {
 // });
 
 router.post("/", (req, res) => {
-	if (badStr(req.body.name)) {
+	if (badStr(req.body.department.name)) {
     // req.flash("error", "Please don't include a '/' in the department name!");
     // res.redirect("/departments/new");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the department name!"});
   } else {
-		const department = {
-			name: req.body.name,
-			description: req.body.description
-		};
+		const department = req.body.department;
 		Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
 			if (err) {
 				console.log(err);
@@ -92,15 +89,12 @@ router.get("/:name", (req, res) => {
 // });
 
 router.put("/:name", (req, res) => {
-	if (badStr(req.body.name)) {
+	if (badStr(req.body.department.name)) {
     // req.flash("error", "Please don't include a '/' in the department name!");
     // res.redirect("/departments");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the department name!"});
 	} else {
-		const department = {
-			name: req.body.name,
-			description: req.body.description
-		};
+		const department = req.body.department;
 		Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
 			if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
 				console.log("Department not found!");
