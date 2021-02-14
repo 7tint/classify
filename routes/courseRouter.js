@@ -116,7 +116,7 @@ function badStr(str) {
   return str.includes("/");
 }
 
-const validateCourse = function(req, res, next) {
+function validateCourse(req, res, next) {
   const courseSchema = Joi.object({
     course: Joi.object({
       name: Joi.string().required(),
@@ -131,6 +131,31 @@ const validateCourse = function(req, res, next) {
     }).required()
   });
   const {error} = courseSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map(el => el.message).join(',');
+    res.status(400).json({error: error, message: msg});
+  } else {
+    next();
+  }
+}
+
+function validateReview(req, res, next) {
+  const reviewSchema = Joi.object({
+    review: Joi.object({
+      email: Joi.string().required(),
+      isCourseReview: Joi.boolean().required(),
+      teacher: Joi.objectId(),
+      course: Joi.objectId(),
+      metric1: Joi.number(),
+      metric2: Joi.number(),
+      metric3: Joi.number(),
+      commentText: Joi.string(),
+      createdAt: Joi.date().required(),
+      isAnonymous: Joi.boolean().required(),
+      isApproved: Joi.boolean().required()
+    }).required()
+  });
+  const {error} = reviewSchema.validate(req.body);
   if (error) {
     const msg = error.details.map(el => el.message).join(',');
     res.status(400).json({error: error, message: msg});
@@ -610,16 +635,17 @@ router.delete("/:code", function(req, res) {
 //   });
 // });
 
-router.post("/:code/review", async function(req, res) {
-  var review = {
-    email: "email@domain.com",
-    isCourseReview: true,
-    metric1: req.body.metric1,
-    metric2: req.body.metric2,
-    metric3: req.body.metric3,
-    commentText: req.body.commentText,
-    isAnonymous: req.body.isAnonymous,
-  };
+router.post("/:code/review", validateReview, async function(req, res) {
+  // var review = {
+  //   email: "email@domain.com",
+  //   isCourseReview: true,
+  //   metric1: req.body.metric1,
+  //   metric2: req.body.metric2,
+  //   metric3: req.body.metric3,
+  //   commentText: req.body.commentText,
+  //   isAnonymous: req.body.isAnonymous,
+  // };
+  const review = req.body.review;
 
   await Preferences.findOne({}, function(err, preferences) {
     if (preferences.course.approveComments === false) {
@@ -714,16 +740,17 @@ router.post("/:code/review", async function(req, res) {
 //   });
 // });
 
-router.put("/:code/:id/edit", async function(req, res) {
-  var review = {
-    email: "email@domain.com",
-    isCourseReview: true,
-    metric1: req.body.metric1,
-    metric2: req.body.metric2,
-    metric3: req.body.metric3,
-    commentText: req.body.commentText,
-    isAnonymous: req.body.isAnonymous,
-  };
+router.put("/:code/:id/edit", validateReview, async function(req, res) {
+  // var review = {
+  //   email: "email@domain.com",
+  //   isCourseReview: true,
+  //   metric1: req.body.metric1,
+  //   metric2: req.body.metric2,
+  //   metric3: req.body.metric3,
+  //   commentText: req.body.commentText,
+  //   isAnonymous: req.body.isAnonymous,
+  // };
+  const review = req.body.review;
 
   await Preferences.findOne({}, function(err, preferences) {
     if (preferences.course.approveComments === false) {

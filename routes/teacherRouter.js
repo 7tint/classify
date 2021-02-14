@@ -59,6 +59,32 @@ function validateTeacher(req, res, next) {
   }
 }
 
+function validateReview(req, res, next) {
+  const reviewSchema = Joi.object({
+    review: Joi.object({
+      email: Joi.string().required(),
+      isCourseReview: Joi.boolean().required(),
+      teacher: Joi.objectId(),
+      course: Joi.objectId(),
+      metric1: Joi.number(),
+      metric2: Joi.number(),
+      metric3: Joi.number(),
+      commentText: Joi.string(),
+      createdAt: Joi.date().required(),
+      isAnonymous: Joi.boolean().required(),
+      isApproved: Joi.boolean().required()
+    }).required()
+  });
+  const {error} = reviewSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map(el => el.message).join(',');
+    res.status(400).json({error: error, message: msg});
+  } else {
+    next();
+  }
+}
+
+
 router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
 		if (err) {
@@ -355,18 +381,9 @@ router.delete("/:name", function(req, res) {
 // });
 
 
-router.post("/:name/review", async function(req, res) {
+router.post("/:name/review", validateReview, async function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-
-	var review = {
-		email: "email@domain.com",
-		isCourseReview: false,
-		metric1: req.body.metric1,
-		metric2: req.body.metric2,
-		metric3: req.body.metric3,
-		commentText: req.body.commentText,
-		isAnonymous: req.body.isAnonymous,
-	};
+	const review = req.body.review;
 
 	await Preferences.findOne({}, function(err, preferences) {
 		if (preferences.teacher.approveComments === false) {
@@ -458,18 +475,9 @@ router.post("/:name/review", async function(req, res) {
 // 	});
 // });
 
-router.put("/:name/:id/edit", async function(req, res) {
+router.put("/:name/:id/edit", validateReview, async function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
-
-	var review = {
-		email: "email@domain.com",
-		isCourseReview: false,
-		metric1: req.body.metric1,
-		metric2: req.body.metric2,
-		metric3: req.body.metric3,
-		commentText: req.body.commentText,
-		isAnonymous: req.body.isAnonymous,
-	};
+	const review = req.body.review;
 
 	await Preferences.findOne({}, function(err, preferences) {
 		if (preferences.teacher.approveComments === false) {
