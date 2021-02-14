@@ -97,7 +97,18 @@
   export default {
     data() {
       return {
-        preferences: {}
+        preferences: {
+          course: {
+            hasMetrics: undefined,
+            hasComments: undefined,
+            approveComments: undefined
+          },
+          teacher: {
+            hasMetrics: undefined,
+            hasComments: undefined,
+            approveComments: undefined
+          }
+        }
       }
     },
     created() {
@@ -107,7 +118,7 @@
       });
     },
     methods: {
-      editDepartment() {
+      editPreferences() {
         let uri = `http://127.0.0.1:3000/api/preferences/`;
         this.axios.put(uri, this.preferences).then(() => {
           this.$router.push({name: "preferenceIndex"});

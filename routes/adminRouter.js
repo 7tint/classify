@@ -124,14 +124,14 @@ router.put("/", function(req, res) {
     isPublic: req.body.isPublic,
     isAnonymous: req.body.isAnonymous,
   	course: {
-      hasMetrics: req.body.course_hasMetrics,
-      hasComments: req.body.course_hasComments,
-      approveComments: req.body.approveCourseComments,
+      hasMetrics: req.body.course.hasMetrics,
+      hasComments: req.body.course.hasComments,
+      approveComments: req.body.course.approveComments,
     },
     teacher: {
-      hasMetrics: req.body.teacher_hasMetrics,
-      hasComments: req.body.teacher_hasComments,
-      approveComments: req.body.approveTeacherComments,
+      hasMetrics: req.body.teacher.hasMetrics,
+      hasComments: req.body.teacher.hasComments,
+      approveComments: req.body.teacher.approveComments,
     }
   };
 

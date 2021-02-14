@@ -63,15 +63,15 @@ router.get("/", function(req, res) {
 // });
 
 router.post("/", function(req, res) {
-	if (badStr(req.body.firstName) || badStr(req.body.lastName)) {
+	if (badStr(req.body.name.firstName) || badStr(req.body.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/new");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
 	} else {
 		const teacher = {
 			name: {
-				firstName: req.body.firstName,
-				lastName: req.body.lastName
+				firstName: req.body.name.firstName,
+				lastName: req.body.name.lastName
 			},
 			preferredTitle: req.body.preferredTitle,
 			profilePicture: req.body.profilePicture,
@@ -159,6 +159,7 @@ router.get("/:name", function(req, res) {
         }));
       }
 			// res.render("teachers/show", {teacher, reviews});
+			console.log(teacher);
 			res.json({teacher: teacher, reviews: reviews});
 		}
 	});
@@ -180,7 +181,7 @@ router.get("/:name", function(req, res) {
 // });
 
 router.put("/:name", function(req, res) {
-	if (badStr(req.body.firstName) || badStr(req.body.lastName)) {
+	if (badStr(req.body.name.firstName) || badStr(req.body.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/" + req.params.name + "/edit");
 		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
@@ -188,10 +189,10 @@ router.put("/:name", function(req, res) {
 		const nameObject = convertNametoObj(req.params.name);
 		const teacher = {
 			name: {
-				firstName: req.body.firstName,
-				lastName: req.body.lastName
+				firstName: req.body.name.firstName,
+				lastName: req.body.name.lastName
 			},
-			prefferedTitle: req.body.prefferedTitle,
+			preferredTitle: req.body.preferredTitle,
 			profilePicture: req.body.profilePicture,
 			courses: req.body.courses
 		};
@@ -226,7 +227,6 @@ router.put("/:name", function(req, res) {
 
 						if (isValid) {
 							teacher.courses = courseids;
-
 							Teacher.findOneAndUpdate({name: nameObject}, teacher, async function(err, updatedTeacher) {
 								if (err) {
 									console.log(err);

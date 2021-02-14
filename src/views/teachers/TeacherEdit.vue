@@ -5,13 +5,13 @@
       <div class="col">
         <div class="form-group">
           <label for="first-name">Teacher First Name</label>
-          <input type="text" class="form-control" v-model="teacher.firstName" id="first-name" placeholder="Teacher First Name" required>
+          <input type="text" class="form-control" v-model="teacher.name.firstName" id="first-name" placeholder="Teacher First Name" required>
         </div>
       </div>
       <div class="col">
           <div class="form-group">
             <label for="last-name">Teacher Last Name</label>
-            <input type="text" class="form-control" v-model="teacher.lastName" id="last-name" placeholder="Teacher Last Name" required>
+            <input type="text" class="form-control" v-model="teacher.name.lastName" id="last-name" placeholder="Teacher Last Name" required>
           </div>
         </div>
       <div class="col">
@@ -45,20 +45,26 @@
   export default {
     data() {
       return {
-        teacher: {}
+        teacher: {
+          name: {
+            firstName: "",
+            lastName: ""
+          }
+        }
       }
     },
     created() {
       let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
       this.axios.get(uri).then((response) => {
         this.teacher = response.data.teacher;
+        console.log(this.teacher);
       });
     },
     methods: {
       editTeacher() {
         let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
         this.axios.put(uri, this.teacher).then(() => {
-          this.$router.push({name: "teacherShow", params: {name: this.teacher.name}});
+          this.$router.push({name: "teacherShow", params: {name: this.teacher.name.firstName + '_' + this.teacher.name.lastName}});
         });
       }
     }
