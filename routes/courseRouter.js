@@ -302,16 +302,7 @@ router.post("/", validateCourse, function(req, res) {
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
-    // var course = {
-    //   name: req.body.name,
-    //   code: req.body.code,
-    //   description: req.body.description,
-    //   grade: req.body.grade,
-    //   pace: req.body.pace,
-    //   department: req.body.department,
-    //   prereq: req.body.prereq
-    // };
-    var course = req.body.course;
+    let course = req.body.course;
 
     Course.find({code: course.code}, function(err, searchResults) {
       if (err) {
@@ -435,22 +426,13 @@ router.get("/:code", function(req, res) {
 // });
 
 router.put("/:code", validateCourse, function(req, res) {
-  if (badStr(req.body.code)) {
+  if (badStr(req.body.course.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses");
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
-    var course = {
-      name: req.body.name,
-      code: req.body.code,
-      description: req.body.description,
-      grade: req.body.grade,
-      pace: req.body.pace,
-      department: req.body.department,
-      prereq: req.body.prereq
-    };
-
+    const course = req.body.course;
     let url = "/courses/" + req.params.code + "/edit";
 
     Course.findOne({code: req.params.code}, function(err, foundCourse) {
