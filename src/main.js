@@ -45,8 +45,28 @@ const routes = [
   //   path: "/courses/manage",
   //   component: CourseManage
   // }
+  {
+    name: "departmentIndex",
+    path: "/departments/",
+    component: DepartmentIndex
+  },
+  {
+    name: "departmentNew",
+    path: "/departments/new",
+    component: DepartmentNew
+  },
+  {
+    name: "departmentShow",
+    path: "/departments/:name",
+    component: DepartmentShow
+  },
+  {
+    name: "departmentEdit",
+    path: "/departments/:name/edit",
+    component: DepartmentEdit
+  },
 ];
 
-const router = new VueRouter({ mode: 'history', routes: routes});
+const router = new VueRouter({mode: 'history', routes: routes});
 
-new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+new Vue(Vue.util.extend({router}, App)).$mount('#app');
