@@ -39,36 +39,39 @@ router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
 		if (err) {
 			console.log(err);
-			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-			res.redirect("/");
+			// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+			// res.redirect("/");
+			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 		}
 		else {
-			res.render("teachers/index", {teachers: allTeachers});
+			// res.render("teachers/index", {teachers: allTeachers});
+			res.json({teachers: allTeachers})
 		}
 	});
 });
 
-router.get("/new", function(req, res) {
-	Course.find({}, function(err, courses) {
-		if (err) {
-			console.log(err);
-			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-			res.redirect("/teaachers");
-		} else {
-			res.render("teachers/new", {courses});
-		}
-	});
-});
+// router.get("/new", function(req, res) {
+// 	Course.find({}, function(err, courses) {
+// 		if (err) {
+// 			console.log(err);
+// 			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+// 			res.redirect("/teaachers");
+// 		} else {
+// 			res.render("teachers/new", {courses});
+// 		}
+// 	});
+// });
 
 router.post("/", function(req, res) {
-	if (badStr(req.body.teacherFirstName) || badStr(req.body.teacherLastName)) {
-		req.flash("error", "Please don't include a '/' in the teacher name!");
-    res.redirect("/teachers/new");
+	if (badStr(req.body.firstName) || badStr(req.body.lastName)) {
+		// req.flash("error", "Please don't include a '/' in the teacher name!");
+    // res.redirect("/teachers/new");
+		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
 	} else {
 		const teacher = {
 			name: {
-				firstName: req.body.teacherFirstName,
-				lastName: req.body.teacherLastName
+				firstName: req.body.firstName,
+				lastName: req.body.lastName
 			},
 			preferredTitle: req.body.preferredTitle,
 			profilePicture: req.body.profilePicture,
@@ -80,8 +83,9 @@ router.post("/", function(req, res) {
 		Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, async function(err, searchResults) {
 			if (err) {
 				console.log(err);
-				req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-				res.redirect("/teachers/new");
+				// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+				// res.redirect("/teachers/new");
+				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 			}
 			else if (!searchResults.length) {
 				if (teacher.courses) {
@@ -101,32 +105,37 @@ router.post("/", function(req, res) {
 					Teacher.create(teacher, async function(err, newTeacher) {
 						if (err) {
 							console.log(err);
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers/new");
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers/new");
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 						}
 						else {
 							await Promise.all(teacher.courses.map(async function(course) {
 								await Course.findOneAndUpdate({_id: course}, {$addToSet: {teachers: newTeacher._id}}, function(err, updatedCourse) {
 									if (err) {
 										console.log(err);
-										req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-										res.redirect("/teachers/new");
+										// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+										// res.redirect("/teachers/new");
+										res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 									}
 								});
 							}));
-							req.flash("success", "Teacher created successfully!");
-							res.redirect("/teachers");
+							// req.flash("success", "Teacher created successfully!");
+							// res.redirect("/teachers");
+							res.status(201).json({teacher: newTeacher});
 						}
 					});
 				} else {
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers/new");
+					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+					// res.redirect("/teachers/new");
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 				}
 			}
 			else {
 				console.log("Teacher already exists!");
-				req.flash("error", "Teacher already exists!");
-				res.redirect("/teachers/new");
+				// req.flash("error", "Teacher already exists!");
+				// res.redirect("/teachers/new");
+				res.status(400).json({error: "", message: "Teacher already exists!"});
 			}
 		});
 	}
@@ -136,8 +145,9 @@ router.get("/:name", function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
 	Teacher.findOne({name: nameObject}, async function(err, teacher) {
 		if (err || teacher === null || teacher === undefined || !teacher) {
-			req.flash("error", "Teacher not found!");
-			res.redirect("/teachers");
+			// req.flash("error", "Teacher not found!");
+			// res.redirect("/teachers");
+			res.status(400).json({error: "", message: "Teacher not found!"});
 		}
 		else {
 			const reviews = new Array();
@@ -148,36 +158,38 @@ router.get("/:name", function(req, res) {
           reviews.push(foundReview);
         }));
       }
-			res.render("teachers/show", {teacher, reviews});
+			// res.render("teachers/show", {teacher, reviews});
+			res.json({teacher: teacher, reviews: reviews});
 		}
 	});
 });
 
-router.get("/:name/edit", function(req, res) {
-	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
-		if (err || teacher === null || teacher === undefined || !teacher) {
-			console.log("Teacher not found!");
-			req.flash("error", "Teacher not found!");
-		}
-		else {
-			Course.find({}, function(err, courses) {
-				res.render("teachers/edit", { teacher, courses });
-			});
-		}
-	});
-});
+// router.get("/:name/edit", function(req, res) {
+// 	const nameObject = convertNametoObj(req.params.name);
+// 	Teacher.findOne({name: nameObject}, function(err, teacher) {
+// 		if (err || teacher === null || teacher === undefined || !teacher) {
+// 			console.log("Teacher not found!");
+// 			req.flash("error", "Teacher not found!");
+// 		}
+// 		else {
+// 			Course.find({}, function(err, courses) {
+// 				res.render("teachers/edit", { teacher, courses });
+// 			});
+// 		}
+// 	});
+// });
 
 router.put("/:name", function(req, res) {
-	if (badStr(req.body.teacherFirstName) || badStr(req.body.teacherLastName)) {
-		req.flash("error", "Please don't include a '/' in the teacher name!");
-    res.redirect("/teachers/" + req.params.name + "/edit");
+	if (badStr(req.body.firstName) || badStr(req.body.lastName)) {
+		// req.flash("error", "Please don't include a '/' in the teacher name!");
+    // res.redirect("/teachers/" + req.params.name + "/edit");
+		res.status(400).json({error: "", message: "Please don't include a '/' in the teacher name!"});
 	} else {
 		const nameObject = convertNametoObj(req.params.name);
 		const teacher = {
 			name: {
-				firstName: req.body.teacherFirstName,
-				lastName: req.body.teacherLastName
+				firstName: req.body.firstName,
+				lastName: req.body.lastName
 			},
 			prefferedTitle: req.body.prefferedTitle,
 			profilePicture: req.body.profilePicture,
@@ -188,15 +200,17 @@ router.put("/:name", function(req, res) {
 
 		Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
 			if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-				req.flash("error", "Teacher not found!");
-				res.redirect("/teachers");
+				// req.flash("error", "Teacher not found!");
+				// res.redirect("/teachers");
+				res.status(400).json({error: "", message: "Teacher not found!"});
 			}
 			else {
 				Teacher.find({name: new RegExp(`^${teacher.name}$`, 'i')}, async function(err, searchResults) {
 					if (err) {
 						console.log(err);
-						req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-						res.redirect("/teachers/" + req.params.name + "/edit");
+						// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+						// res.redirect("/teachers/" + req.params.name + "/edit");
+						res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 					}
 					else if (!searchResults.length) {
 						if (teacher.courses) {
@@ -216,8 +230,9 @@ router.put("/:name", function(req, res) {
 							Teacher.findOneAndUpdate({name: nameObject}, teacher, async function(err, updatedTeacher) {
 								if (err) {
 									console.log(err);
-									req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-									res.redirect("/teachers/" + req.params.name + "/edit");
+									// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+									// res.redirect("/teachers/" + req.params.name + "/edit");
+									res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 								}
 								else {
 									if (foundTeacher.courses) {
@@ -225,8 +240,9 @@ router.put("/:name", function(req, res) {
 											await Course.findOneAndUpdate({_id: course}, {$pull: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
 												if (err) {
 													console.log(err);
-													req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-													res.redirect("/teachers/" + req.params.name + "/edit");
+													// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+													// res.redirect("/teachers/" + req.params.name + "/edit");
+													res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 												}
 											});
 										}));
@@ -236,24 +252,28 @@ router.put("/:name", function(req, res) {
 											await Course.findOneAndUpdate({_id: course}, {$addToSet: {teachers: updatedTeacher._id}}, function(err, updatedCourse) {
 												if (err) {
 													console.log(err);
-													req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-													res.redirect("/teachers/" + req.params.name + "/edit");
+													// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+													// res.redirect("/teachers/" + req.params.name + "/edit");
+													res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 												}
 											});
 										}));
 									}
-									req.flash("success", "Teacher updated successfully!");
-									res.redirect("/teachers");
+									// req.flash("success", "Teacher updated successfully!");
+									// res.redirect("/teachers");
+									res.status(200).json({teacher: updatedTeacher});
 								}
 							});
 						} else {
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers/" + req.params.name + "/edit");
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers/" + req.params.name + "/edit");
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 						}
 					}
 					else {
-						req.flash("error", "The teacher name submitted already exists!");
-						res.redirect("/teachers/" + req.params.name + "/edit");
+						// req.flash("error", "The teacher name submitted already exists!");
+						// res.redirect("/teachers/" + req.params.name + "/edit");
+						res.status(400).json({error: "", message: "Teacher name already exists!"});
 					}
 				});
 			}
@@ -265,8 +285,9 @@ router.delete("/:name", function(req, res) {
 	var nameObject = convertNametoObj(req.params.name);
 	Teacher.findOne({name: nameObject}, async function(err, foundTeacher) {
 		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-			req.flash("error", "Teacher not found!");
-			res.redirect("/teachers");
+			// req.flash("error", "Teacher not found!");
+			// res.redirect("/teachers");
+			res.status(400).json({error: "", message: "Teacher not found!"});
 		}
 		else {
 			if (foundTeacher.courses) {
@@ -274,8 +295,9 @@ router.delete("/:name", function(req, res) {
 					await Course.findOneAndUpdate({_id: course}, {$pull: {teachers: foundTeacher._id}}, function(err, updatedCourse) {
 						if (err) {
 							console.log(err);
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers");
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers");
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 						}
 					});
 				}));
@@ -283,21 +305,24 @@ router.delete("/:name", function(req, res) {
 			Teacher.deleteOne({name: nameObject}, async function(err, deletedTeacher) {
 				if (err) {
 					console.log(err);
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers");
+					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+					// res.redirect("/teachers");
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 				}
 				else {
 					if (foundTeacher.reviews) {
 						await Promise.all(foundTeacher.reviews.map(async function(review) {
 							await Review.deleteOne({_id: review}, function(err, deletedReview) {
 								console.log(err);
-								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-								res.redirect("/teachers");
+								// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+								// res.redirect("/teachers");
+								res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 							});
 						}));
 					}
-					req.flash("success", "Deleted " + nameObject.firstName + " " + nameObject.lastName + " successfully!");
-					res.redirect("/teachers");
+					// req.flash("success", "Deleted " + nameObject.firstName + " " + nameObject.lastName + " successfully!");
+					// res.redirect("/teachers");
+					res.status(204).json();
 				}
 			});
 		}
@@ -306,18 +331,20 @@ router.delete("/:name", function(req, res) {
 
 /* ------------ START OF TEACHER REVIEW ROUTES ----------------- */
 
-router.get("/:name/reviews/new", function(req, res) {
-	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
-		if (err) {
-			console.log(err);
-			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-			res.redirect("/teachers/" + req.params.code);
-		} else {
-			res.render("reviews/teacher/new", {teacher});
-		}
-	});
-});
+// router.get("/:name/reviews/new", function(req, res) {
+// 	const nameObject = convertNametoObj(req.params.name);
+// 	Teacher.findOne({name: nameObject}, function(err, teacher) {
+// 		if (err) {
+// 			console.log(err);
+// 			// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+// 			// res.redirect("/teachers/" + req.params.code);
+// 			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+// 		} else {
+// 			//res.render("reviews/teacher/new", {teacher});
+// 			res.status(200).json({teacher: teacher});
+// 		}
+// 	});
+// });
 
 
 router.post("/:name/review", async function(req, res) {
@@ -357,8 +384,9 @@ router.post("/:name/review", async function(req, res) {
 
 	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
 		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-			req.flash("error", "Teacher Not Found!");
-			res.redirect("/teachers");
+			// req.flash("error", "Teacher Not Found!");
+			// res.redirect("/teachers");
+			res.status(400).json({error: "", message: "Teacher not found!"});
 		}
 		else {
 			review.teacher = foundTeacher._id;
@@ -366,18 +394,21 @@ router.post("/:name/review", async function(req, res) {
 			Review.create(review, function(err, newReview) {
 				if (err) {
 					console.log(err);
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers/" + req.params.code);
+					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+					// res.redirect("/teachers/" + req.params.code);
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 				}
 				else {
 					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: newReview._id}}, function(err, updatedTeacher) {
             if (err) {
 							console.log(err);
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers/" + req.params.code);
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers/" + req.params.code);
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             } else {
-							req.flash("success", "Thank you for submitting your review!");
-              res.redirect("/teachers/" + req.params.code);
+							// req.flash("success", "Thank you for submitting your review!");
+              // res.redirect("/teachers/" + req.params.code);
+							res.status(201).json({review: newReview});
             }
           });
 				}
@@ -387,37 +418,37 @@ router.post("/:name/review", async function(req, res) {
 });
 
 
-router.get("/:name/:id/edit", function(req, res) {
-	const nameObject = convertNametoObj(req.params.name);
-	Teacher.findOne({name: nameObject}, function(err, teacher) {
-		if (err || teacher === null || teacher === undefined || !teacher) {
-			req.flash("error", "Teacher Not Found!");
-			res.redirect("/teachers");
-		}
-		else {
-			Review.findOne({_id: req.params.id}, function(err, review) {
-				if (err) {
-					console.log(err);
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers/" + req.params.code);
-				}
-				else {
-					if (review.isCourseReview === false) {
-						res.render("reviews/teacher/edit", {review, teacher,
-							metric1: review.metric1,
-							metric2: review.metric2,
-							metric3: review.metric3,
-							isAnonymous: review.isAnonymous,
-						});
-					} else {
-						req.flash("error", "Teacher review not found!");
-						res.redirect("/teachers");
-					}
-				}
-			});
-		}
-	});
-});
+// router.get("/:name/:id/edit", function(req, res) {
+// 	const nameObject = convertNametoObj(req.params.name);
+// 	Teacher.findOne({name: nameObject}, function(err, teacher) {
+// 		if (err || teacher === null || teacher === undefined || !teacher) {
+// 			req.flash("error", "Teacher Not Found!");
+// 			res.redirect("/teachers");
+// 		}
+// 		else {
+// 			Review.findOne({_id: req.params.id}, function(err, review) {
+// 				if (err) {
+// 					console.log(err);
+// 					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+// 					res.redirect("/teachers/" + req.params.code);
+// 				}
+// 				else {
+// 					if (review.isCourseReview === false) {
+// 						res.render("reviews/teacher/edit", {review, teacher,
+// 							metric1: review.metric1,
+// 							metric2: review.metric2,
+// 							metric3: review.metric3,
+// 							isAnonymous: review.isAnonymous,
+// 						});
+// 					} else {
+// 						req.flash("error", "Teacher review not found!");
+// 						res.redirect("/teachers");
+// 					}
+// 				}
+// 			});
+// 		}
+// 	});
+// });
 
 router.put("/:name/:id/edit", async function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
@@ -456,8 +487,9 @@ router.put("/:name/:id/edit", async function(req, res) {
 
 	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
 		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-			req.flash("error", "Teacher not found!");
-			res.redirect("/teachers");
+			// req.flash("error", "Teacher not found!");
+			// res.redirect("/teachers");
+			res.status(400).json({error: "", message: "Teacher not found!"});
 		}
 		else {
 			review.teacher = foundTeacher.id;
@@ -465,17 +497,20 @@ router.put("/:name/:id/edit", async function(req, res) {
 			Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
 				if (err) {
 					console.log(err);
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers/" + req.params.name);
+					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+					// res.redirect("/teachers/" + req.params.name);
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 				} else {
 					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedTeacher) {
             if (err) {
 							console.log(err);
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers/" + req.params.name);
-            } else {
-							req.flash("success", "Review updated successfully!");
-							res.redirect("/teachers/" + req.params.name);
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers/" + req.params.name);
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+            // } else {
+						// 	req.flash("success", "Review updated successfully!");
+						// 	res.redirect("/teachers/" + req.params.name);
+							res.status(200).json({review: foundReview});
             }
           });
 				}
@@ -489,25 +524,29 @@ router.delete("/:name/:id", function(req, res) {
 
 	Review.findOne({_id: req.params.id}, function(err, foundReview) {
 		if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === true) {
-			req.flash("error", "Review not found!");
-			res.redirect("/teachers/" + req.params.name);
+			// req.flash("error", "Review not found!");
+			// res.redirect("/teachers/" + req.params.name);
+			res.status(400).json({error: "", message: "Review not found!"});
 		}
 		else {
 			Review.deleteOne({_id: foundReview._id}, function(err, review) {
 				if (err) {
 					console.log(err);
-					req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/teachers/" + req.params.name);
+					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+					// res.redirect("/teachers/" + req.params.name);
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 				}
 				else {
 					Teacher.findOneAndUpdate({_id: foundReview.teacher}, {$pull: {reviews: foundReview._id}}, function(err, updatedTeacher) {
 						if (err) {
 							console.log(err);
-							req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							res.redirect("/teachers/" + req.params.name);
+							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+							// res.redirect("/teachers/" + req.params.name);
+							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 						} else {
-							req.flash("success", "Deleted review successfully!");
-							res.redirect("/teachers");
+							// req.flash("success", "Deleted review successfully!");
+							// res.redirect("/teachers");
+							res.status(204).json();
 						}
 					});
 				}
