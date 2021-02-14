@@ -144,7 +144,7 @@ router.put("/manage", async function(req, res) {
 	var oldDepartments = new Array();
 	var isValid = true;
 
-	if (courses.length === 0) {
+	if (!(courses) || courses.length === 0) {
 		req.flash("error", "Please create courses before assigning them to departments!");
 		res.redirect("/courses/manage");
 	}
@@ -346,7 +346,7 @@ router.post("/", function(req, res) {
 router.get("/:code", function(req, res) {
   Course.findOne({code: req.params.code}, async function(err, course) {
     if (err || course === null || course === undefined || !course) {
-      req.flash("Course not found!", err);
+      req.flash("error", "Course not found!");
       res.redirect("/courses");
     }
     else {
@@ -483,7 +483,7 @@ router.put("/:code", function(req, res) {
                                 });
                               }
                               req.flash("success", "Course updated successfully!");
-                              res.redirect("/courses/" + req.params.code);
+                              res.redirect("/courses");
                             }
                           });
                         }
@@ -543,9 +543,11 @@ router.delete("/:code", function(req, res) {
               if (foundCourse.reviews) {
     						await Promise.all(foundCourse.reviews.map(async function(review) {
     							await Review.deleteOne({_id: review}, function(err, deletedReview) {
-    								console.log(err);
-    								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                    res.redirect("/courses");
+                    if (err) {
+      								console.log(err);
+      								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                      res.redirect("/courses");
+                    }
     							});
     						}));
     					}
