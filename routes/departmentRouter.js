@@ -7,8 +7,25 @@ function badStr(str) {
   return str.includes("/");
 }
 
-router.get("/", (req, res) => {
-	Department.find({}, (err, departments) => {
+const validateDepartment = function(req, res, next) {
+  const departmentSchema = Joi.object({
+    department: Joi.object({
+      name: Joi.string().required(),
+      description: Joi.string(),
+      corses: Joi.array().items(Joi.objectId()),
+    }).required()
+  });
+  const {error} = departmentSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map(el => el.message).join(',');
+    res.status(400).json({error: error, message: msg});
+  } else {
+    next();
+  }
+}
+
+router.get("/", function(req, res) {
+	Department.find({}, function(err, departments) {
 		if (err) {
 			// console.log(err);
 			// req.flash("error", err);
@@ -25,7 +42,7 @@ router.get("/", (req, res) => {
 // 	res.render("departments/new");
 // });
 
-router.post("/", (req, res) => {
+router.post("/", validateDepartment, function(req, res) {
 	if (badStr(req.body.department.name)) {
     // req.flash("error", "Please don't include a '/' in the department name!");
     // res.redirect("/departments/new");
@@ -38,7 +55,7 @@ router.post("/", (req, res) => {
 				req.flash("error", err);
 			}
 			else if (!searchResults.length) {
-				Department.create(department, (err, newDepartment) => {
+				Department.create(department, function(err, newDepartment) {
 					if (err) {
 						// console.log(err);
 						// req.flash("error", err);
@@ -60,7 +77,7 @@ router.post("/", (req, res) => {
 	}
 });
 
-router.get("/:name", (req, res) => {
+router.get("/:name", function(req, res) {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
 		if (err || department === null || department === undefined || !department) {
 			console.log("Department not found!");
@@ -88,7 +105,7 @@ router.get("/:name", (req, res) => {
 // 	});
 // });
 
-router.put("/:name", (req, res) => {
+router.put("/:name", validateDepartment, function(req, res) {
 	if (badStr(req.body.department.name)) {
     // req.flash("error", "Please don't include a '/' in the department name!");
     // res.redirect("/departments");
@@ -136,7 +153,7 @@ router.put("/:name", (req, res) => {
 	}
 });
 
-router.delete("/:name", (req, res) => {
+router.delete("/:name", function(req, res) {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
 		if (err || department === null || department === undefined || !department) {
 			console.log("Department not found!");
