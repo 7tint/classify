@@ -64,7 +64,7 @@ router.post("/", validateDepartment, function(req, res) {
 						res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 					}
 					else {
-						res.redirect("/departments");
+						// res.redirect("/departments");
 						res.status(201).json({department: newDepartment});
 					}
 				});
@@ -172,7 +172,7 @@ router.delete("/:name", function(req, res) {
 				}
 				else {
 					if (department.courses.length === 0) {
-						console.log("Deleted: " + req.params.name);
+						// console.log("Deleted: " + req.params.name);
 						// req.flash("sucess", "Deleted: " + req.params.name);
 						// res.redirect("/departments");
 						res.status(204).json();
