@@ -15,6 +15,16 @@ import CourseIndex from "./views/courses/CourseIndex.vue";
 import CourseNew from "./views/courses/CourseNew.vue";
 import CourseShow from "./views/courses/CourseShow.vue";
 import CourseEdit from "./views/courses/CourseEdit.vue";
+
+import DepartmentIndex from "./views/departments/DepartmentIndex.vue";
+import DepartmentNew from "./views/departments/DepartmentNew.vue";
+import DepartmentShow from "./views/departments/DepartmentShow.vue";
+import DepartmentEdit from "./views/departments/DepartmentEdit.vue";
+
+import TeacherIndex from "./views/teachers/TeacherIndex.vue";
+import TeacherNew from "./views/teachers/TeacherNew.vue";
+import TeacherShow from "./views/teachers/TeacherShow.vue";
+import TeacherEdit from "./views/teachers/TeacherEdit.vue";
 // import CourseManage from "./views/courses/CourseManage.vue";
 
 // import "../";
@@ -64,6 +74,26 @@ const routes = [
     name: "departmentEdit",
     path: "/departments/:name/edit",
     component: DepartmentEdit
+  },
+  {
+    name: "teacherIndex",
+    path: "/teachers/",
+    component: TeacherIndex
+  },
+  {
+    name: "teacherNew",
+    path: "/teachers/new",
+    component: TeacherNew
+  },
+  {
+    name: "teacherShow",
+    path: "/teachers/:name",
+    component: TeacherShow
+  },
+  {
+    name: "teacherEdit",
+    path: "/teachers/:name/edit",
+    component: TeacherEdit
   },
 ];
 
