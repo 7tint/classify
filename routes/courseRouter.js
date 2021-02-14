@@ -302,15 +302,16 @@ router.post("/", validateCourse, function(req, res) {
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
-    var course = {
-      name: req.body.name,
-      code: req.body.code,
-      description: req.body.description,
-      grade: req.body.grade,
-      pace: req.body.pace,
-      department: req.body.department,
-      prereq: req.body.prereq
-    };
+    // var course = {
+    //   name: req.body.name,
+    //   code: req.body.code,
+    //   description: req.body.description,
+    //   grade: req.body.grade,
+    //   pace: req.body.pace,
+    //   department: req.body.department,
+    //   prereq: req.body.prereq
+    // };
+    var course = req.body.course;
 
     Course.find({code: course.code}, function(err, searchResults) {
       if (err) {
