@@ -1,4 +1,6 @@
 const express = require("express");
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 const router = express.Router({ mergeParams: true });
 const Teacher = require("./../models/teacherModel");
 const Review = require("./../models/reviewModel");
@@ -35,6 +37,28 @@ function badStr(str) {
   return str.includes("/");
 }
 
+function validateTeacher(req, res, next) {
+  const teacherSchema = Joi.object({
+    teacher: Joi.object({
+      name: Joi.object({
+				firstName: Joi.string().required(),
+				lastName: Joi.string().required()
+			}).required(),
+      preferredTitle: Joi.string().required(),
+      profilePicture: Joi.string(),
+      courses: Joi.array().items(Joi.objectId()),
+      reviews: Joi.array().items(Joi.objectId())
+    }).required()
+  });
+  const {error} = teacherSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map(el => el.message).join(',');
+    res.status(400).json({error: error, message: msg});
+  } else {
+    next();
+  }
+}
+
 router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
 		if (err) {
@@ -62,7 +86,7 @@ router.get("/", function(req, res) {
 // 	});
 // });
 
-router.post("/", function(req, res) {
+router.post("/", validateTeacher, function(req, res) {
 	if (badStr(req.body.teacher.name.firstName) || badStr(req.body.teacher.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/new");
@@ -172,7 +196,7 @@ router.get("/:name", function(req, res) {
 // 	});
 // });
 
-router.put("/:name", function(req, res) {
+router.put("/:name", validateTeacher, function(req, res) {
 	if (badStr(req.body.teacher.name.firstName) || badStr(req.body.teacher.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/" + req.params.name + "/edit");
