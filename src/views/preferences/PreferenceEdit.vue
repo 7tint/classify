@@ -133,9 +133,9 @@
             approveComments: this.preferences.course.approveComments,
           },
           teacher: {
-            hasMetrics: this.preferences.course.hasMetrics,
-            hasComments: this.preferences.course.hasComments,
-            approveComments: this.preferences.course.approveComments,
+            hasMetrics: this.preferences.teacher.hasMetrics,
+            hasComments: this.preferences.teacher.hasComments,
+            approveComments: this.preferences.teacher.approveComments,
           }
         };
         this.axios.put(uri, {preferences: updatedPreferences}).then(() => {
