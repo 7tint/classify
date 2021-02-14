@@ -1,5 +1,7 @@
 <template>
   <form @submit.prevent="editPreferences()">
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'preferenceIndex'}">Preferences</router-link>
     <h5 class="mb-3">Course Catalogue Configurations: <br/></h5>
     <div class="form-group">
       <div class="pr-3">Is Public:</div>
