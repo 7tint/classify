@@ -77,9 +77,6 @@ app.use(function(req, res, next) {
 	next();
 });
 
-// Static node module files
-app.use('/modules', express.static(path.join(__dirname, 'node_modules/')));
-
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");
 const adminRouter = require("./routes/adminRouter.js");
