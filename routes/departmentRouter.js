@@ -73,7 +73,7 @@ router.get("/:name", (req, res) => {
     }
 		else {
 			//res.render("departments/show", {department});
-			res.json({department: department})
+			res.json({department: department});
 		}
 	});
 });
