@@ -165,18 +165,18 @@ router.put("/", validatePreferences, function(req, res) {
   const preferences = req.body.preferences;
 
   // If there are no course/teacher metrics and comments, set anonymous reviews as true as default.
-  if (((preferences.course.hasMetrics === "false") && (preferences.course.hasComments === "false")) &&
-      ((preferences.teacher.hasMetrics === "false") && (preferences.teacher.hasComments === "false"))) {
+  if (((preferences.course.hasMetrics === false) && (preferences.course.hasComments === false)) &&
+      ((preferences.teacher.hasMetrics === false) && (preferences.teacher.hasComments === false))) {
     console.log("Metrics and comments are disabled.");
     preferences.isAnonymous = true;
   }
 
   // If comments are off, put approveComments as true as default.
-  if (preferences.course.hasComments === "false") {
+  if (preferences.course.hasComments === false) {
     preferences.course.approveComments = true;
   }
 
-  if (preferences.teacher.hasComments === "false") {
+  if (preferences.teacher.hasComments === false) {
     preferences.teacher.approveComments = true;
   }
 
