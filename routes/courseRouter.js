@@ -277,15 +277,16 @@ router.post("/", function(req, res) {
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
-    var course = {
-      name: req.body.courseName,
-      code: req.body.courseCode,
-      description: req.body.courseDescription,
-      grade: req.body.courseGrade,
-      pace: req.body.coursePace,
-      department: req.body.courseDepartment,
-      prereq: req.body.coursePrerequisites,
-    };
+    // var course = {
+    //   name: req.body.courseName,
+    //   code: req.body.courseCode,
+    //   description: req.body.courseDescription,
+    //   grade: req.body.courseGrade,
+    //   pace: req.body.coursePace,
+    //   department: req.body.courseDepartment,
+    //   prereq: req.body.coursePrerequisites,
+    // };
+    var course = req.body.course;
 
     Course.find({code: course.code}, function(err, searchResults) {
       if (err) {
@@ -346,8 +347,9 @@ router.post("/", function(req, res) {
 router.get("/:code", function(req, res) {
   Course.findOne({code: req.params.code}, async function(err, course) {
     if (err || course === null || course === undefined || !course) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
       const reviews = new Array();
@@ -361,11 +363,13 @@ router.get("/:code", function(req, res) {
 
       if (course.department) {
         Department.findOne({_id: course.department}, function(err, department) {
-          res.render("courses/show", {course, department, reviews});
+          //res.render("courses/show", {course, department, reviews});
+          res.json({course: course, department: department, reviews: reviews});
         });
       }
       else {
-        res.render("courses/show", {course, department: undefined, reviews});
+        //res.render("courses/show", {course, department: undefined, reviews});
+        res.json({course: course, department: undefined, reviews: reviews});
       }
     }
   });
@@ -374,25 +378,29 @@ router.get("/:code", function(req, res) {
 router.get("/:code/edit", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
     if (err || course === null || course === undefined || !course) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
       Course.find({}, function(err, courses) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses");
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses");
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         }
         else {
           Department.find({}, function(err, departments) {
             if (err) {
               console.log(err);
-              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              res.redirect("/courses");
+              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+              // res.redirect("/courses");
+              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             }
             else {
-              res.render("courses/edit", {course, courses, departments});
+              //res.render("courses/edit", {course, courses, departments});
+              res.json({course: course, courses: courses, departments: departments});
             }
           });
         }
@@ -403,8 +411,9 @@ router.get("/:code/edit", function(req, res) {
 
 router.put("/:code", function(req, res) {
   if (badStr(req.body.courseCode)) {
-    req.flash("error", "Please don't include a '/' in the course code!");
-    res.redirect("/courses");
+    // req.flash("error", "Please don't include a '/' in the course code!");
+    // res.redirect("/courses");
+    res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
     var course = {
@@ -420,24 +429,27 @@ router.put("/:code", function(req, res) {
 
     Course.findOne({code: req.params.code}, function(err, foundCourse) {
       if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-        req.flash("error", "Course not found!");
-        res.redirect(url);
+        // req.flash("error", "Course not found!");
+        // res.redirect(url);
+        res.status(400).json({error: "", message: "Course not found!"});
       }
       else {
         // Search for existing courses with the course code to check for duplicates
         Course.find({code: course.code}, function(err, searchResults) {
           if (err) {
             console.log(err);
-            req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-            res.redirect(url);
+            // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+            // res.redirect(url);
+            res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
           }
           // If no OTHER COURSE results are found, proceed
           else if (searchResults.length === 0 || searchResults[0].code === req.params.code) {
             // Check that department exists
             Department.findOne({_id: course.department}, function(err, department) {
               if (course.department && (err || department === null || department === undefined || !department)) {
-                req.flash("error", "The department submitted is not valid!");
-                res.redirect(url);
+                // req.flash("error", "The department submitted is not valid!");
+                // res.redirect(url);
+                res.status(400).json({error: "", message: "The department submitted is not valid!"});
               }
               else {
                 // Check that the course prerequisites is valid
@@ -448,8 +460,9 @@ router.put("/:code", function(req, res) {
                       Course.findOneAndUpdate({code: req.params.code}, {$unset: {department: ""}}, function(err, updatedCourse) {
                         if (err) {
                           console.log(err);
-                          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                          res.redirect(url);
+                          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                          // res.redirect(url);
+                          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                         }
                         else {
                           if (count === 0 || count === undefined) {
@@ -458,8 +471,9 @@ router.put("/:code", function(req, res) {
                           Course.findOneAndUpdate({code: req.params.code}, course, async function(err, updatedCourse2) {
                             if (err) {
                               console.log(err);
-                              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                              res.redirect(url);
+                              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                              // res.redirect(url);
+                              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                             }
                             else {
                               if (updatedCourse.department) {
@@ -467,8 +481,9 @@ router.put("/:code", function(req, res) {
                                 await Department.findOneAndUpdate({_id: updatedCourse.department}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                                   if (err) {
                                     console.log(err);
-                                    req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                                    res.redirect(url);
+                                    // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                                    // res.redirect(url);
+                                    res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                                   }
                                 });
                               }
@@ -477,13 +492,15 @@ router.put("/:code", function(req, res) {
                                 await Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
                                   if (err) {
                                     console.log(err);
-                                    req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                                    res.redirect(url);
+                                    // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                                    // res.redirect(url);
+                                    res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                                   }
                                 });
                               }
-                              req.flash("success", "Course updated successfully!");
-                              res.redirect("/courses");
+                              // req.flash("success", "Course updated successfully!");
+                              // res.redirect("/courses");
+                              res.status(200).json({course: updatedCourse2});
                             }
                           });
                         }
@@ -491,8 +508,9 @@ router.put("/:code", function(req, res) {
                     });
                   }
                   else {
-                    req.flash("error", "The course prerequisites submitted are not valid!");
-                    res.redirect(url);
+                    // req.flash("error", "The course prerequisites submitted are not valid!");
+                    // res.redirect(url);
+                    res.status(400).json({error: "", message: "The course prerequisites submitted are not valid!"});
                   }
                 });
               }
@@ -500,8 +518,9 @@ router.put("/:code", function(req, res) {
           }
           // If course code already exists, display error message
           else {
-            req.flash("error", "The course code submitted already exists!");
-            res.redirect(url);
+            // req.flash("error", "The course code submitted already exists!");
+            // res.redirect(url);
+            res.status(400).json({error: "", message: "The course code submitted already exists!"});
           }
         });
       }
@@ -512,15 +531,17 @@ router.put("/:code", function(req, res) {
 router.delete("/:code", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(500).json({error: err, message: "Course not found!"});
     }
     else {
       Course.deleteOne({code: req.params.code}, async function(err, course) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses");
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses");
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         }
         else {
           if (foundCourse.teachers) {
@@ -528,8 +549,9 @@ router.delete("/:code", function(req, res) {
     					await Teacher.findOneAndUpdate({_id: teacher}, {$pull: {courses: foundCourse._id}}, function(err, updatedTeacher) {
     						if (err) {
     							console.log(err);
-                  req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                  res.redirect("/courses");
+                  // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                  // res.redirect("/courses");
+                  res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     						}
     					});
     				}));
@@ -545,14 +567,16 @@ router.delete("/:code", function(req, res) {
     							await Review.deleteOne({_id: review}, function(err, deletedReview) {
                     if (err) {
       								console.log(err);
-      								req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                      res.redirect("/courses");
+      								// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                      // res.redirect("/courses");
+                      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                     }
     							});
     						}));
     					}
-              req.flash("success", "Deleted " + req.params.code + " successfully!");
-              res.redirect("/courses");
+              // req.flash("success", "Deleted " + req.params.code + " successfully!");
+              // res.redirect("/courses");
+              res.status(204).json();
             }
           });
         }
@@ -567,10 +591,12 @@ router.get("/:code/reviews/new", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, course) {
     if (err) {
       console.log(err);
-      req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses/" + req.params.code);
+      // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+      // res.redirect("/courses/" + req.params.code);
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     } else {
-      res.render("reviews/course/new", {course});
+      // res.render("reviews/course/new", {course});
+      res.status(200).json({course: course});
     }
   });
 });
