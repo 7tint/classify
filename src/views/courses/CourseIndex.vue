@@ -5,6 +5,8 @@
     <a href="/admin">Admin</a>
 
     <div class="d-flex flex-row mt-5">
+      <router-link class="btn btn-primary" :to="{name: 'courseNew'}">New Course</router-link>
+      <br/>
       <div v-for="course in courses" :key="course._id" class="p-2 m-1 bg-light">
         <p>Name: {{course.name}}</p>
         <p>Department: {{course.departmentName}}</p>
@@ -14,8 +16,6 @@
         <p>Pace: {{course.pace}}</p>
         <p>Prerequisites: {{course.prereq}}</p>
         <p>Teachers: {{course.teachers}}</p>
-        <br/>
-        <router-link class="btn btn-primary" :to="{name: 'courseNew'}">New Course</router-link>
         <br/>
         <router-link class="btn btn-primary" :to="{name: 'courseShow', params: {code: course.code}}">View</router-link>
         <br/>

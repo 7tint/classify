@@ -1,14 +1,16 @@
 <template>
   <div class="container">
-    <h1 class="mb-1">{{department.name}}</h1>
-    <p>{{department.description}}</p>
+    <h1 class="mb-1">{{teacher.name}}</h1>
     <!-- <div v-for="review in reviews" :key="review._id">
       <router-link class="btn btn-primary" :to="{name: 'reviewEdit', params: {code: this.course.code, _id: review._id}}">Edit Review</router-link>
     </div> -->
     <br/><br/>
-    <router-link class="btn btn-primary" :to="{name: 'departmentIndex'}">Departments</router-link>
+    <div v-for="course in teacher.courses" :key="course">
+      {{course}}
+    </div>
+    <router-link class="btn btn-primary" :to="{name: 'teacherIndex'}">Teachers</router-link>
     <br/>
-    <router-link class="btn btn-primary" :to="{name: 'departmentEdit', params: {name: this.$route.params.name}}">Edit</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'teacherEdit', params: {name: this.$route.params.name}}">Edit</router-link>
     <br/>
     <!-- <router-link class="btn btn-primary" :to="{name: 'reviewPost', params: {code: this.course.code}}">Add Review</router-link> -->
   </div>
@@ -18,13 +20,13 @@
   export default {
     data() {
       return {
-        department: {}
+        teacher: {}
       }
     },
     created() {
-      let uri = `http://127.0.0.1:3000/api/departments/${this.$route.params.name}`;
+      let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
       this.axios.get(uri).then((response) => {
-          this.department = response.data.department;
+          this.teacher = response.data.teacher;
       });
     }
   }

@@ -5,10 +5,10 @@
     <a href="/admin">Admin</a>
 
     <div class="d-flex flex-row mt-5">
+      <router-link class="btn btn-primary" :to="{name: 'departmentNew'}">New Department</router-link>
+      <br/>
       <div v-for="department in departments" :key="department.name" class="p-2 m-1 bg-light">
-        <p>Name: {{course.name}}</p>
-        <router-link class="btn btn-primary" :to="{name: 'departmentNew'}">New Department</router-link>
-        <br/>
+        <p>Name: {{department.name}}</p>
         <router-link class="btn btn-primary" :to="{name: 'departmentShow', params: {name: department.name}}">View</router-link>
         <br/>
         <router-link class="btn btn-primary" :to="{name: 'departmentEdit', params: {name: department.name}}">Edit</router-link>
@@ -23,7 +23,7 @@
   export default {
     data() {
       return {
-        courses: []
+        departments: []
       }
     },
     created() {
