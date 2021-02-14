@@ -7,8 +7,9 @@ router.get("/", function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
     if (err) {
       console.log("ERROR while retrieving preferences!");
-      req.flash("error", "ERROR while retrieving preferences!");
-      console.log(err);
+      // req.flash("error", "ERROR while retrieving preferences!");
+      // console.log(err);
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     }
     else {
       if (retrievedPreferences === null) {
@@ -31,89 +32,92 @@ router.get("/", function(req, res) {
         Preferences.create(defaultPreferences, function(err, createdPreferences) {
           if (err) {
             console.log("ERROR while creating preferences object!");
-            req.flash("error", "ERROR while crearing preferences object!");
-            console.log(err);
+            // req.flash("error", "ERROR while crearing preferences object!");
+            // console.log(err);
+            res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             // Redirect to preferences page with an error message
           }
           else {
             console.log("Preferences created!");
-            req.flash("success", "Preferences created!");
-            res.redirect("/admin");
+            // req.flash("success", "Preferences created!");
+            // res.redirect("/admin");
+            res.json({preferences: createdPreferences});
           }
         });
       }
 
       else {
-        res.render("preferences/index", {
-          isPublicVar: retrievedPreferences.isPublic,
-          courseMetricsVar: retrievedPreferences.course.hasMetrics,
-          courseCommentsVar: retrievedPreferences.course.hasComments,
-          teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
-          teacherCommentsVar: retrievedPreferences.teacher.hasComments,
-          isAnonymousVar: retrievedPreferences.isAnonymous,
-          approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
-          approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
-        });
+        // res.render("preferences/index", {
+        //   isPublicVar: retrievedPreferences.isPublic,
+        //   courseMetricsVar: retrievedPreferences.course.hasMetrics,
+        //   courseCommentsVar: retrievedPreferences.course.hasComments,
+        //   teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
+        //   teacherCommentsVar: retrievedPreferences.teacher.hasComments,
+        //   isAnonymousVar: retrievedPreferences.isAnonymous,
+        //   approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
+        //   approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
+        // });
+        res.json({preferences: retrievedPreferences});
       }
     }
   });
 });
 
-router.get("/edit", function(req, res) {
-  Preferences.findOne({}, function(err, retrievedPreferences) {
-    if (err) {
-      console.log("ERROR while retrieving preferences!");
-      req.flash("error", "ERROR while retrieving preferences!");
-      console.log(err);
-    }
-    else {
-      if (retrievedPreferences === null) {
-        // Create default preferences object.
-        const defaultPreferences = {
-          isPublic: true,
-        	course: {
-            hasMetrics: true,
-            hasComments: true,
-            approveComments: false,
-          },
-          teacher: {
-            hasMetrics: true,
-            hasComments: true,
-            approveComments: false,
-          },
-          isAnonymous: true
-        };
+// router.get("/edit", function(req, res) {
+//   Preferences.findOne({}, function(err, retrievedPreferences) {
+//     if (err) {
+//       console.log("ERROR while retrieving preferences!");
+//       req.flash("error", "ERROR while retrieving preferences!");
+//       console.log(err);
+//     }
+//     else {
+//       if (retrievedPreferences === null) {
+//         // Create default preferences object.
+//         const defaultPreferences = {
+//           isPublic: true,
+//         	course: {
+//             hasMetrics: true,
+//             hasComments: true,
+//             approveComments: false,
+//           },
+//           teacher: {
+//             hasMetrics: true,
+//             hasComments: true,
+//             approveComments: false,
+//           },
+//           isAnonymous: true
+//         };
 
-        Preferences.create(defaultPreferences, function(err, createdPreferences) {
-          if (err) {
-            console.log("ERROR while creating preferences object!");
-            req.flash("error", "ERROR while creating preferences object!");
-            console.log(err);
-            // Redirect to preferences page with an error message
-          }
-          else {
-            console.log("Preferences created!");
-            req.flash("success", "Preferences created!");
-            res.redirect("/admin/");
-          }
-        });
-      }
+//         Preferences.create(defaultPreferences, function(err, createdPreferences) {
+//           if (err) {
+//             console.log("ERROR while creating preferences object!");
+//             req.flash("error", "ERROR while creating preferences object!");
+//             console.log(err);
+//             // Redirect to preferences page with an error message
+//           }
+//           else {
+//             console.log("Preferences created!");
+//             req.flash("success", "Preferences created!");
+//             res.redirect("/admin/");
+//           }
+//         });
+//       }
 
-      else {
-        res.render("preferences/edit", {
-          isPublicVar: retrievedPreferences.isPublic,
-          courseMetricsVar: retrievedPreferences.course.hasMetrics,
-          courseCommentsVar: retrievedPreferences.course.hasComments,
-          teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
-          teacherCommentsVar: retrievedPreferences.teacher.hasComments,
-          isAnonymousVar: retrievedPreferences.isAnonymous,
-          approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
-          approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
-        });
-      }
-    }
-  });
-});
+//       else {
+//         res.render("preferences/edit", {
+//           isPublicVar: retrievedPreferences.isPublic,
+//           courseMetricsVar: retrievedPreferences.course.hasMetrics,
+//           courseCommentsVar: retrievedPreferences.course.hasComments,
+//           teacherMetricsVar: retrievedPreferences.teacher.hasMetrics,
+//           teacherCommentsVar: retrievedPreferences.teacher.hasComments,
+//           isAnonymousVar: retrievedPreferences.isAnonymous,
+//           approveTeacherCommentsVar: retrievedPreferences.course.approveComments,
+//           approveCourseCommentsVar: retrievedPreferences.teacher.approveComments,
+//         });
+//       }
+//     }
+//   });
+// });
 
 router.put("/", function(req, res) {
   var preferences = {
@@ -151,12 +155,14 @@ router.put("/", function(req, res) {
   Preferences.findOneAndUpdate({}, preferences, {upsert: true}, function(err, docs) {
     if (err) {
       console.log("ERROR while deleting preference objects!");
-      req.flash("error", "ERROR while deleting preference objects!");
-      console.log(err);
+      // req.flash("error", "ERROR while deleting preference objects!");
+      // console.log(err);
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     }
     else {
-      console.log("Replaced old preferences: ", docs);
-      res.redirect("/admin/");
+      // console.log("Replaced old preferences: ", docs);
+      // res.redirect("/admin/");
+      res.status(200).json({preferences: docs});
     }
   });
 });
