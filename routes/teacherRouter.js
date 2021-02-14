@@ -1,6 +1,6 @@
 const express = require("express");
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 const router = express.Router({ mergeParams: true });
 const Teacher = require("./../models/teacherModel");
 const Review = require("./../models/reviewModel");

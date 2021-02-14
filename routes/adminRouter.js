@@ -1,6 +1,6 @@
 const express = require("express");
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 const router = express.Router({mergeParams: true});
 const Preferences = require("./../models/preferencesModel.js");
 const Course = require("./../models/courseModel.js");
