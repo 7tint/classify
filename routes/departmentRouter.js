@@ -13,13 +13,12 @@ const validateDepartment = function(req, res, next) {
   const departmentSchema = Joi.object({
     department: Joi.object({
       name: Joi.string().required(),
-      description: Joi.string(),
-      corses: Joi.array().items(Joi.objectId()),
+      description: Joi.string().allow(null, ""),
     }).required()
   });
   const {error} = departmentSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
     res.status(400).json({error: error, message: msg});
   } else {
     next();

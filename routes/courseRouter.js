@@ -121,43 +121,36 @@ function validateCourse(req, res, next) {
     course: Joi.object({
       name: Joi.string().required(),
       code: Joi.string().required(),
-      description: Joi.string(),
+      description: Joi.string().allow(null, ""),
       grade: Joi.number().required().min(0),
-      pace: Joi.string(),
+      pace: Joi.string().allow(null, ""),
       prereq: Joi.array().items(Joi.string()),
-      department: Joi.objectId(),
-      teachers: Joi.array().items(Joi.objectId()),
-      reviews: Joi.array().items(Joi.objectId())
+      department: Joi.objectId()
     }).required()
   });
   const {error} = courseSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
     res.status(400).json({error: error, message: msg});
   } else {
     next();
   }
 }
 
-function validateReview(req, res, next) {
+function validatePostReview(req, res, next) {
   const reviewSchema = Joi.object({
     review: Joi.object({
-      email: Joi.string().required(),
-      isCourseReview: Joi.boolean().required(),
-      teacher: Joi.objectId(),
       course: Joi.objectId(),
       metric1: Joi.number(),
       metric2: Joi.number(),
       metric3: Joi.number(),
-      commentText: Joi.string(),
-      createdAt: Joi.date().required(),
+      commentText: Joi.string().allow(null, ""),
       isAnonymous: Joi.boolean().required(),
-      isApproved: Joi.boolean().required()
     }).required()
   });
   const {error} = reviewSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
     res.status(400).json({error: error, message: msg});
   } else {
     next();
@@ -636,16 +629,9 @@ router.delete("/:code", function(req, res) {
 // });
 
 router.post("/:code/review", validateReview, async function(req, res) {
-  // var review = {
-  //   email: "email@domain.com",
-  //   isCourseReview: true,
-  //   metric1: req.body.metric1,
-  //   metric2: req.body.metric2,
-  //   metric3: req.body.metric3,
-  //   commentText: req.body.commentText,
-  //   isAnonymous: req.body.isAnonymous,
-  // };
   const review = req.body.review;
+  review.isCourseReview = true;
+	review.email = "example@domain.com";
 
   await Preferences.findOne({}, function(err, preferences) {
     if (preferences.course.approveComments === false) {
@@ -741,15 +727,6 @@ router.post("/:code/review", validateReview, async function(req, res) {
 // });
 
 router.put("/:code/:id/edit", validateReview, async function(req, res) {
-  // var review = {
-  //   email: "email@domain.com",
-  //   isCourseReview: true,
-  //   metric1: req.body.metric1,
-  //   metric2: req.body.metric2,
-  //   metric3: req.body.metric3,
-  //   commentText: req.body.commentText,
-  //   isAnonymous: req.body.isAnonymous,
-  // };
   const review = req.body.review;
 
   await Preferences.findOne({}, function(err, preferences) {
@@ -764,48 +741,30 @@ router.put("/:code/:id/edit", validateReview, async function(req, res) {
     }
 
     if (preferences.course.hasMetrics === false) {
-      delete review.metric1;
-      delete review.metric2;
-      delete review.metric3;
+      review.metric1 = undefined;
+      review.metric2 = undefined;
+      review.metric3 = undefined;
     }
 
     if (preferences.course.hasComments === false) {
-      delete review.commentText;
+      review.commentText = undefined;
     }
   });
 
-  Course.findOne({code: req.params.code}, function(err, foundCourse) {
-    if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-      // req.flash("error", "Course not found!");
-      // res.redirect("/courses");
-      res.status(400).json({error: "", message: "Course not found!"});
-    }
-    else {
-      review.course = foundCourse.id;
-
-      Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
-        if (err) {
-          console.log(err);
-          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          // res.redirect("/courses/" + req.params.code);
-          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-        } else {
-          Course.findOneAndUpdate({code: req.params.code}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedCourse) {
-            if (err) {
-              console.log(err);
-              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              // res.redirect("/courses/" + req.params.code);
-              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-            } else {
-              // req.flash("success", "Review updated successfully!");
-              // res.redirect("/courses/" + req.params.code);
-              res.status(200).json({review: foundReview});
-            }
-          });
-        }
-      });
-    }
-  });
+  if (review.isCourseReview === false) {
+		res.status(400).json({error: err, message: "Teacher reviews are not to be modified in the course reviews route!"});
+	} else {
+		Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
+			if (err) {
+				console.log(err);
+				// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+				// res.redirect("/teachers/" + req.params.name);
+				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+			} else {
+				res.status(200).json({review: foundReview});
+			}
+		});
+	}
 });
 
 router.delete("/:code/:id", function(req, res) {

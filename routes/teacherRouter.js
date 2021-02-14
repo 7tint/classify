@@ -45,45 +45,39 @@ function validateTeacher(req, res, next) {
 				lastName: Joi.string().required()
 			}).required(),
       preferredTitle: Joi.string().required(),
-      profilePicture: Joi.string(),
-      courses: Joi.array().items(Joi.objectId()),
-      reviews: Joi.array().items(Joi.objectId())
+      profilePicture: Joi.string().allow(null, ""),
+      courses: Joi.array().items(Joi.objectId())
     }).required()
   });
   const {error} = teacherSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
+		console.log(msg);
     res.status(400).json({error: error, message: msg});
   } else {
     next();
   }
 }
 
-function validateReview(req, res, next) {
+function validatePostReview(req, res, next) {
   const reviewSchema = Joi.object({
     review: Joi.object({
-      email: Joi.string().required(),
-      isCourseReview: Joi.boolean().required(),
-      teacher: Joi.objectId(),
       course: Joi.objectId(),
       metric1: Joi.number(),
       metric2: Joi.number(),
       metric3: Joi.number(),
-      commentText: Joi.string(),
-      createdAt: Joi.date().required(),
+      commentText: Joi.string().allow(null, ""),
       isAnonymous: Joi.boolean().required(),
-      isApproved: Joi.boolean().required()
     }).required()
   });
   const {error} = reviewSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
     res.status(400).json({error: error, message: msg});
   } else {
     next();
   }
 }
-
 
 router.get("/", function(req, res) {
 	Teacher.find({}, function(err, allTeachers) {
@@ -201,7 +195,6 @@ router.get("/:name", function(req, res) {
         }));
       }
 			// res.render("teachers/show", {teacher, reviews});
-			console.log(teacher);
 			res.json({teacher: teacher, reviews: reviews});
 		}
 	});
@@ -223,6 +216,7 @@ router.get("/:name", function(req, res) {
 // });
 
 router.put("/:name", validateTeacher, function(req, res) {
+	console.log(req.body);
 	if (badStr(req.body.teacher.name.firstName) || badStr(req.body.teacher.name.lastName)) {
 		// req.flash("error", "Please don't include a '/' in the teacher name!");
     // res.redirect("/teachers/" + req.params.name + "/edit");
@@ -384,6 +378,8 @@ router.delete("/:name", function(req, res) {
 router.post("/:name/review", validateReview, async function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
 	const review = req.body.review;
+	review.isCourseReview = false;
+	review.email = "example@domain.com";
 
 	await Preferences.findOne({}, function(err, preferences) {
 		if (preferences.teacher.approveComments === false) {
@@ -501,38 +497,20 @@ router.put("/:name/:id/edit", validateReview, async function(req, res) {
     }
 	});
 
-	Teacher.findOne({name: nameObject}, function(err, foundTeacher) {
-		if (err || foundTeacher === null || foundTeacher === undefined || !foundTeacher) {
-			// req.flash("error", "Teacher not found!");
-			// res.redirect("/teachers");
-			res.status(400).json({error: "", message: "Teacher not found!"});
-		}
-		else {
-			review.teacher = foundTeacher.id;
-
-			Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
-				if (err) {
-					console.log(err);
-					// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					// res.redirect("/teachers/" + req.params.name);
-					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-				} else {
-					Teacher.findOneAndUpdate({_id: review.teacher}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedTeacher) {
-            if (err) {
-							console.log(err);
-							// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-							// res.redirect("/teachers/" + req.params.name);
-							res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-            // } else {
-						// 	req.flash("success", "Review updated successfully!");
-						// 	res.redirect("/teachers/" + req.params.name);
-							res.status(200).json({review: foundReview});
-            }
-          });
-				}
-			});
-		}
-	});
+	if (review.isCourseReview === true) {
+		res.status(400).json({error: err, message: "Course reviews are not to be modified in the teacher reviews route!"});
+	} else {
+		Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
+			if (err) {
+				console.log(err);
+				// req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+				// res.redirect("/teachers/" + req.params.name);
+				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+			} else {
+				res.status(200).json({review: foundReview});
+			}
+		});
+	}
 });
 
 router.delete("/:name/:id", function(req, res) {

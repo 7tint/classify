@@ -24,7 +24,7 @@ function validatePreferences(req, res, next) {
   });
   const {error} = preferencesSchema.validate(req.body);
   if (error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = error.details.map(el => el.message).join(",");
     res.status(400).json({error: error, message: msg});
   } else {
     next();
