@@ -1,4 +1,6 @@
 const express = require("express");
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi)
 const router = express.Router({mergeParams: true});
 const Course = require("./../models/courseModel");
 const Teacher = require("./../models/teacherModel");
@@ -53,165 +55,188 @@ function checkPrereq(prerequisites, code, callback) {
     });
   }
 }
-
-function updateCourseDepartmentsHelper(course, department, oldDepartment, callback) {
-	if (department !== "") {
-		Course.findOneAndUpdate({code: course}, {department}, function(err, updatedCourse) {
-			if (err) {
-				console.log("ERROR while updating course object!");
-				callback(err);
-				// Redirect to admin courses with an error message
-			}
-			else {
-				if (oldDepartment !== "") {
-					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
-						if (err) {
-							console.log("ERROR while adding course to department!");
-							callback(err);
-						}
-					});
-				}
-				Department.findOneAndUpdate({_id: department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
-					if (err) {
-						console.log("ERROR while adding course to department!");
-						callback(err);
-					}
-					else {
-						callback();
-					}
-				});
-			}
-		});
-	}
-	else {
-		Course.findOneAndUpdate({code: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
-			if (err) {
-				console.log("ERROR while updating course object!");
-				callback(err);
-				// Redirect to admin courses with an error message
-			}
-			else {
-				if (oldDepartment !== "") {
-					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
-						if (err) {
-							console.log("ERROR while adding course to department!");
-							callback(err);
-						}
-						else {
-							callback();
-						}
-					});
-				}
-				else {
-					callback();
-				}
-			}
-		});
-	}
-}
+//
+// function updateCourseDepartmentsHelper(course, department, oldDepartment, callback) {
+// 	if (department !== "") {
+// 		Course.findOneAndUpdate({code: course}, {department}, function(err, updatedCourse) {
+// 			if (err) {
+// 				console.log("ERROR while updating course object!");
+// 				callback(err);
+// 				// Redirect to admin courses with an error message
+// 			}
+// 			else {
+// 				if (oldDepartment !== "") {
+// 					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+// 						if (err) {
+// 							console.log("ERROR while adding course to department!");
+// 							callback(err);
+// 						}
+// 					});
+// 				}
+// 				Department.findOneAndUpdate({_id: department}, {$addToSet: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+// 					if (err) {
+// 						console.log("ERROR while adding course to department!");
+// 						callback(err);
+// 					}
+// 					else {
+// 						callback();
+// 					}
+// 				});
+// 			}
+// 		});
+// 	}
+// 	else {
+// 		Course.findOneAndUpdate({code: course}, {$unset: {department: ""}}, function(err, updatedCourse) {
+// 			if (err) {
+// 				console.log("ERROR while updating course object!");
+// 				callback(err);
+// 				// Redirect to admin courses with an error message
+// 			}
+// 			else {
+// 				if (oldDepartment !== "") {
+// 					Department.findOneAndUpdate({_id: oldDepartment}, {$pull: {courses: updatedCourse._id}}, function(err, updatedDepartment) {
+// 						if (err) {
+// 							console.log("ERROR while adding course to department!");
+// 							callback(err);
+// 						}
+// 						else {
+// 							callback();
+// 						}
+// 					});
+// 				}
+// 				else {
+// 					callback();
+// 				}
+// 			}
+// 		});
+// 	}
+// }
 
 function badStr(str) {
   return str.includes("/");
 }
 
+const validateCourse = (req, res, next) => {
+  const courseSchema = Joi.object({
+    course: Joi.object({
+      name: Joi.string().required(),
+      code: Joi.string().required(),
+      description: Joi.string(),
+      grade: Joi.number().required().min(0),
+      pace: Joi.string(),
+      prereq: Joi.array().items(Joi.string()),
+      department: Joi.objectId(),
+      teachers: Joi.array().items(Joi.objectId()),
+      reviews: Joi.array().items(Joi.objectId())
+    }).required()
+  });
+  const {error} = courseSchema.validate(req.body);
+  if (error) {
+    const msg = error.details.map(el => el.message).join(',');
+    res.status(400).json({error: error, message: msg});
+  } else {
+    next();
+  }
+}
+
 /* ------------ START OF MANAGE COURSES ROUTES ----------------- */
+//
+// router.get("/manage", function(req, res) {
+// 	Department.find({}, (err, departments) => {
+// 		if (err) {
+// 			console.log(err);
+// 			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//       res.redirect("/courses");
+// 		}
+// 		else {
+// 			Course.find({}, function(err, courses) {
+// 				if (err) {
+// 					console.log(err);
+//           req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//           res.redirect("/courses");
+// 				}
+// 				else {
+// 					res.render("courses/manage", {departments, courses});
+// 				}
+// 			});
+// 		}
+// 	});
+// });
 
-router.get("/manage", function(req, res) {
-	Department.find({}, (err, departments) => {
-		if (err) {
-			console.log(err);
-			req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses");
-		}
-		else {
-			Course.find({}, function(err, courses) {
-				if (err) {
-					console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses");
-				}
-				else {
-					res.render("courses/manage", {departments, courses});
-				}
-			});
-		}
-	});
-});
-
-router.put("/manage", async function(req, res) {
-	const courses = req.body.courses;
-	const departments = req.body.departments;
-	var oldDepartments = new Array();
-	var isValid = true;
-
-	if (!(courses) || courses.length === 0) {
-		req.flash("error", "Please create courses before assigning them to departments!");
-		res.redirect("/courses/manage");
-	}
-
-	else {
-		await Promise.all(departments.map(async function(department) {
-			if (department) {
-				if (await ObjectId.isValid(department)) {
-					let foundDepartment = await Department.findOne({_id: department});
-					if (foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
-						isValid = false;
-					}
-				} else {
-					isValid = false;
-				}
-			}
-		}));
-
-		if (!isValid) {
-			req.flash("error", "The departments submitted are not valid!");
-			res.redirect("/courses/manage");
-		}
-
-		else {
-			await Promise.all(courses.map(async function(course) {
-				let foundCourse = await Course.findOne({code: course});
-				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
-					isValid = false;
-				}
-				else {
-					if (foundCourse.department === undefined) {
-						oldDepartments.push("");
-					} else {
-						oldDepartments.push(foundCourse.department);
-					}
-				}
-			}));
-
-			if (!isValid) {
-				req.flash("error", "The course codes submitted are not valid!");
-				res.redirect("/courses/manage");
-			}
-
-			else {
-				if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
-					console.log("(array mismatch) while updating course departments.");
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-					res.redirect("/courses/manage");
-				}
-
-				else {
-					await Promise.all(courses.map(async function(course, i) {
-						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
-							if (err) {
-								console.log(err);
-                req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                res.redirect("/courses/manage");
-							}
-						});
-					}));
-          req.flash("success", "Courses updated successfully!");
-					res.redirect("/courses/manage");
-				}
-			}
-		}
-	}
-});
+// router.put("/manage", async function(req, res) {
+// 	const courses = req.body.courses;
+// 	const departments = req.body.departments;
+// 	var oldDepartments = new Array();
+// 	var isValid = true;
+//
+// 	if (!(courses) || courses.length === 0) {
+// 		req.flash("error", "Please create courses before assigning them to departments!");
+// 		res.redirect("/courses/manage");
+// 	}
+//
+// 	else {
+// 		await Promise.all(departments.map(async function(department) {
+// 			if (department) {
+// 				if (await ObjectId.isValid(department)) {
+// 					let foundDepartment = await Department.findOne({_id: department});
+// 					if (foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
+// 						isValid = false;
+// 					}
+// 				} else {
+// 					isValid = false;
+// 				}
+// 			}
+// 		}));
+//
+// 		if (!isValid) {
+// 			req.flash("error", "The departments submitted are not valid!");
+// 			res.redirect("/courses/manage");
+// 		}
+//
+// 		else {
+// 			await Promise.all(courses.map(async function(course) {
+// 				let foundCourse = await Course.findOne({code: course});
+// 				if (foundCourse === null || foundCourse === undefined || !foundCourse) {
+// 					isValid = false;
+// 				}
+// 				else {
+// 					if (foundCourse.department === undefined) {
+// 						oldDepartments.push("");
+// 					} else {
+// 						oldDepartments.push(foundCourse.department);
+// 					}
+// 				}
+// 			}));
+//
+// 			if (!isValid) {
+// 				req.flash("error", "The course codes submitted are not valid!");
+// 				res.redirect("/courses/manage");
+// 			}
+//
+// 			else {
+// 				if (courses.length !== departments.length || courses.length !== oldDepartments.length) {
+// 					console.log("(array mismatch) while updating course departments.");
+//           req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+// 					res.redirect("/courses/manage");
+// 				}
+//
+// 				else {
+// 					await Promise.all(courses.map(async function(course, i) {
+// 						await updateCourseDepartmentsHelper(course, departments[i], oldDepartments[i], function(err) {
+// 							if (err) {
+// 								console.log(err);
+//                 req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//                 res.redirect("/courses/manage");
+// 							}
+// 						});
+// 					}));
+//           req.flash("success", "Courses updated successfully!");
+// 					res.redirect("/courses/manage");
+// 				}
+// 			}
+// 		}
+// 	}
+// });
 
 /* ------------ START OF COURSE RESTFUL ROUTES ----------------- */
 
@@ -270,7 +295,7 @@ router.get("/", function(req, res) {
 //   });
 // });
 
-router.post("/", function(req, res) {
+router.post("/", validateCourse, function(req, res) {
   if (badStr(req.body.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses/new");
@@ -408,7 +433,7 @@ router.get("/:code", function(req, res) {
 //   });
 // });
 
-router.put("/:code", function(req, res) {
+router.put("/:code", validateCourse, function(req, res) {
   if (badStr(req.body.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses");

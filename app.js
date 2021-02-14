@@ -89,16 +89,8 @@ app.use("/api/courses", courseRouter);
 app.use("/api/teachers", teacherRouter);
 app.use("/api/departments", departmentRouter);
 
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.get("*", function(req, res) {
+  res.status(404).send("404 Not Found.");
 });
 
 app.listen(port, hostname, function() {
