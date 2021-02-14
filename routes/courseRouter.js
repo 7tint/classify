@@ -271,7 +271,7 @@ router.get("/new", function(req, res) {
 });
 
 router.post("/", function(req, res) {
-  if (badStr(req.body.courseCode)) {
+  if (badStr(req.body.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses/new");
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
@@ -286,7 +286,9 @@ router.post("/", function(req, res) {
     //   department: req.body.courseDepartment,
     //   prereq: req.body.coursePrerequisites,
     // };
-    var course = req.body.course;
+    var course = req.body;
+
+    console.log(course);
 
     Course.find({code: course.code}, function(err, searchResults) {
       if (err) {
