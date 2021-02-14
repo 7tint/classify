@@ -246,29 +246,29 @@ router.get("/", function(req, res) {
   });
 });
 
-router.get("/new", function(req, res) {
-  Course.find({}, function(err, courses) {
-    if (err) {
-      console.log(err);
-      // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      // res.redirect("/courses");
-      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-    }
-    else {
-      Department.find({}, function(err, departments) {
-        if (err) {
-          console.log(err);
-          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          // res.redirect("/courses");
-          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-        } else {
-          //res.render("courses/new", {courses, departments});
-          res.json({courses: courses, departments: departments});
-        }
-      })
-    }
-  });
-});
+// router.get("/new", function(req, res) {
+//   Course.find({}, function(err, courses) {
+//     if (err) {
+//       console.log(err);
+//       // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//       // res.redirect("/courses");
+//       res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+//     }
+//     else {
+//       Department.find({}, function(err, departments) {
+//         if (err) {
+//           console.log(err);
+//           // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//           // res.redirect("/courses");
+//           res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+//         } else {
+//           //res.render("courses/new", {courses, departments});
+//           res.json({courses: courses, departments: departments});
+//         }
+//       })
+//     }
+//   });
+// });
 
 router.post("/", function(req, res) {
   if (badStr(req.body.code)) {
@@ -374,39 +374,39 @@ router.get("/:code", function(req, res) {
   });
 });
 
-router.get("/:code/edit", function(req, res) {
-  Course.findOne({code: req.params.code}, function(err, course) {
-    if (err || course === null || course === undefined || !course) {
-      // req.flash("error", "Course not found!");
-      // res.redirect("/courses");
-      res.status(400).json({error: "", message: "Course not found!"});
-    }
-    else {
-      Course.find({}, function(err, courses) {
-        if (err) {
-          console.log(err);
-          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          // res.redirect("/courses");
-          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-        }
-        else {
-          Department.find({}, function(err, departments) {
-            if (err) {
-              console.log(err);
-              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              // res.redirect("/courses");
-              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-            }
-            else {
-              //res.render("courses/edit", {course, courses, departments});
-              res.json({course: course, courses: courses, departments: departments});
-            }
-          });
-        }
-      });
-    }
-  });
-});
+// router.get("/:code/edit", function(req, res) {
+//   Course.findOne({code: req.params.code}, function(err, course) {
+//     if (err || course === null || course === undefined || !course) {
+//       // req.flash("error", "Course not found!");
+//       // res.redirect("/courses");
+//       res.status(400).json({error: "", message: "Course not found!"});
+//     }
+//     else {
+//       Course.find({}, function(err, courses) {
+//         if (err) {
+//           console.log(err);
+//           // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//           // res.redirect("/courses");
+//           res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+//         }
+//         else {
+//           Department.find({}, function(err, departments) {
+//             if (err) {
+//               console.log(err);
+//               // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+//               // res.redirect("/courses");
+//               res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+//             }
+//             else {
+//               //res.render("courses/edit", {course, courses, departments});
+//               res.json({course: course, courses: courses, departments: departments});
+//             }
+//           });
+//         }
+//       });
+//     }
+//   });
+// });
 
 router.put("/:code", function(req, res) {
   if (badStr(req.body.code)) {
