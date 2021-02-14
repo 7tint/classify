@@ -47,7 +47,12 @@
   export default {
     data() {
       return {
-        teacher: {}
+        teacher: {
+          name: {
+            firstName: "",
+            lastName: ""
+          }
+        }
       }
     },
     methods: {
