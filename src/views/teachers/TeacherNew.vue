@@ -5,13 +5,13 @@
       <div class="col">
         <div class="form-group">
           <label for="first-name">Teacher First Name</label>
-          <input type="text" class="form-control" v-model="teacher.firstName" id="first-name" placeholder="Teacher First Name" required>
+          <input type="text" class="form-control" v-model="teacher.name.firstName" id="first-name" placeholder="Teacher First Name" required>
         </div>
       </div>
       <div class="col">
           <div class="form-group">
             <label for="last-name">Teacher Last Name</label>
-            <input type="text" class="form-control" v-model="teacher.lastName" id="last-name" placeholder="Teacher Last Name" required>
+            <input type="text" class="form-control" v-model="teacher.name.lastName" id="last-name" placeholder="Teacher Last Name" required>
           </div>
         </div>
       <div class="col">

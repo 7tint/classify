@@ -7,13 +7,13 @@
     <div class="d-flex flex-row mt-5">
       <router-link class="btn btn-primary" :to="{name: 'teacherNew'}">New Teacher</router-link>
       <br/>
-      <div v-for="teacher in teachers" :key="teacher.name" class="p-2 m-1 bg-light">
+      <div v-for="teacher in teachers" :key="teacher.name.firstName + '_' + teacher.name.lastName" class="p-2 m-1 bg-light">
         <p>Name: {{teacher.name}}</p>
-        <router-link class="btn btn-primary" :to="{name: 'teacherShow', params: {name: teacher.name}}">View</router-link>
+        <router-link class="btn btn-primary" :to="{name: 'teacherShow', params: {name: teacher.name.firstName + '_' + teacher.name.lastName}}">View</router-link>
         <br/>
-        <router-link class="btn btn-primary" :to="{name: 'teacherEdit', params: {name: teacher.name}}">Edit</router-link>
+        <router-link class="btn btn-primary" :to="{name: 'teacherEdit', params: {name: teacher.name.firstName + '_' + teacher.name.lastName}}">Edit</router-link>
         <br/>
-        <button class="btn btn-danger" @click.prevent="deleteTeacher(teacher.name)">Delete</button>
+        <button class="btn btn-danger" @click.prevent="deleteTeacher(teacher.name.firstName + '_' + teacher.name.lastName)">Delete</button>
       </div>
     </div>
   </div>

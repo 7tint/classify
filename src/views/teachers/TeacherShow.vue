@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 class="mb-1">{{teacher.name}}</h1>
+    <h1 class="mb-1">{{teacher.name.firstName}} {{teacher.name.lastName}}</h1>
     <!-- <div v-for="review in reviews" :key="review._id">
       <router-link class="btn btn-primary" :to="{name: 'reviewEdit', params: {code: this.course.code, _id: review._id}}">Edit Review</router-link>
     </div> -->
@@ -20,7 +20,12 @@
   export default {
     data() {
       return {
-        teacher: {}
+        teacher: {
+          name: {
+            firstName: "",
+            lastName: ""
+          }
+        }
       }
     },
     created() {

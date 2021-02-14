@@ -97,7 +97,18 @@
   export default {
     data() {
       return {
-        preferences: {}
+        preferences: {
+          course: {
+            hasMetrics: undefined,
+            hasComments: undefined,
+            approveComments: undefined
+          },
+          teacher: {
+            hasMetrics: undefined,
+            hasComments: undefined,
+            approveComments: undefined
+          }
+        }
       }
     },
     created() {
