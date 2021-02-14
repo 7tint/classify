@@ -219,12 +219,14 @@ router.get("/", function(req, res) {
   Course.find({}, async function(err, courses) {
     if (err) {
       console.log(err);
-      req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses");
+      //req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+      //res.redirect("/courses");
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     }
     else {
       if (courses.length === 0) {
-        res.render("courses/index", {courses});
+        //res.render("courses/index", {courses});
+        res.json({courses: courses});
       }
       else {
         await Promise.all(courses.map(async function(course) {
@@ -237,7 +239,8 @@ router.get("/", function(req, res) {
             }
           }
         }));
-        res.render("courses/index", {courses});
+        //res.render("courses/index", {courses});
+        res.json({courses: courses});
       }
     }
   });
@@ -247,17 +250,20 @@ router.get("/new", function(req, res) {
   Course.find({}, function(err, courses) {
     if (err) {
       console.log(err);
-      req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-      res.redirect("/courses");
+      // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+      // res.redirect("/courses");
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
     }
     else {
       Department.find({}, function(err, departments) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses");
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses");
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         } else {
-          res.render("courses/new", {courses, departments});
+          //res.render("courses/new", {courses, departments});
+          res.json({courses: courses, departments: departments});
         }
       })
     }
@@ -266,8 +272,9 @@ router.get("/new", function(req, res) {
 
 router.post("/", function(req, res) {
   if (badStr(req.body.courseCode)) {
-    req.flash("error", "Please don't include a '/' in the course code!");
-    res.redirect("/courses/new");
+    // req.flash("error", "Please don't include a '/' in the course code!");
+    // res.redirect("/courses/new");
+    res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
   }
   else {
     var course = {
@@ -283,8 +290,9 @@ router.post("/", function(req, res) {
     Course.find({code: course.code}, function(err, searchResults) {
       if (err) {
         console.log(err);
-        req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-        res.redirect("/courses/new");
+        // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+        // res.redirect("/courses/new");
+        res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
       }
       else if (!searchResults.length) {
         // Check that the course prerequisites is valid
@@ -297,34 +305,39 @@ router.post("/", function(req, res) {
               Course.create(course, function(err, newCourse) {
                 if (err) {
                   console.log(err);
-                  req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                  res.redirect("/courses/new");
+                  // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                  // res.redirect("/courses/new");
+                  res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                 }
                 else {
                   if (course.department) {
                     Department.findOneAndUpdate({_id: course.department}, {$addToSet: {courses: newCourse._id}}, function(err, updatedDepartment) {
                       if (err) {
                         console.log(err);
-                        req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-                        res.redirect("/courses/new");
+                        // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+                        // res.redirect("/courses/new");
+                        res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
                       }
                     });
                   }
-                  req.flash("success", "Course created successfully!");
-                  res.redirect("/courses");
+                  // req.flash("success", "Course created successfully!");
+                  // res.redirect("/courses");
+                  res.status(201).json({course: newCourse});
                 }
               });
             });
           }
           else {
-            req.flash("error", "The course prerequisites submitted are not valid!");
-            res.redirect("/courses/new");
+            // req.flash("error", "The course prerequisites submitted are not valid!");
+            // res.redirect("/courses/new");
+            res.status(400).json({error: "", message: "The course prerequisites submitted are not valid!"});
           }
         });
       }
       else {
-        req.flash("error", "The course code submitted already exists!");
-        res.redirect("/courses/new");
+        // req.flash("error", "The course code submitted already exists!");
+        // res.redirect("/courses/new");
+        res.status(400).json({error: "", message: "The course code submitted already exists!"});
       }
     });
   }
