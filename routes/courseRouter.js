@@ -409,7 +409,7 @@ router.get("/:code/edit", function(req, res) {
 });
 
 router.put("/:code", function(req, res) {
-  if (badStr(req.body.courseCode)) {
+  if (badStr(req.body.code)) {
     // req.flash("error", "Please don't include a '/' in the course code!");
     // res.redirect("/courses");
     res.status(400).json({error: "", message: "Please don't include a '/' in the course code!"});
@@ -559,8 +559,9 @@ router.delete("/:code", function(req, res) {
           Department.findOneAndUpdate({_id: foundCourse.department}, {$pull: {courses: foundCourse._id}}, async function(err, updatedDepartment) {
             if (err) {
               console.log(err);
-              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              res.redirect("/courses");
+              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+              // res.redirect("/courses");
+              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             } else {
               if (foundCourse.reviews) {
     						await Promise.all(foundCourse.reviews.map(async function(review) {
@@ -636,8 +637,9 @@ router.post("/:code/review", async function(req, res) {
 
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
       review.course = foundCourse._id;
@@ -645,18 +647,21 @@ router.post("/:code/review", async function(req, res) {
       Review.create(review, function(err, newReview) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses/" + req.params.code);
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses/" + req.params.code);
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         }
         else {
           Course.findOneAndUpdate({code: req.params.code}, {$addToSet: {reviews: newReview._id}}, function(err, updatedCourse) {
             if (err) {
               console.log(err);
-              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              res.redirect("/courses/" + req.params.code);
+              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+              // res.redirect("/courses/" + req.params.code);
+              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             } else {
-              req.flash("success", "Thank you for submitting your review!");
-              res.redirect("/courses/" + req.params.code);
+              // req.flash("success", "Thank you for submitting your review!");
+              // res.redirect("/courses/" + req.params.code);
+              res.status(201).json({review: newReview});
             }
           });
         }
@@ -668,28 +673,32 @@ router.post("/:code/review", async function(req, res) {
 router.get("/:code/:id/edit", function(req, res) {
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
       Review.findOne({_id: req.params.id}, function(err, review) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses/" + req.params.code);
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses/" + req.params.code);
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         }
         else {
           if (review.isCourseReview === true) {
-            res.render("reviews/course/edit", {review,
-              course: foundCourse,
-              metric1: review.metric1,
-              metric2: review.metric2,
-              metric3: review.metric3,
-              isAnonymous: review.isAnonymous,
-            });
+            // res.render("reviews/course/edit", {review,
+            //   course: foundCourse,
+            //   metric1: review.metric1,
+            //   metric2: review.metric2,
+            //   metric3: review.metric3,
+            //   isAnonymous: review.isAnonymous,
+            // });
+            res.status(200).json({review: review, course: foundCourse});
           } else {
-            req.flash("error", "Course review not found!");
-            res.redirect("/courses/" + req.params.code);
+            // req.flash("error", "Course review not found!");
+            // res.redirect("/courses/" + req.params.code);
+            res.status(400).json({error: "", message: "Course review not found!"});
           }
         }
       });
@@ -732,8 +741,9 @@ router.put("/:code/:id/edit", async function(req, res) {
 
   Course.findOne({code: req.params.code}, function(err, foundCourse) {
     if (err || foundCourse === null || foundCourse === undefined || !foundCourse) {
-      req.flash("error", "Course not found!");
-      res.redirect("/courses");
+      // req.flash("error", "Course not found!");
+      // res.redirect("/courses");
+      res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
       review.course = foundCourse.id;
@@ -741,17 +751,20 @@ router.put("/:code/:id/edit", async function(req, res) {
       Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses/" + req.params.code);
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses/" + req.params.code);
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         } else {
           Course.findOneAndUpdate({code: req.params.code}, {$addToSet: {reviews: foundReview._id}}, function(err, updatedCourse) {
             if (err) {
               console.log(err);
-              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              res.redirect("/courses/" + req.params.code);
+              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+              // res.redirect("/courses/" + req.params.code);
+              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             } else {
-              req.flash("success", "Review updated successfully!");
-              res.redirect("/courses/" + req.params.code);
+              // req.flash("success", "Review updated successfully!");
+              // res.redirect("/courses/" + req.params.code);
+              res.status(200).json({review: foundReview});
             }
           });
         }
@@ -763,25 +776,29 @@ router.put("/:code/:id/edit", async function(req, res) {
 router.delete("/:code/:id", function(req, res) {
   Review.findOne({_id: req.params.id}, function(err, foundReview) {
     if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === false) {
-      req.flash("error", "Review not found!");
-      res.redirect("/courses/" + req.params.code);
+      // req.flash("error", "Review not found!");
+      // res.redirect("/courses/" + req.params.code);
+      res.status(400).json({error: "", message: "Review not found!"});
     }
     else {
       Review.deleteOne({_id: foundReview._id}, function(err, review) {
         if (err) {
           console.log(err);
-          req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-          res.redirect("/courses/" + req.params.code);
+          // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+          // res.redirect("/courses/" + req.params.code);
+          res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
         }
         else {
           Course.findOneAndUpdate({_id: foundReview.course}, {$pull: {reviews: foundReview._id}}, function(err, updatedCourse) {
             if (err) {
               console.log(err);
-              req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
-              res.redirect("/courses/" + req.params.code);
+              // req.flash("error", "Oops! Something went wrong. If you think this is an error, please contact us.");
+              // res.redirect("/courses/" + req.params.code);
+              res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
             } else {
-              req.flash("success", "Deleted review successfully!");
-              res.redirect("/courses");
+              // req.flash("success", "Deleted review successfully!");
+              // res.redirect("/courses");
+              res.status(204).json();
             }
           });
         }
