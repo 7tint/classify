@@ -52,8 +52,9 @@ router.post("/", validateDepartment, function(req, res) {
 		const department = req.body.department;
 		Department.find({name: new RegExp(`^${department.name}$`, 'i')}, function(err, searchResults) {
 			if (err) {
-				console.log(err);
-				req.flash("error", err);
+				// console.log(err);
+				// req.flash("error", err);
+        res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 			}
 			else if (!searchResults.length) {
 				Department.create(department, function(err, newDepartment) {
@@ -69,7 +70,7 @@ router.post("/", validateDepartment, function(req, res) {
 				});
 			}
 			else {
-				console.log("Department already exists!");
+				// console.log("Department already exists!");
 				// req.flash("error", "Department already exists!");
 				// res.redirect("/departments/new");
 				res.status(400).json({error: "", message: "Department already exists!"});
@@ -81,7 +82,7 @@ router.post("/", validateDepartment, function(req, res) {
 router.get("/:name", function(req, res) {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
 		if (err || department === null || department === undefined || !department) {
-			console.log("Department not found!");
+			// console.log("Department not found!");
 			// req.flash("error", "Department not found!");
       // res.redirect("/departments");
 			res.status(400).json({error: "", message: "Department not found!"});
@@ -115,7 +116,7 @@ router.put("/:name", validateDepartment, function(req, res) {
 		const department = req.body.department;
 		Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, foundDepartment) {
 			if (err || foundDepartment === null || foundDepartment === undefined || !foundDepartment) {
-				console.log("Department not found!");
+				// console.log("Department not found!");
 				// req.flash("error", "Department not found!");
 				// res.redirect("/departments");
 				res.status(400).json({error: "", message: "Department not found!"});
@@ -127,7 +128,7 @@ router.put("/:name", validateDepartment, function(req, res) {
 						// req.flash("error", err);
 						res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 					}
-					else if (!searchResults.length) {
+					else if (!searchResults.length || (department.name === req.params.name)) {
 						Department.findOneAndUpdate({name: new RegExp(`^${req.params.name}$`, 'i')}, department, function(err, updatedDepartment) {
 							if (err) {
 								// console.log(err);
@@ -135,7 +136,7 @@ router.put("/:name", validateDepartment, function(req, res) {
 								res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
 							}
 							else {
-								console.log(updatedDepartment.name + " department updated");
+								// console.log(updatedDepartment.name + " department updated");
 								// req.flash("sucess", updatedDepartment.name + " department updated!");
 								// res.redirect("/departments");
 								res.status(200).json({department: updatedDepartment});
@@ -143,7 +144,7 @@ router.put("/:name", validateDepartment, function(req, res) {
 						});
 					}
 					else {
-						console.log("Department already exists!");
+						// console.log("Department already exists!");
 						// req.flash("error", "Department already exists!");
 						// res.redirect("/departments");
 						res.status(400).json({error: "", message: "Department already exists!"});
@@ -157,7 +158,7 @@ router.put("/:name", validateDepartment, function(req, res) {
 router.delete("/:name", function(req, res) {
 	Department.findOne({name: new RegExp(`^${req.params.name}$`, 'i')}, function(err, department) {
 		if (err || department === null || department === undefined || !department) {
-			console.log("Department not found!");
+			// console.log("Department not found!");
 			// req.flash("error", "Department not found!");
       // res.redirect("/departments");
 			res.status(400).json({error: "", message: "Department not found!"});
@@ -188,7 +189,7 @@ router.delete("/:name", function(req, res) {
 		        });
 
 		        await Promise.all(promises);
-						console.log("Deleted: " + req.params.name);
+						// console.log("Deleted: " + req.params.name);
 						// req.flash("success", "Deleted: " + req.params.name);
 						// res.redirect("/departments");
 						res.status(204).json();

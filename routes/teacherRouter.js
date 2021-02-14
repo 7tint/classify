@@ -59,7 +59,7 @@ function validateTeacher(req, res, next) {
   }
 }
 
-function validatePostReview(req, res, next) {
+function validateReview(req, res, next) {
   const reviewSchema = Joi.object({
     review: Joi.object({
       course: Joi.objectId(),

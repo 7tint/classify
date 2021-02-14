@@ -43,7 +43,11 @@
     methods: {
       editDepartment() {
         let uri = `http://127.0.0.1:3000/api/departments/${this.$route.params.name}`;
-        this.axios.put(uri, {department: this.department}).then(() => {
+        const updatedDepartment = {
+          name: this.department.name,
+          description: this.department.description
+        };
+        this.axios.put(uri, {department: updatedDepartment}).then(() => {
           this.$router.push({name: "departmentShow", params: {name: this.department.name}});
         });
       }

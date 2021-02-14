@@ -116,13 +116,29 @@
     created() {
       let uri = `http://127.0.0.1:3000/api/preferences/`;
       this.axios.get(uri).then((response) => {
+        delete response.data.preferences._id;
+        delete response.data.preferences.__v;
         this.preferences = response.data.preferences;
       });
     },
     methods: {
       editPreferences() {
         let uri = `http://127.0.0.1:3000/api/preferences/`;
-        this.axios.put(uri, {preferences: this.preferences}).then(() => {
+        const updatedPreferences = {
+          isPublic: this.preferences.isPublic,
+          isAnonymous: this.preferences.isAnonymous,
+          course: {
+            hasMetrics: this.preferences.course.hasMetrics,
+            hasComments: this.preferences.course.hasComments,
+            approveComments: this.preferences.course.approveComments,
+          },
+          teacher: {
+            hasMetrics: this.preferences.course.hasMetrics,
+            hasComments: this.preferences.course.hasComments,
+            approveComments: this.preferences.course.approveComments,
+          }
+        };
+        this.axios.put(uri, {preferences: updatedPreferences}).then(() => {
           this.$router.push({name: "preferenceIndex"});
         });
       }

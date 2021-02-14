@@ -89,7 +89,14 @@
     methods: {
       editCourse() {
         let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}`;
-        this.axios.put(uri, {course: this.course}).then(() => {
+        const updatedCourse = {
+          name: this.course.name,
+          code: this.course.code,
+          description: this.course.description,
+          grade: this.course.grade,
+          pace: this.course.pace
+        };
+        this.axios.put(uri, {course: updatedCourse}).then(() => {
           this.$router.push({name: "courseShow", params: {code: this.course.code}});
         });
       }
