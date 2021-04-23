@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const session = require("express-session");
-const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const MongoDBStore = require("connect-mongo")(session);
@@ -49,7 +48,7 @@ store.on("error", function(e) {
 const sessionConfig = {
 	store,
 	name: "session",
-	secret: "keyboard cat",
+	secret: "course catalogue",
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
@@ -64,18 +63,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
 app.use(methodOverride("_method"));
-app.use(cookieParser('keyboard cat'));
+app.use(cookieParser("course catalogue"));
 app.use(session(sessionConfig));
-app.use(flash());
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
 
-app.use(function(req, res, next) {
-	res.locals.currentUser = req.user;
-	res.locals.success = req.flash("success");
-	res.locals.error = req.flash("error");
-	next();
-});
+// app.use(function(req, res, next) {
+// 	res.locals.currentUser = req.user;
+// 	res.locals.success = req.flash("success");
+// 	res.locals.error = req.flash("error");
+// 	next();
+// });
 
 // Require routes
 const courseRouter = require("./routes/courseRouter.js");

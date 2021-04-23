@@ -1,0 +1,37 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Lambert Liu",
+    "email": "lambert0928@outlook.com"
+  },
+  "contributors": [
+    {
+      "name": "Daniel Kaichis",
+      "email": "danielkaichis@gmail.com"
+    },
+    {
+      "name": "Brian Tu",
+      "email": "brianptu2@gmail.com",
+      "url": "https://briantu.tech/"
+    }
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "connect-mongo": "^3.2.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "joi": "^17.4.0",
+    "joi-objectid": "^3.0.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.10.5"
+  }
+}
