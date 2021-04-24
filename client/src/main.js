@@ -19,6 +19,9 @@ import CourseShow from "./views/courses/CourseShow.vue";
 import CourseEdit from "./views/courses/CourseEdit.vue";
 // import CourseManage from "./views/courses/CourseManage.vue";
 
+import CourseReviewNew from "./views/reviews/CourseReviewNew.vue";
+import CourseReviewEdit from "./views/reviews/CourseReviewEdit.vue";
+
 import DepartmentIndex from "./views/departments/DepartmentIndex.vue";
 import DepartmentNew from "./views/departments/DepartmentNew.vue";
 import DepartmentShow from "./views/departments/DepartmentShow.vue";
@@ -38,6 +41,8 @@ const routes = [
   {name: "courseNew", path: "/courses/new", component: CourseNew},
   {name: "courseShow", path: "/courses/:code", component: CourseShow},
   {name: "courseEdit", path: "/courses/:code/edit", component: CourseEdit},
+  {name: "courseReviewNew", path: "/courses/:code/new", component: CourseReviewNew},
+  {name: "courseReviewEdit", path: "/courses/:code/:id", component: CourseReviewEdit},
   // {name: "courseManage", path: "/courses/manage", component: CourseManage}
   {name: "departmentIndex", path: "/departments/", component: DepartmentIndex},
   {name: "departmentNew", path: "/departments/new", component: DepartmentNew},
