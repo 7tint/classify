@@ -27,7 +27,7 @@ const teacherSchema = new mongoose.Schema({
 	reviews: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "TeacherReview"
+			ref: "Review"
 		}
 	]
 });
