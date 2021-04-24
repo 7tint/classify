@@ -52,32 +52,16 @@ function checkPrereq(prerequisites, code, callback) {
 }
 
 function badStr(str) {
-  return (!/[^a-zA-Z0-9-._~]/.test(word));
+  return (/[^a-zA-Z0-9-._~]/.test(word));
 }
 
 exports.coursesGet = function(req, res) {
-  Course.find({}, async function(err, courses) {
+  Course.find({}).populate("department", "name").exec(function(err, courses) {
     if (err) {
       console.log(err);
       res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-    }
-    else {
-      if (courses.length === 0) {
-        res.json({courses: courses});
-      }
-      else {
-        await Promise.all(courses.map(async function(course) {
-          if (course.department) {
-            if (ObjectId.isValid(course.department)) {
-              let foundDepartment = await Department.findOne({_id: course.department});
-              if (foundDepartment) {
-                course.departmentName = foundDepartment.name;
-              }
-            }
-          }
-        }));
-        res.json({courses: courses});
-      }
+    } else {
+      res.json({courses: courses});
     }
   });
 }
@@ -134,28 +118,12 @@ exports.coursePost = function(req, res) {
 }
 
 exports.courseGet = function(req, res) {
-  Course.findOne({code: req.params.code}, async function(err, course) {
+  Course.findOne({code: req.params.code}).populate("reviews").populate("teachers").populate("department", "name").exec(function(err, course) {
     if (err || course === null || course === undefined || !course) {
       res.status(400).json({error: "", message: "Course not found!"});
     }
     else {
-      const reviews = new Array();
-
-      if (course.reviews) {
-        await Promise.all(course.reviews.map(async function(review) {
-          let foundReview = await Review.findOne({_id: review});
-          reviews.push(foundReview);
-        }));
-      }
-
-      if (course.department) {
-        Department.findOne({_id: course.department}, function(err, department) {
-          res.json({course: course, department: department, reviews: reviews});
-        });
-      }
-      else {
-        res.json({course: course, department: undefined, reviews: reviews});
-      }
+      res.json({course: course});
     }
   });
 }
