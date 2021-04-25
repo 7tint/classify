@@ -61,7 +61,6 @@
           isApproved: approveordisaprove
         };
         this.axios.put(uri, {review: approvedReview}).then(() => {
-          this.pendingReviews.splice(this.pendingReviews.indexOf(id), 1);
           this.axios.get(uri_false).then((response) => {
             this.pendingReviews = response.data.reviews;
           });
