@@ -1,8 +1,9 @@
 <template>
   <div class="container">
-    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
-    <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
-    
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link> <br/>
+    <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link> <br/>
+    <router-link :to="{name: 'courseReviewNew'}">Add Review</router-link> <br/>
+
     <h1 class="mb-1">{{course.code}}</h1>
     <!-- <div v-for="review in reviews" :key="review._id">
       <router-link class="btn btn-primary" :to="{name: 'reviewEdit', params: {code: this.course.code, _id: review._id}}">Edit Review</router-link>
