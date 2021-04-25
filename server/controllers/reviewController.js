@@ -52,7 +52,7 @@ exports.reviewPut = function (req, res) {
 	const review = req.body.review;
 
 	Review.findOne({_id: req.params.id}, function(err, foundReview) {
-		if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === true) {
+		if (err || foundReview === null || foundReview === undefined || !foundReview) {
 			res.status(400).json({error: "", message: "Review not found!"});
 		}
 		else {
