@@ -55,15 +55,31 @@ function badStr(str) {
   return (/[^a-zA-Z0-9-._~]/.test(word));
 }
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
 exports.coursesGet = function(req, res) {
-  Course.find({}).populate("department", "name").exec(function(err, courses) {
-    if (err) {
-      console.log(err);
-      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-    } else {
-      res.json({courses: courses});
-    }
-  });
+  if (req.query.search) {
+    const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+    Course.find({$or: [{code: regex}, {name: regex}, {description: regex}, {pace: regex}]}).populate("department", "name").exec(function(err, courses) {
+      if (err) {
+        console.log(err);
+        res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+      } else {
+        res.json({courses: courses});
+      }
+    });
+  } else {
+    Course.find({}).populate("department", "name").exec(function(err, courses) {
+      if (err) {
+        console.log(err);
+        res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+      } else {
+        res.json({courses: courses});
+      }
+    });
+  }
 }
 
 exports.coursePost = function(req, res) {

@@ -5,15 +5,33 @@ function badStr(str) {
   return (/[^a-zA-Z0-9-._~]/.test(word));
 }
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
 exports.departmentsGet = function(req, res) {
-	Department.find({}, function(err, departments) {
-		if (err) {
-			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-		}
-		else {
-			res.json({departments: departments});
-		}
-	});
+  if (req.query.search) {
+    const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+    Department.find({$or: [{name: regex}, {description: regex}]}, function(err, departments) {
+  		if (err) {
+        console.log(err);
+  			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+  		}
+  		else {
+  			res.json({departments: departments});
+  		}
+  	});
+  } else {
+  	Department.find({}, function(err, departments) {
+  		if (err) {
+        console.log(err);
+  			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+  		}
+  		else {
+  			res.json({departments: departments});
+  		}
+  	});
+  }
 }
 
 exports.departmentPost = function(req, res) {

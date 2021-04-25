@@ -33,16 +33,30 @@ function badStr(str) {
   return (/[^a-zA-Z0-9-._~]/.test(word));
 }
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
 exports.teachersGet = function(req, res) {
-	Teacher.find({}, function(err, allTeachers) {
-		if (err) {
-			console.log(err);
-			res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-		}
-		else {
-			res.json({teachers: allTeachers})
-		}
-	});
+	if (req.query.search) {
+    const regex = escapeRegex(req.query.search);
+		Teacher.aggregate([
+			{$project: {fullname: {$concat: ["$name.firstName", ' ', "$name.lastName"]}}},
+			{$match: {fullname: {$regex: regex, $options: 'i'}}}
+		]).exec(function(err, teachers) {
+			res.json({teachers: teachers})
+		});
+  } else {
+		Teacher.find({}, function(err, teachers) {
+			if (err) {
+				console.log(err);
+				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+			}
+			else {
+				res.json({teachers: teachers})
+			}
+		});
+	}
 }
 
 exports.teacherPost = function(req, res) {
