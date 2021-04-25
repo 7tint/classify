@@ -230,8 +230,10 @@ exports.teacherDelete = function(req, res) {
 					if (foundTeacher.reviews) {
 						await Promise.all(foundTeacher.reviews.map(async function(review) {
 							await Review.deleteOne({_id: review}, function(err, deletedReview) {
-								console.log(err);
-								res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+								if (err) {
+									console.log(err);
+									res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+								}
 							});
 						}));
 					}
