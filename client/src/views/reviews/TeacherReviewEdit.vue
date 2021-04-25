@@ -72,14 +72,14 @@
       }
     },
     created() {
-      let uri = `http://127.0.0.1:3000/api/teacher/${this.$route.params.code}/reviews/${this.$route.params.id}`;
+      let uri = `http://127.0.0.1:3000/api/teacher/${this.$route.params.name}/reviews/${this.$route.params.id}`;
       this.axios.get(uri).then((response) => {
         this.review = response.data.review;
       });
     },
     methods: {
       editReview() {
-        let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.code}/reviews/${this.$route.params.id}`;
+        let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}/reviews/${this.$route.params.id}`;
         const updatedReview = {
           metric1: this.course.metric1,
           metric2: this.course.metric2,
@@ -88,7 +88,7 @@
           isAnonymous: this.course.isAnonymous
         };
         this.axios.put(uri, {review: updatedReview}).then(() => {
-          this.$router.push({name: "courseShow", params: {code: this.$route.params.code}});
+          this.$router.push({name: "courseShow", params: {name: this.$route.params.name}});
         });
       }
     }
