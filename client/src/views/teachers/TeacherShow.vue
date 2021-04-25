@@ -14,8 +14,6 @@
     </div>
     <router-link class="btn btn-primary" :to="{name: 'teacherIndex'}">Teachers</router-link>
     <br/>
-    <router-link class="btn btn-primary" :to="{name: 'teacherEdit', params: {name: this.$route.params.name}}">Edit</router-link>
-    <br/>
     <!-- <router-link class="btn btn-primary" :to="{name: 'reviewPost', params: {code: this.course.code}}">Add Review</router-link> -->
 
     <div class="d-flex flex-row mt-5">
