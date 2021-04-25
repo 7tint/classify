@@ -114,7 +114,7 @@
       }
     },
     created() {
-      let uri = `http://127.0.0.1:3000/api/preferences/`;
+      let uri = `http://127.0.0.1:3000/api/admin/preferences/`;
       this.axios.get(uri).then((response) => {
         this.preferences = response.data.preferences;
       });
