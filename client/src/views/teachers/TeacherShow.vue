@@ -17,6 +17,20 @@
     <router-link class="btn btn-primary" :to="{name: 'teacherEdit', params: {name: this.$route.params.name}}">Edit</router-link>
     <br/>
     <!-- <router-link class="btn btn-primary" :to="{name: 'reviewPost', params: {code: this.course.code}}">Add Review</router-link> -->
+
+    <div class="d-flex flex-row mt-5">
+      <br/>
+      <div v-for="review in teacher.reviews" :key="review._id" class="p-2 m-1 bg-light">
+        <p>Metric 1: {{review.metric1}}</p>
+        <p>Metric 2: {{review.metric2}}</p>
+        <p>Metric 3: {{review.metric3}}</p>
+        <p>Comment: {{review.commentText}}</p>
+        <br/>
+        <router-link class="btn btn-primary" :to="{name: 'teacherReviewEdit', params: {code: teacher.name, id: review._id}}">Edit</router-link>
+        <br/>
+        <!-- <button class="btn btn-danger" @click.prevent="deleteCourse(course.code)">Delete</button> -->
+      </div>
+    </div>
   </div>
 </template>
 
