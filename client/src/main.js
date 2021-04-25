@@ -38,13 +38,13 @@ import PreferenceEdit from "./views/preferences/PreferenceEdit.vue";
 
 const routes = [
   {name: "home", path: "/", component: Home},
+  {name: "courseManage", path: "/courses/manage", component: CourseManage},
   {name: "courseIndex", path: "/courses/", component: CourseIndex},
   {name: "courseNew", path: "/courses/new", component: CourseNew},
   {name: "courseShow", path: "/courses/:code", component: CourseShow},
   {name: "courseEdit", path: "/courses/:code/edit", component: CourseEdit},
   {name: "courseReviewNew", path: "/courses/:code/new", component: CourseReviewNew},
   {name: "courseReviewEdit", path: "/courses/:code/:id", component: CourseReviewEdit},
-  {name: "courseManage", path: "/courses/manage", component: CourseManage},
 
   {name: "teacherIndex", path: "/teachers/", component: TeacherIndex},
   {name: "teacherNew", path: "/teachers/new", component: TeacherNew},
