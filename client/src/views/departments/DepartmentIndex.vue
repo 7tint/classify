@@ -35,7 +35,10 @@
       deleteDepartment(name) {
         let uri = `http://127.0.0.1:3000/api/departments/${name}`;
         this.axios.delete(uri).then(() => {
-          this.departments.splice(this.departments.indexOf(name), 1);
+          let uri = `http://127.0.0.1:3000/api/departments`;
+          this.axios.get(uri).then(response => {
+            this.departments = response.data.departments;
+          });
         });
       }
     }

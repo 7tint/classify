@@ -26,8 +26,6 @@
         <p>Metric 3: {{review.metric3}}</p>
         <p>Comment: {{review.commentText}}</p>
         <br/>
-        <router-link class="btn btn-primary" :to="{name: 'teacherReviewEdit', params: {code: teacher.name, id: review._id}}">Edit</router-link>
-        <br/>
         <button class="btn btn-danger" @click.prevent="deleteReview(review._id)">Delete</button>
       </div>
     </div>
@@ -56,7 +54,10 @@
       deleteReview(id) {
         let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}/reviews/${id}`;
         this.axios.delete(uri).then(() => {
-          this.teacher.reviews.splice(this.teacher.reviews.indexOf(id), 1);
+          let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}`;
+          this.axios.get(uri).then((response) => {
+              this.teacher = response.data.teacher;
+          });
         });
       }
     }

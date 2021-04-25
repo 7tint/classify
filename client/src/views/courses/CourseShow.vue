@@ -46,7 +46,10 @@
       deleteReview(id) {
         let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}/reviews/${id}`;
         this.axios.delete(uri).then(() => {
-          this.course.reviews.splice(this.course.reviews.indexOf(id), 1);
+          let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}`;
+          this.axios.get(uri).then((response) => {
+              this.course = response.data.course;
+          });
         });
       }
     }
