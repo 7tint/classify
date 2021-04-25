@@ -30,7 +30,7 @@ function validatePreferences(req, res, next) {
   }
 }
 
-router.get("/", adminController.preferencesGet);
-router.put("/", validatePreferences, adminController.preferencesPut);
+router.get("/preferences", adminController.preferencesGet);
+router.put("/preferences", validatePreferences, adminController.preferencesPut);
 
 module.exports = router;

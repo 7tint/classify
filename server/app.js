@@ -80,7 +80,7 @@ const teacherRouter = require("./routes/teacherRouter.js");
 const departmentRouter = require("./routes/departmentRouter.js");
 
 // Routes
-app.use("/api/preferences", adminRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/teachers", teacherRouter);
 app.use("/api/departments", departmentRouter);
