@@ -114,7 +114,7 @@
       }
     },
     created() {
-      let uri = `http://127.0.0.1:3000/api/preferences/`;
+      let uri = `http://127.0.0.1:3000/api/admin/preferences/`;
       this.axios.get(uri).then((response) => {
         delete response.data.preferences._id;
         delete response.data.preferences.__v;
@@ -123,7 +123,7 @@
     },
     methods: {
       editPreferences() {
-        let uri = `http://127.0.0.1:3000/api/preferences/`;
+        let uri = `http://127.0.0.1:3000/api/admin/preferences/`;
         const updatedPreferences = {
           isPublic: this.preferences.isPublic,
           isAnonymous: this.preferences.isAnonymous,
