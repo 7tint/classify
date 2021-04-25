@@ -1,6 +1,7 @@
 <template lang="html">
   <div class="">
     <router-link class="btn m-4 btn-primary" :to="{name: 'preferenceIndex'}">Preferences</router-link>
+    <router-link class="btn m-4 btn-primary" :to="{name: 'adminReview'}">Reviews</router-link>
     <br/>
     <router-link class="btn m-4 btn-secondary" :to="{name: 'courseIndex'}">Courses</router-link>
     <br/>
