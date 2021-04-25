@@ -84,6 +84,17 @@ exports.courseReviewPost = async function(req, res) {
   });
 }
 
+exports.courseReviewGet = function(req, res) {
+	Review.findOne({_id: req.params.id}, function(err, review) {
+    if (err || review === null || review === undefined || !review) {
+      res.status(400).json({error: "", message: "Review not found!"});
+    }
+    else {
+      res.json({review: review});
+    }
+  });
+}
+
 exports.courseReviewPut = async function(req, res) {
   const review = req.body.review;
 
@@ -203,6 +214,18 @@ exports.teacherReviewPost = async function(req, res) {
 		}
 	});
 }
+
+exports.teacherReviewGet = function(req, res) {
+	Review.findOne({_id: req.params.id}, function(err, review) {
+    if (err || review === null || review === undefined || !review) {
+      res.status(400).json({error: "", message: "Review not found!"});
+    }
+    else {
+      res.json({review: review});
+    }
+  });
+}
+
 
 exports.teacherReviewPut = async function(req, res) {
 	const nameObject = convertNametoObj(req.params.name);
