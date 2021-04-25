@@ -1,5 +1,6 @@
 const Preferences = require("./../models/preferencesModel.js");
 const Course = require("./../models/courseModel.js");
+const Review = require("./../models/reviewModel.js");
 
 exports.preferencesGet = function(req, res) {
   Preferences.findOne({}, function(err, retrievedPreferences) {
@@ -70,3 +71,22 @@ exports.preferencesPut = function(req, res) {
     }
   });
 }
+
+//
+// exports.reviewsPut = function(req, res) {
+//   Review.findOne({_id: req.params.id}, function(err, foundReview) {
+//     if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === true) {
+//       res.status(400).json({error: "", message: "Review not found!"});
+//     }
+//     else {
+//       Review.findOneAndUpdate({_id: req.params.id}, {isApproved: req.params.approved}, function(err, updatedReview) {
+//         if (err) {
+//           console.log(err);
+//           res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+//         } else {
+//           res.status(200).json({review: updatedReview});
+//         }
+//       });
+//     }
+//   });
+// }

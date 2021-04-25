@@ -30,6 +30,45 @@ function convertNametoObj(name) {
 	return name;
 }
 
+exports.reviewsGet = function(req, res) {
+  let approved = req.query.approved;
+
+  if (approved !== "true") {
+    approved = false;
+  } else {
+    approved = true;
+  }
+
+  Review.find({isApproved: approved}, function(err, reviews) {
+    if (err) {
+      res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+    } else {
+      res.json({reviews: reviews});
+    }
+  });
+}
+
+exports.reviewPut = function (req, res) {
+	const review = req.body.review;
+
+	Review.findOne({_id: req.params.id}, function(err, foundReview) {
+		if (err || foundReview === null || foundReview === undefined || !foundReview || foundReview.isCourseReview === true) {
+			res.status(400).json({error: "", message: "Review not found!"});
+		}
+		else {
+			Review.findOneAndUpdate({_id: req.params.id}, {isApproved: review.isApproved}, function(err, updatedReview) {
+				if (err) {
+					console.log(err);
+					res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
+				} else {
+					res.status(200).json({review: updatedReview});
+				}
+			});
+		}
+	});
+}
+
+
 exports.courseReviewPost = async function(req, res) {
   const review = req.body.review;
   review.isCourseReview = true;
@@ -93,45 +132,6 @@ exports.courseReviewGet = function(req, res) {
       res.json({review: review});
     }
   });
-}
-
-exports.courseReviewPut = async function(req, res) {
-  const review = req.body.review;
-
-  await Preferences.findOne({}, function(err, preferences) {
-    if (preferences.course.approveComments === false) {
-      review.isApproved = true;
-    } else {
-      review.isApproved = false;
-    }
-
-    if (preferences.isAnonymous === true) {
-      review.isAnonymous = true;
-    }
-
-    if (preferences.course.hasMetrics === false) {
-      review.metric1 = undefined;
-      review.metric2 = undefined;
-      review.metric3 = undefined;
-    }
-
-    if (preferences.course.hasComments === false) {
-      review.commentText = undefined;
-    }
-  });
-
-  if (review.isCourseReview === false) {
-		res.status(400).json({error: err, message: "Teacher reviews are not to be modified in the course reviews route!"});
-	} else {
-		Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
-			if (err) {
-				console.log(err);
-				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-			} else {
-				res.status(200).json({review: foundReview});
-			}
-		});
-	}
 }
 
 exports.courseReviewDelete = function(req, res) {
@@ -224,47 +224,6 @@ exports.teacherReviewGet = function(req, res) {
       res.json({review: review});
     }
   });
-}
-
-
-exports.teacherReviewPut = async function(req, res) {
-	const nameObject = convertNametoObj(req.params.name);
-	const review = req.body.review;
-
-	await Preferences.findOne({}, function(err, preferences) {
-		if (preferences.teacher.approveComments === false) {
-      review.isApproved = true;
-    } else {
-      review.isApproved = false;
-    }
-
-    if (preferences.isAnonymous === true) {
-      review.isAnonymous = true;
-    }
-
-    if (preferences.teacher.hasMetrics === false) {
-      review.metric1 = undefined;
-      review.metric2 = undefined;
-      review.metric3 = undefined;
-    }
-
-    if (preferences.teacher.hasComments === false) {
-      review.commentText = undefined;
-    }
-	});
-
-	if (review.isCourseReview === true) {
-		res.status(400).json({error: err, message: "Course reviews are not to be modified in the teacher reviews route!"});
-	} else {
-		Review.findOneAndUpdate({_id: req.params.id}, review, function(err, foundReview) {
-			if (err) {
-				console.log(err);
-				res.status(500).json({error: err, message: "Oops! Something went wrong. If you think this is an error, please contact us."});
-			} else {
-				res.status(200).json({review: foundReview});
-			}
-		});
-	}
 }
 
 exports.teacherReviewDelete = function(req, res) {
