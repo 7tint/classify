@@ -2,7 +2,7 @@
   <div class="container">
     <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link> <br/>
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link> <br/>
-    <router-link :to="{name: 'courseReviewNew'}">Add Review</router-link> <br/>
+    <router-link class="btn btn-primary" :to="{name: 'courseReviewNew'}">Add Review</router-link> <br/>
 
     <h1 class="mb-1">{{course.code}}</h1>
     <!-- <div v-for="review in reviews" :key="review._id">
@@ -25,7 +25,7 @@
         <br/>
         <router-link class="btn btn-primary" :to="{name: 'courseReviewEdit', params: {code: course.code, id: review._id}}">Edit</router-link>
         <br/>
-        <!-- <button class="btn btn-danger" @click.prevent="deleteCourse(course.code)">Delete</button> -->
+        <button class="btn btn-danger" @click.prevent="deleteReview(review._id)">Delete</button>
       </div>
     </div>
   </div>
@@ -43,6 +43,14 @@
       this.axios.get(uri).then((response) => {
           this.course = response.data.course;
       });
+    },
+    methods: {
+      deleteReview(id) {
+        let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}/reviews/${id}`;
+        this.axios.delete(uri).then(() => {
+          this.course.reviews.splice(this.course.reviews.indexOf(id), 1);
+        });
+      }
     }
   }
 </script>
