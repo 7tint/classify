@@ -1,7 +1,6 @@
 <template>
   <div class="m-5">
     <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
-    <br>
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
 
     <form @submit.prevent="postCourse()">

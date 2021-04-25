@@ -5,7 +5,7 @@
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
 
     <form @submit.prevent="postReview()">
-      <h5 class="mb-3">Add Review</h5>
+      <h5 class="mb-3">Add Course Review</h5>
       <div class="form-row">
         <div class="col">
           <div class="form-group">
@@ -75,7 +75,7 @@
       postReview() {
         let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}/reviews`;
         this.axios.post(uri, {review: this.review}).then(() => {
-          this.$router.push({name: "courseShow", params: {code: this.$route.params.code}});
+          this.$router.push({name: "courseShow", params: {name: this.$route.params.name}});
         });
       }
     }
