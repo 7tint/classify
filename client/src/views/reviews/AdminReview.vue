@@ -53,12 +53,12 @@
       });
     },
     methods: {
-      putReview(id, approveordisaprove) { // approve review
+      putReview(id, approved) { // approve review
         let uri = `http://127.0.0.1:3000/api/admin/reviews/${id}`;
         let uri_false = `http://127.0.0.1:3000/api/admin/reviews?approved=false`;
         let uri_true = `http://127.0.0.1:3000/api/admin/reviews?approved=true`;
         const approvedReview = {
-          isApproved: approveordisaprove
+          isApproved: approved
         };
         this.axios.put(uri, {review: approvedReview}).then(() => {
           this.axios.get(uri_false).then((response) => {
