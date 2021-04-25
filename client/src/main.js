@@ -17,7 +17,7 @@ import CourseIndex from "./views/courses/CourseIndex.vue";
 import CourseNew from "./views/courses/CourseNew.vue";
 import CourseShow from "./views/courses/CourseShow.vue";
 import CourseEdit from "./views/courses/CourseEdit.vue";
-// import CourseManage from "./views/courses/CourseManage.vue";
+import CourseManage from "./views/courses/CourseManage.vue";
 import CourseReviewNew from "./views/reviews/CourseReviewNew.vue";
 import CourseReviewEdit from "./views/reviews/CourseReviewEdit.vue";
 
@@ -44,7 +44,8 @@ const routes = [
   {name: "courseEdit", path: "/courses/:code/edit", component: CourseEdit},
   {name: "courseReviewNew", path: "/courses/:code/new", component: CourseReviewNew},
   {name: "courseReviewEdit", path: "/courses/:code/:id", component: CourseReviewEdit},
-  // {name: "courseManage", path: "/courses/manage", component: CourseManage}
+  {name: "courseManage", path: "/courses/manage", component: CourseManage},
+
   {name: "teacherIndex", path: "/teachers/", component: TeacherIndex},
   {name: "teacherNew", path: "/teachers/new", component: TeacherNew},
   {name: "teacherShow", path: "/teachers/:name", component: TeacherShow},

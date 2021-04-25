@@ -1,10 +1,11 @@
 <template>
   <div class="m-5">
     Courses Page <br/>
-    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link>
+    <router-link class="btn btn-primary" :to="{name: 'home'}">Home</router-link> <br/>
+    <router-link class="btn btn-primary" :to="{name: 'courseNew'}">New Course</router-link> <br/>
+    <router-link class="btn btn-primary" :to="{name: 'courseManage'}">Manage Courses</router-link>
 
     <div class="d-flex flex-row mt-5">
-      <router-link class="btn btn-primary" :to="{name: 'courseNew'}">New Course</router-link>
       <br/>
       <div v-for="course in courses" :key="course._id" class="p-2 m-1 bg-light">
         <p>Name: {{course.name}}</p>
