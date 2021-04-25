@@ -20,16 +20,16 @@ import CourseEdit from "./views/courses/CourseEdit.vue";
 import CourseManage from "./views/courses/CourseManage.vue";
 import CourseReviewNew from "./views/reviews/CourseReviewNew.vue";
 
-import DepartmentIndex from "./views/departments/DepartmentIndex.vue";
-import DepartmentNew from "./views/departments/DepartmentNew.vue";
-import DepartmentShow from "./views/departments/DepartmentShow.vue";
-import DepartmentEdit from "./views/departments/DepartmentEdit.vue";
-
 import TeacherIndex from "./views/teachers/TeacherIndex.vue";
 import TeacherNew from "./views/teachers/TeacherNew.vue";
 import TeacherShow from "./views/teachers/TeacherShow.vue";
 import TeacherEdit from "./views/teachers/TeacherEdit.vue";
 import TeacherReviewNew from "./views/reviews/TeacherReviewNew.vue";
+
+import DepartmentIndex from "./views/departments/DepartmentIndex.vue";
+import DepartmentNew from "./views/departments/DepartmentNew.vue";
+import DepartmentShow from "./views/departments/DepartmentShow.vue";
+import DepartmentEdit from "./views/departments/DepartmentEdit.vue";
 
 import PreferenceIndex from "./views/preferences/PreferenceIndex.vue";
 import PreferenceEdit from "./views/preferences/PreferenceEdit.vue";
