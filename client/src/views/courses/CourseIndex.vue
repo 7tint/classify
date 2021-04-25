@@ -44,7 +44,10 @@
       deleteCourse(id) {
         let uri = `http://127.0.0.1:3000/api/courses/${id}`;
         this.axios.delete(uri).then(() => {
-          this.courses.splice(this.courses.indexOf(id), 1);
+          let uri = `http://127.0.0.1:3000/api/courses`;
+          this.axios.get(uri).then(response => {
+            this.courses = response.data.courses;
+          });
         });
       }
     }

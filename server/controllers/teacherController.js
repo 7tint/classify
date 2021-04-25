@@ -30,7 +30,7 @@ function convertNametoObj(name) {
 }
 
 function badStr(str) {
-  return (/[^a-zA-Z0-9-._~]/.test(word));
+  return (/[^a-zA-Z0-9-._~]/.test(str));
 }
 
 function escapeRegex(text) {
