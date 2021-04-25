@@ -23,8 +23,6 @@
         <p>Metric 3: {{review.metric3}}</p>
         <p>Comment: {{review.commentText}}</p>
         <br/>
-        <router-link class="btn btn-primary" :to="{name: 'courseReviewEdit', params: {code: course.code, id: review._id}}">Edit</router-link>
-        <br/>
         <button class="btn btn-danger" @click.prevent="deleteReview(review._id)">Delete</button>
       </div>
     </div>
