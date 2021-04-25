@@ -55,6 +55,7 @@ router.delete("/:code", courseController.courseDelete);
 
 // Course Review Routes
 router.post("/:code/reviews", validateReview, reviewController.courseReviewPost);
+router.get("/:code/reviews/:id", reviewController.courseReviewGet);
 router.put("/:code/reviews/:id", validateReview, reviewController.courseReviewPut);
 router.delete("/:code/reviews/:id", reviewController.courseReviewDelete);
 
