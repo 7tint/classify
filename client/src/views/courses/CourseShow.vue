@@ -11,6 +11,8 @@
     <br/><br/>
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
     <br/>
+    <router-link class="btn btn-primary" :to="{name: 'courseEdit', params: {code: this.$route.params.code}}">Edit</router-link>
+    <br/>
     <!-- <router-link class="btn btn-primary" :to="{name: 'reviewPost', params: {code: this.course.code}}">Add Review</router-link> -->
 
     <div class="d-flex flex-row mt-5">
@@ -20,8 +22,6 @@
         <p>Metric 2: {{review.metric2}}</p>
         <p>Metric 3: {{review.metric3}}</p>
         <p>Comment: {{review.commentText}}</p>
-        <br/>
-        <router-link class="btn btn-primary" :to="{name: 'courseReviewEdit', params: {code: course.code, id: review._id}}">Edit</router-link>
         <br/>
         <button class="btn btn-danger" @click.prevent="deleteReview(review._id)">Delete</button>
       </div>
@@ -46,7 +46,10 @@
       deleteReview(id) {
         let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}/reviews/${id}`;
         this.axios.delete(uri).then(() => {
-          this.course.reviews.splice(this.course.reviews.indexOf(id), 1);
+          let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}`;
+          this.axios.get(uri).then((response) => {
+              this.course = response.data.course;
+          });
         });
       }
     }
