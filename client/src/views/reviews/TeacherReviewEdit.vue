@@ -4,7 +4,7 @@
     <br>
     <router-link class="btn btn-primary" :to="{name: 'courseIndex'}">Courses</router-link>
 
-    <form @submit.prevent="postReview()">
+    <form @submit.prevent="editReview()">
       <h5 class="mb-3">Edit Teacher Review</h5>
       <div class="form-row">
         <div class="col">
@@ -59,7 +59,7 @@
           </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Add Review</button>
+      <button type="submit" class="btn btn-primary">Edit Review</button>
     </form>
   </div>
 </template>
@@ -81,11 +81,11 @@
       editReview() {
         let uri = `http://127.0.0.1:3000/api/teachers/${this.$route.params.name}/reviews/${this.$route.params.id}`;
         const updatedReview = {
-          metric1: this.course.metric1,
-          metric2: this.course.metric2,
-          metric3: this.course.metric3,
-          commentText: this.course.commentText,
-          isAnonymous: this.course.isAnonymous
+          metric1: this.review.metric1,
+          metric2: this.review.metric2,
+          metric3: this.review.metric3,
+          commentText: this.review.commentText,
+          isAnonymous: this.review.isAnonymous
         };
         this.axios.put(uri, {review: updatedReview}).then(() => {
           this.$router.push({name: "teacherShow", params: {name: this.$route.params.name}});

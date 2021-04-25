@@ -75,7 +75,7 @@
       postReview() {
         let uri = `http://127.0.0.1:3000/api/courses/${this.$route.params.code}/reviews`;
         this.axios.post(uri, {review: this.review}).then(() => {
-          this.$router.push({name: "courseShow", params: {name: this.$route.params.name}});
+          this.$router.push({name: "courseShow", params: {code: this.$route.params.code}});
         });
       }
     }
